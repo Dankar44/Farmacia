@@ -164,14 +164,22 @@ def extraer_datos_producto(hit):
 
     try:
         p_val = hit.get("price")
-        if p_val is not None:
-            precio = Decimal(str(p_val))
+        p_sale = hit.get("best_price") or hit.get("sale_price")
+        
+        precio_api = Decimal(str(p_val)) if p_val is not None else None
+        precio_sale_api = Decimal(str(p_sale)) if p_sale is not None else None
+
+        if precio_api and precio_sale_api and precio_sale_api < precio_api:
+            # Hay descuento
+            precio = precio_sale_api
+            precio_original = round(precio_api, 2)
+        elif precio_sale_api:
+            precio = precio_sale_api
+        elif precio_api:
+            precio = precio_api
             
-        p_orig = hit.get("best_price") or hit.get("sale_price")
-        if p_orig is not None:
-            precio_orig = Decimal(str(p_orig))
-            if precio and precio_orig > precio:
-                precio_original = precio_orig
+        if precio:
+            precio = round(precio, 2)
                 
     except (InvalidOperation, ValueError, TypeError):
         pass

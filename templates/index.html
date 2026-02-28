@@ -1270,6 +1270,7 @@
         </div>
 
         <div class="results" id="results"></div>
+        <div id="sentinel" style="height: 10px; margin-top: 20px;"></div>
     </main>
 
     <!-- Footer -->
@@ -1343,7 +1344,11 @@
         let debounceTimer = null;
         let currentQuery = '';
         let currentData = [];
+        let sortedData = [];
         let currentSort = 'relevancia';
+        let itemsPerPage = 50;
+        let currentPage = 1;
+        let observer = null;
 
         function searchCategory(term) {
             searchInput.value = term;
@@ -1371,24 +1376,35 @@
             }, 300);
         });
 
-        async function doSearch(q) {
+        async function doSearch(q, page = 1) {
             currentQuery = q;
-            loader.classList.add('active');
-            resultsDiv.innerHTML = '';
-            statusBar.style.display = 'none';
-            sortBar.classList.remove('active');
+            currentPage = page;
+
+            if (page === 1) {
+                loader.classList.add('active');
+                resultsDiv.innerHTML = '';
+                statusBar.style.display = 'none';
+                sortBar.classList.remove('active');
+                currentData = [];
+            }
 
             try {
-                const resp = await fetch(`/api/buscar?q=${encodeURIComponent(q)}`);
+                const resp = await fetch(`/api/buscar?q=${encodeURIComponent(q)}&page=${page}&limit=${itemsPerPage}&sort=${currentSort}`);
                 const data = await resp.json();
 
                 if (q !== currentQuery) return;
 
-                loader.classList.remove('active');
-                currentData = data;
-                currentSort = 'relevancia';
-                updateSortButtons();
-                renderResults(sortData(data), q);
+                if (page === 1) loader.classList.remove('active');
+
+                if (page === 1) {
+                    currentData = data.items;
+                    updateSortButtons();
+                    renderResults(currentData, q, false, 0, data.total);
+                    setupIntersectionObserver(data.total);
+                } else {
+                    currentData = currentData.concat(data.items);
+                    renderResults(data.items, q, true, (page - 1) * itemsPerPage, data.total);
+                }
             } catch (err) {
                 loader.classList.remove('active');
                 resultsDiv.innerHTML = `
@@ -1403,7 +1419,28 @@
         function setSort(sortType) {
             currentSort = sortType;
             updateSortButtons();
-            renderResults(sortData(currentData), currentQuery);
+            doSearch(currentQuery, 1);
+        }
+
+        function setupIntersectionObserver(total) {
+            if (observer) observer.disconnect();
+
+            const sentinel = document.getElementById('sentinel');
+            if (!sentinel) return;
+
+            observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    loadMore(total);
+                }
+            }, { rootMargin: '200px' });
+            observer.observe(sentinel);
+        }
+
+        function loadMore(total) {
+            if (!currentData || currentData.length === 0) return;
+            if (currentData.length >= total) return;
+
+            doSearch(currentQuery, currentPage + 1);
         }
 
         function updateSortButtons() {
@@ -1412,41 +1449,8 @@
             });
         }
 
-        function sortData(data) {
-            const sorted = [...data];
-            switch (currentSort) {
-                case 'nombre-asc':
-                    sorted.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-                    break;
-                case 'nombre-desc':
-                    sorted.sort((a, b) => b.nombre.localeCompare(a.nombre, 'es'));
-                    break;
-                case 'precio-asc':
-                    sorted.sort((a, b) => (a.mejor_precio || 9999) - (b.mejor_precio || 9999));
-                    break;
-                case 'precio-desc':
-                    sorted.sort((a, b) => (b.mejor_precio || 0) - (a.mejor_precio || 0));
-                    break;
-                case 'farmacias-desc':
-                    sorted.sort((a, b) => b.num_farmacias - a.num_farmacias);
-                    break;
-                case 'stock':
-                    sorted.sort((a, b) => {
-                        const aStock = a.farmacias.filter(f => f.en_stock).length;
-                        const bStock = b.farmacias.filter(f => f.en_stock).length;
-                        if (aStock > 0 && bStock === 0) return -1;
-                        if (aStock === 0 && bStock > 0) return 1;
-                        return bStock - aStock;
-                    });
-                    break;
-                default: // relevancia - keep original order
-                    break;
-            }
-            return sorted;
-        }
-
-        function renderResults(data, query) {
-            if (data.length === 0) {
+        function renderResults(data, query, append = false, startIndex = 0, total = 0) {
+            if (!append && (!data || data.length === 0)) {
                 statusBar.style.display = 'none';
                 sortBar.classList.remove('active');
                 resultsDiv.innerHTML = `
@@ -1461,12 +1465,15 @@
             statusBar.style.display = 'flex';
             sortBar.classList.add('active');
             statusText.textContent = `Resultados para "${query}"`;
-            statusCount.textContent = `${data.length} producto${data.length !== 1 ? 's' : ''}`;
+
+            const formattedTotal = new Intl.NumberFormat('es-ES').format(total);
+            statusCount.textContent = `${formattedTotal} producto${total !== 1 ? 's' : ''}`;
 
             let html = '';
             data.forEach((prod, idx) => {
+                const globalIdx = startIndex + idx;
                 const priceStr = prod.mejor_precio ? `${prod.mejor_precio.toFixed(2)} €` : '—';
-                const isValidEan = prod.ean && /^\d{1,13}$/.test(prod.ean.trim());
+                const isValidEan = prod.ean && /^\\d{1,13}$/.test(prod.ean.trim());
                 const eanStr = isValidEan ? `EAN: ${prod.ean}` : '';
 
                 let farmaciasHtml = '';
@@ -1489,7 +1496,7 @@
                 });
 
                 html += `
-                    <div class="product-card" id="card-${idx}" onclick="toggleCard(${idx})" style="animation-delay: ${idx * 0.04}s">
+                    <div class="product-card" id="card-${globalIdx}" onclick="toggleCard(${globalIdx})" style="animation-delay: ${(idx % itemsPerPage) * 0.04}s">
                         <div class="product-header">
                             <div class="product-info">
                                 <div class="product-name" title="${escapeHtml(prod.nombre)}">${highlightMatch(prod.nombre, query)}</div>
@@ -1512,7 +1519,11 @@
                     </div>`;
             });
 
-            resultsDiv.innerHTML = html;
+            if (append) {
+                resultsDiv.insertAdjacentHTML('beforeend', html);
+            } else {
+                resultsDiv.innerHTML = html;
+            }
         }
 
         function toggleCard(idx) {

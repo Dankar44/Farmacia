@@ -1,0 +1,37 @@
+# Plan de Verificación de Catálogo Farmacéutico (20 Pasos)
+
+Para asegurarnos de que el comparador (FarmaSearch) y todos los scrapers (`FarmaciasDirect`, `PromoFarma`, `DosFarma`, `Atida`, `FarmaciasVazquez`) funcionan a la perfección, aquí tienes un plan de 20 pruebas exhaustivas divididas por "casos de uso" y "categorías".
+
+## 🩺 Grupo 1: Casos Clínicos y Medicamentos ATC
+*Cuidado: algunos medicamentos sin receta (EFP) tienen precios regulados o muy similares, ideal para ver quién ajusta céntimos.*
+
+1. **Analgésicos populares:** Busca `Paracetamol Normon 1g` o `Ibuprofeno Kern`. Al ser top ventas, comprueba si las 5 farmacias lo tienen en stock y quién ofrece el mejor precio.
+2. **Caída capilar (Minoxidil):** Busca `Regaxidil 50 mg/ml`. Fue nuestro "paciente cero" para el bug de stock. Verifica que FarmaciasDirect ahora sí marca stock y compara su precio.
+3. **Cuidado Articular:** Busca `Voltadol Forte`. Suelen existir formatos de distintos gramos. Comprueba si el buscador agrupa bien las coincidencias usando "Relevancia".
+4. **Resfriados y mucolíticos:** Busca `Bisolvon` o `Frenadol`. Revisa si diferentes sabores/formatos (sobres vs jarabe) se distinguen bien en los nombres traídos por los scrapers.
+5. **Tratamientos crónicos OTC:** Busca `Daflon 500mg` (circulación). Suele ser un producto gancho; verifica qué farmacia está perdiendo margen para captar clientes.
+
+## 🧴 Grupo 2: Dermocosmética e Higiene (Alta Variabilidad)
+*Aquí es donde FarmaciasVazquez y PromoFarma suelen cruzar precios fuertemente.*
+
+6. **Protectores Solares:** Busca `ISDIN Fusion Water`. Revisa si Atida o DosFarma hacen pack dobles ("Duplos") y cómo el scraper extrae el nombre para que no lo confundas con el bote individual.
+7. **Bebés y Mamás:** Busca `Nutriben` o `Suavinex`. Ordena por "Más farmacias" para confirmar que estos productos de alta distribución aparecen en casi todas las plataformas scrapeadas.
+8. **Esmaltes y cuidado uñas:** Busca `Excilor Esmalte XL`. Verifica la corrección del bug de FarmaciasVazquez, confirmando que el descuento masivo se aplica al *"Mejor Precio"*.
+9. **Higiene bucodental:** Busca `Lacer` o `Oral-B`. Comprueba ordenando por "Precio Menor" si te salen primero las pastas de dientes de viaje (pequeñas) antes que los enjuagues de 1 litro.
+10. **Tratamientos Antiedad:** Busca `Sensilis Upgrade` o `Vichy Liftactiv`. Suelen ser los productos más caros de la parafarmacia. Busca la etiqueta indicadora de ahorro viendo los precios que ofrecen Atida vs FarmaciasDirect.
+
+## ⚠️ Grupo 3: Pruebas de Estrés y Borde (Edge Cases)
+*Buscamos romper la lógica o encontrar fallos sutiles en los nombres y códigos EAN.*
+
+11. **Búsquedas de 2 o 3 letras:** Busca `gel` o `sol`. Esto probará el nuevo límite técnico de 1500 resultados. Confirma que la base de datos devuelve resultados exactos y la interfaz no se bloquea.
+12. **Ortografía estricta (Tildes/Espacios):** Busca `champú` frente a `champu`. Asegúrate de que PostgreSQL está haciendo la búsqueda insensible a los acentos/tildes correctamente.
+13. **Productos fantasma (Sin stock general):** Busca un producto súper específico o descatalogado (ej. mascarillas FFP2 de una marca rara temporal). Verifica el comportamiento cuando las farmacias devuelven "Sin stock".
+14. **Búsqueda por EAN estricto:** Copia el numerito EAN de 13 dígitos de un producto (puedes verlo en la ficha ampliada) y búscalo exactamente así. Solo debería salir 1 producto agrupando de forma inmaculada a todas las farmacias que lo venden.
+15. **Detección de "Duplicados Falsos":** Examina algún resultado de PromoFarma. A veces los vendedores de PromoFarma varían una coma en el nombre. Revisa si ves el producto 2 veces casi idéntico. (Esto requerirá en el futuro IA para limpiar nombres).
+
+## 💰 Grupo 4: Promociones, Formatos y Ofertas
+16. **Nutrición y Control de peso:** Busca `XLS MEDICAL PACK TRIPLO PRO7`. Confirma de nuevo que el macro-descuento de FarmaciasVazquez (de casi 150€) domina el ránking de precios.
+17. **Vitaminas y Suplementos:** Busca `Supradyn Activo` o `Multicentrum`. Compara qué farmacia lanza agresivamente ofertas en la versión de "30 comprimidos" frente a la de "90 comprimidos".
+18. **Packs Promocionales:** Escribe la palabra `Duplo` o `Pack` en el buscador. Analiza cómo las distintas farmacias (ej. DosFarma) indexan estas palabras en sus nombres oficiales.
+19. **Ordenación Máxima de Stock:** Ordena una lista larga por "En stock" usando el menú de filtros del comparador web. Las farmacias en gris o rojo ("Agotado") deben desaparecer de la vista principal o hundirse.
+20. **Auditoría de Origen (Click al vendedor):** Elige aleatoriamente 5 enlaces verdes ("Comprar ->") de 5 farmacias diferentes. Haz click en ellos y verifica que aterrizas exactamente en la página original del producto y que el precio scrapeado hoy concuerda al 100% con el que dictan en su web actual.

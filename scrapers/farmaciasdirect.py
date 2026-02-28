@@ -187,7 +187,7 @@ def extraer_datos_producto(hit):
     url = hit.get('__url', hit.get('link', ''))
     marca = hit.get('marca', '')
     disponibilidad = hit.get('disponibilidad', '')
-    en_stock = disponibilidad.lower() in ('disponible', 'in stock', 'true', '1') if disponibilidad else True
+    en_stock = disponibilidad.lower() in ('disponible', 'in stock', 'in_stock', 'true', '1') if disponibilidad else True
     referencia = hit.get('referencia', hit.get('externalIdProducto', ''))
 
     # Precios

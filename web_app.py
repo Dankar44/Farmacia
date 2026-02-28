@@ -82,29 +82,83 @@ def panel():
 @app.route('/api/buscar')
 def buscar():
     q = request.args.get('q', '').strip()
-    if len(q) < 2:
-        return jsonify([])
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 50))
+    sort = request.args.get('sort', 'relevancia')
 
-    query = text("""
-        SELECT
-            p.nombre, p.farmacia, p.url, p.ean,
-            pr.precio, pr.en_stock
-        FROM productos p
-        JOIN (
+    if len(q) < 2:
+        return jsonify({"total": 0, "items": []})
+
+    search_term = f"%{q.lower()}%"
+    offset = (page - 1) * limit
+
+    order_clause = "key_name ASC"
+    if sort == 'nombre-desc':
+        order_clause = "key_name DESC"
+    elif sort == 'precio-asc':
+        order_clause = "mejor_precio ASC NULLS LAST, key_name ASC"
+    elif sort == 'precio-desc':
+        order_clause = "mejor_precio DESC NULLS LAST, key_name ASC"
+    elif sort == 'farmacias-desc':
+        order_clause = "num_farmacias DESC, key_name ASC"
+    elif sort == 'stock':
+        order_clause = "tiene_stock DESC, key_name ASC"
+
+    count_query = text("""
+        SELECT COUNT(DISTINCT LOWER(nombre))
+        FROM productos
+        WHERE LOWER(nombre) LIKE :search
+    """)
+
+    keys_query = text(f"""
+        WITH latest_prices AS (
             SELECT DISTINCT ON (producto_id)
                 producto_id, precio, en_stock
             FROM precios
             ORDER BY producto_id, fecha_captura DESC
-        ) pr ON p.id = pr.producto_id
-        WHERE LOWER(p.nombre) LIKE :search
-        ORDER BY p.nombre
-        LIMIT 500
+        ),
+        product_stats AS (
+            SELECT 
+                LOWER(p.nombre) as key_name,
+                MIN(pr.precio) as mejor_precio,
+                COUNT(p.id) as num_farmacias,
+                BOOL_OR(pr.en_stock) as tiene_stock
+            FROM productos p
+            LEFT JOIN latest_prices pr ON p.id = pr.producto_id
+            WHERE LOWER(p.nombre) LIKE :search
+            GROUP BY LOWER(p.nombre)
+        )
+        SELECT key_name FROM product_stats
+        ORDER BY {order_clause}
+        LIMIT :limit OFFSET :offset
     """)
 
-    search_term = f"%{q.lower()}%"
-
     with engine.connect() as con:
-        rows = con.execute(query, {"search": search_term}).fetchall()
+        count = con.execute(count_query, {"search": search_term}).scalar()
+        
+        if count == 0:
+            return jsonify({"total": 0, "items": []})
+            
+        keys = [row.key_name for row in con.execute(keys_query, {"search": search_term, "limit": limit, "offset": offset}).fetchall()]
+        
+        if not keys:
+            return jsonify({"total": count, "items": []})
+
+        data_query = text("""
+            SELECT
+                p.nombre, p.farmacia, p.url, p.ean,
+                pr.precio, pr.en_stock
+            FROM productos p
+            LEFT JOIN (
+                SELECT DISTINCT ON (producto_id)
+                    producto_id, precio, en_stock
+                FROM precios
+                ORDER BY producto_id, fecha_captura DESC
+            ) pr ON p.id = pr.producto_id
+            WHERE LOWER(p.nombre) = ANY(:keys)
+        """)
+        
+        rows = con.execute(data_query, {"keys": keys}).fetchall()
 
     productos = {}
     for row in rows:
@@ -121,7 +175,7 @@ def buscar():
         productos[key]["farmacias"].append({
             "farmacia": row.farmacia,
             "precio": float(row.precio) if row.precio else None,
-            "en_stock": bool(row.en_stock),
+            "en_stock": bool(row.en_stock) if row.en_stock is not None else False,
             "url": row.url
         })
 
@@ -129,14 +183,17 @@ def buscar():
             productos[key]["ean"] = row.ean
 
     result = []
-    for data in productos.values():
-        data["farmacias"].sort(key=lambda f: f["precio"] if f["precio"] else 9999)
-        mejor_precio = next((f["precio"] for f in data["farmacias"] if f["precio"]), None)
-        data["mejor_precio"] = mejor_precio
-        data["num_farmacias"] = len(data["farmacias"])
-        result.append(data)
+    # Preserve the exact order from SQL `keys`
+    for key in keys:
+        if key in productos:
+            data = productos[key]
+            data["farmacias"].sort(key=lambda f: f["precio"] if f["precio"] else 9999)
+            mejor_precio = next((f["precio"] for f in data["farmacias"] if f["precio"]), None)
+            data["mejor_precio"] = mejor_precio
+            data["num_farmacias"] = len(data["farmacias"])
+            result.append(data)
 
-    return jsonify(result)
+    return jsonify({"total": count, "items": result})
 
 
 # ============================================================
