@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel — {{ farmacia_nombre }} — FarmaSearch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #00a99d;
+            --primary-dark: #008f85;
+            --primary-light: #e0f7f5;
+            --accent-orange: #f57c00;
+            --bg-body: #f4f6f8;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-body: #333;
+            --text-muted: #999;
+            --border: #e0e0e0;
+            --border-light: #eee;
+            --radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-body);
+            min-height: 100vh;
+        }
+
+        /* Top bar */
+        .panel-topbar {
+            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 100%);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+        }
+
+        .panel-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-topbar-left svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .panel-topbar-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .panel-topbar-user {
+            font-size: 0.82rem;
+            opacity: 0.9;
+            margin-left: 10px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+        }
+
+        .panel-topbar-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-topbar-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .panel-topbar-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .panel-topbar-links .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main layout */
+        .panel-main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 28px 20px;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .panel-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .panel-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-card-body {
+            padding: 20px;
+        }
+
+        /* Form */
+        .form-row {
+            margin-bottom: 14px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .form-row input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-row input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.1);
+        }
+
+        .form-row-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 4px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-add:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Mini map */
+        #miniMap {
+            height: 160px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 14px;
+        }
+
+        .map-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Location list */
+        .locations-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .location-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .location-item:last-child {
+            border-bottom: none;
+        }
+
+        .location-info h4 {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .location-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .btn-delete {
+            padding: 6px 12px;
+            background: #fef2f2;
+            color: #c62828;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+        }
+
+        .empty-locations {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Success/error toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--text-dark);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            background: #c62828;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="panel-topbar">
+        <div class="panel-topbar-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
+                <path d="m8.5 8.5 7 7" stroke="#fff" />
+                <path d="M14 6 6 14" stroke="#ffe0b2" />
+            </svg>
+            <span class="panel-topbar-title">FarmaSearch Panel</span>
+            <span class="panel-topbar-user">{{ farmacia_nombre }}</span>
+        </div>
+        <div class="panel-topbar-links">
+            <a href="/">Buscador</a>
+            <a href="/mapa">Mapa</a>
+            <a href="/logout" class="logout-btn">Cerrar sesión</a>
+        </div>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-grid">
+            <!-- Add location form -->
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="width:18px;height:18px">
+                        <path d="M12 5v14" stroke="var(--primary)" />
+                        <path d="M5 12h14" stroke="var(--primary)" />
+                    </svg>
+                    Añadir ubicación
+                </div>
+                <div class="panel-card-body">
+                    <div id="miniMap"></div>
+                    <p class="map-hint">Haz clic en el mapa para seleccionar la ubicación</p>
+
+                    <div class="form-row">
+                        <label>Nombre de la tienda</label>
+                        <input type="text" id="inp_nombre" placeholder="ej: Farmacia Central Sol">
+                    </div>
+                    <div class="form-row">
+                        <label>Dirección</label>
+                        <input type="text" id="inp_direccion" placeholder="ej: Calle Gran Vía 12, Madrid">
+                    </div>
+                    <div class="form-row form-row-pair">
+                        <div>
+                            <label>Latitud</label>
+                            <input type="number" step="any" id="inp_lat" placeholder="40.4168">
+                        </div>
+                        <div>
+                            <label>Longitud</label>
+                            <input type="number" step="any" id="inp_lng" placeholder="-3.7038">
+                        </div>
+                    </div>
+                    <div class="form-row form-row-pair">
+                        <div>
+                            <label>Teléfono</label>
+                            <input type="text" id="inp_tel" placeholder="ej: 91 123 4567">
+                        </div>
+                        <div>
+                            <label>Horario</label>
+                            <input type="text" id="inp_horario" placeholder="ej: L-V 9:00-21:00">
+                        </div>
+                    </div>
+                    <button class="btn-add" id="btnAdd" onclick="addLocation()">Añadir ubicación</button>
+                </div>
+            </div>
+
+            <!-- Locations list -->
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="width:18px;height:18px">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" stroke="var(--primary)" />
+                        <circle cx="12" cy="10" r="3" stroke="var(--accent-orange)" />
+                    </svg>
+                    Mis ubicaciones
+                </div>
+                <div class="locations-list" id="locationsList">
+                    <div class="empty-locations">Cargando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Mini map for picking coordinates
+        const miniMap = L.map('miniMap').setView([40.4168, -3.7038], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(miniMap);
+
+        let pickMarker = null;
+
+        miniMap.on('click', function (e) {
+            document.getElementById('inp_lat').value = e.latlng.lat.toFixed(6);
+            document.getElementById('inp_lng').value = e.latlng.lng.toFixed(6);
+
+            if (pickMarker) miniMap.removeLayer(pickMarker);
+            pickMarker = L.marker(e.latlng).addTo(miniMap);
+        });
+
+        // Load existing locations
+        async function loadLocations() {
+            try {
+                const resp = await fetch('/api/farmacias/mis-ubicaciones');
+                const data = await resp.json();
+
+                const list = document.getElementById('locationsList');
+
+                if (data.length === 0) {
+                    list.innerHTML = '<div class="empty-locations">No tienes ubicaciones registradas.<br>Usa el formulario para añadir tu primera tienda.</div>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(loc => {
+                    html += `
+                        <div class="location-item">
+                            <div class="location-info">
+                                <h4>${escapeHtml(loc.nombre_tienda)}</h4>
+                                <p>${escapeHtml(loc.direccion)}</p>
+                                <p>${loc.telefono ? escapeHtml(loc.telefono) : ''} ${loc.horario ? '· ' + escapeHtml(loc.horario) : ''}</p>
+                            </div>
+                            <button class="btn-delete" onclick="deleteLocation(${loc.id})">Eliminar</button>
+                        </div>`;
+                });
+                list.innerHTML = html;
+            } catch (err) {
+                document.getElementById('locationsList').innerHTML = '<div class="empty-locations">Error al cargar ubicaciones</div>';
+            }
+        }
+
+        async function addLocation() {
+            const nombre = document.getElementById('inp_nombre').value.trim();
+            const direccion = document.getElementById('inp_direccion').value.trim();
+            const lat = parseFloat(document.getElementById('inp_lat').value);
+            const lng = parseFloat(document.getElementById('inp_lng').value);
+            const tel = document.getElementById('inp_tel').value.trim();
+            const horario = document.getElementById('inp_horario').value.trim();
+
+            if (!nombre || !direccion || isNaN(lat) || isNaN(lng)) {
+                showToast('Rellena nombre, dirección y coordenadas', true);
+                return;
+            }
+
+            const btn = document.getElementById('btnAdd');
+            btn.disabled = true;
+            btn.textContent = 'Añadiendo...';
+
+            try {
+                const resp = await fetch('/api/farmacias/ubicaciones', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre_tienda: nombre,
+                        direccion: direccion,
+                        latitud: lat,
+                        longitud: lng,
+                        telefono: tel,
+                        horario: horario
+                    })
+                });
+
+                if (resp.ok) {
+                    showToast('Ubicación añadida correctamente');
+                    // Clear form
+                    document.getElementById('inp_nombre').value = '';
+                    document.getElementById('inp_direccion').value = '';
+                    document.getElementById('inp_lat').value = '';
+                    document.getElementById('inp_lng').value = '';
+                    document.getElementById('inp_tel').value = '';
+                    document.getElementById('inp_horario').value = '';
+                    if (pickMarker) miniMap.removeLayer(pickMarker);
+                    loadLocations();
+                } else {
+                    const err = await resp.json();
+                    showToast(err.error || 'Error al añadir', true);
+                }
+            } catch (err) {
+                showToast('Error de conexión', true);
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Añadir ubicación';
+        }
+
+        async function deleteLocation(id) {
+            if (!confirm('¿Eliminar esta ubicación?')) return;
+
+            try {
+                const resp = await fetch(`/api/farmacias/ubicaciones/${id}`, { method: 'DELETE' });
+                if (resp.ok) {
+                    showToast('Ubicación eliminada');
+                    loadLocations();
+                } else {
+                    showToast('Error al eliminar', true);
+                }
+            } catch (err) {
+                showToast('Error de conexión', true);
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Init
+        loadLocations();
+    </script>
+</body>
+
+</html>

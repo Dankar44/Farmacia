@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Logs (se regeneran al ejecutar)
+logs/*.log
+
+# Credenciales
+.env
+
+# Exports (se regeneran al ejecutar)
+exports/*.xlsx
+exports/*.csv
+
+# Backups and data
+backups/
+data/*.csv

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Farmacias — FarmaSearch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #00a99d;
+            --primary-dark: #008f85;
+            --primary-light: #e0f7f5;
+            --accent-orange: #f57c00;
+            --bg-body: #f4f6f8;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-body: #333;
+            --text-muted: #999;
+            --border: #e0e0e0;
+            --border-light: #eee;
+            --radius: 12px;
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-body);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top bar */
+        .map-topbar {
+            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 100%);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .map-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .map-topbar-left svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .map-topbar-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .map-topbar-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .map-topbar-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .map-topbar-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .map-topbar-links .login-link {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Layout */
+        .map-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .map-sidebar {
+            width: 340px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sidebar-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .sidebar-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .filter-btn {
+            padding: 5px 12px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-white);
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .sidebar-count {
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .sidebar-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .sidebar-item:hover {
+            background: var(--primary-light);
+        }
+
+        .sidebar-item-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .sidebar-item-chain {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .sidebar-item-address {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .sidebar-item-details {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .sidebar-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Map */
+        #map {
+            flex: 1;
+        }
+
+        /* Pharmacy neon cross marker */
+        .pharmacy-marker {
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+        }
+
+        .pharmacy-marker svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .pharmacy-marker.partner {
+            filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.6));
+        }
+
+        .pharmacy-marker.regular {
+            filter: drop-shadow(0 2px 6px rgba(168, 85, 247, 0.5));
+        }
+
+        /* Location search */
+        .loc-search {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .loc-search-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .loc-search-title svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .loc-input-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .loc-input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .loc-input:focus {
+            border-color: var(--primary);
+        }
+
+        .loc-btn {
+            padding: 8px 12px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .loc-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .loc-btn-geo {
+            padding: 8px;
+            background: var(--primary-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .loc-btn-geo:hover {
+            background: #c8f0ec;
+        }
+
+        .loc-radius-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loc-radius-row label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .loc-radius-row select {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            outline: none;
+            background: #fff;
+        }
+
+        .loc-radius-row select:focus {
+            border-color: var(--primary);
+        }
+
+        .loc-clear {
+            padding: 4px 10px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .loc-clear:hover {
+            background: #fef2f2;
+            color: #c62828;
+            border-color: #fecaca;
+        }
+
+        /* Leaflet popup customization */
+        .pharmacy-popup {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .pharmacy-popup h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .pharmacy-popup .popup-chain {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .pharmacy-popup p {
+            font-size: 0.78rem;
+            color: #555;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .map-sidebar {
+                width: 100%;
+                max-height: 220px;
+            }
+
+            .map-layout {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="map-topbar">
+        <div class="map-topbar-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
+                <path d="m8.5 8.5 7 7" stroke="#fff" />
+                <path d="M14 6 6 14" stroke="#ffe0b2" />
+            </svg>
+            <span class="map-topbar-title">Mapa de Farmacias</span>
+        </div>
+        <div class="map-topbar-links">
+            <a href="/">Buscador</a>
+            <a href="/login" class="login-link">Acceso Farmacias</a>
+        </div>
+    </div>
+
+    <div class="map-layout">
+        <!-- Sidebar -->
+        <div class="map-sidebar">
+            <!-- Location search -->
+            <div class="loc-search">
+                <div class="loc-search-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Buscar por ubicación
+                </div>
+                <div class="loc-input-row">
+                    <input type="text" class="loc-input" id="locInput" placeholder="Ej: Gran Vía, Madrid">
+                    <button class="loc-btn-geo" onclick="useMyLocation()" title="Usar mi ubicación">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M12 2v4" />
+                            <path d="M12 18v4" />
+                            <path d="M2 12h4" />
+                            <path d="M18 12h4" />
+                        </svg>
+                    </button>
+                    <button class="loc-btn" onclick="searchLocation()">Buscar</button>
+                </div>
+                <div class="loc-radius-row">
+                    <label>Radio:</label>
+                    <select id="radiusSelect" onchange="onRadiusChange()">
+                        <option value="500">500 m</option>
+                        <option value="1000" selected>1 km</option>
+                        <option value="2000">2 km</option>
+                        <option value="5000">5 km</option>
+                        <option value="10000">10 km</option>
+                    </select>
+                    <button class="loc-clear" onclick="clearLocation()">Limpiar</button>
+                </div>
+            </div>
+
+            <div class="sidebar-header">
+                <div class="sidebar-title">Farmacias cercanas</div>
+                <div style="font-size:0.7rem;color:var(--text-muted)">Datos: OpenStreetMap · Comunidad de Madrid</div>
+            </div>
+            <div class="sidebar-count" id="sidebarCount">Cargando...</div>
+            <div class="sidebar-list" id="sidebarList">
+                <div class="sidebar-empty">Cargando farmacias...</div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // Create map centered on Madrid
+        const map = L.map('map').setView([40.4168, -3.7038], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let allLocations = [];
+        let markers = [];
+        let currentFilter = 'all';
+        let userLat = null, userLng = null;
+        let radiusCircle = null;
+        let userMarker = null;
+
+        // Green neon icon — FarmaSearch partner pharmacies
+        const partnerIcon = L.divIcon({
+            className: '',
+            html: `<div class="pharmacy-marker partner"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><filter id="neon-gp" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polygon points="30,10 70,10 70,30 90,30 90,70 70,70 70,90 30,90 30,70 10,70 10,30 30,30" fill="#005500"/><polygon points="32,12 68,12 68,32 88,32 88,68 68,68 68,88 32,88 32,68 12,68 12,32 32,32" fill="#10b981" filter="url(#neon-gp)"/><polygon points="40,20 60,20 60,40 80,40 80,60 60,60 60,80 40,80 40,60 20,60 20,40 40,40" fill="#a7f3d0" opacity="0.8"/></svg></div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -20]
+        });
+
+        // Purple neon icon — regular pharmacies (OpenStreetMap)
+        const regularIcon = L.divIcon({
+            className: '',
+            html: `<div class="pharmacy-marker regular"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><filter id="neon-gr" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polygon points="30,10 70,10 70,30 90,30 90,70 70,70 70,90 30,90 30,70 10,70 10,30 30,30" fill="#2d1854"/><polygon points="32,12 68,12 68,32 88,32 88,68 68,68 68,88 32,88 32,68 12,68 12,32 32,32" fill="#a855f7" filter="url(#neon-gr)"/><polygon points="40,20 60,20 60,40 80,40 80,60 60,60 60,80 40,80 40,60 20,60 20,40 40,40" fill="#e9d5ff" opacity="0.8"/></svg></div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -20]
+        });
+
+        // Haversine distance in meters
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        // Location search
+        async function searchLocation() {
+            const q = document.getElementById('locInput').value.trim();
+            if (!q) return;
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`);
+                const data = await resp.json();
+                if (data.length > 0) {
+                    setUserLocation(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                } else {
+                    alert('No se encontró esa dirección. Intenta ser más específico.');
+                }
+            } catch (e) { alert('Error al buscar la dirección'); }
+        }
+
+        function useMyLocation() {
+            if (!navigator.geolocation) { alert('Tu navegador no soporta geolocalización'); return; }
+            navigator.geolocation.getCurrentPosition(
+                pos => setUserLocation(pos.coords.latitude, pos.coords.longitude),
+                () => alert('No se pudo obtener tu ubicación')
+            );
+        }
+
+        function setUserLocation(lat, lng) {
+            userLat = lat; userLng = lng;
+            const radius = parseInt(document.getElementById('radiusSelect').value);
+            drawRadius(lat, lng, radius);
+            map.setView([lat, lng], radius <= 1000 ? 15 : radius <= 2000 ? 14 : radius <= 5000 ? 13 : 12);
+            renderLocations();
+        }
+
+        function drawRadius(lat, lng, radius) {
+            if (radiusCircle) map.removeLayer(radiusCircle);
+            if (userMarker) map.removeLayer(userMarker);
+            radiusCircle = L.circle([lat, lng], { radius, color: '#00a99d', fillColor: '#00a99d', fillOpacity: 0.08, weight: 2, dashArray: '6 4' }).addTo(map);
+            userMarker = L.circleMarker([lat, lng], { radius: 7, fillColor: '#f57c00', color: '#fff', weight: 2, fillOpacity: 1 }).addTo(map).bindPopup('Tu ubicación');
+        }
+
+        function onRadiusChange() {
+            if (userLat !== null) {
+                const radius = parseInt(document.getElementById('radiusSelect').value);
+                drawRadius(userLat, userLng, radius);
+                map.setView([userLat, userLng], radius <= 1000 ? 15 : radius <= 2000 ? 14 : radius <= 5000 ? 13 : 12);
+                renderLocations();
+            }
+        }
+
+        function clearLocation() {
+            userLat = null; userLng = null;
+            if (radiusCircle) { map.removeLayer(radiusCircle); radiusCircle = null; }
+            if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
+            document.getElementById('locInput').value = '';
+            renderLocations();
+            map.setView([40.4168, -3.7038], 13);
+        }
+
+        // Enter key on input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('locInput').addEventListener('keydown', e => { if (e.key === 'Enter') searchLocation(); });
+        });
+
+        // Create pharmacy cross marker
+        function createMarker(loc) {
+            const isPartner = loc.farmacia === 'FarmaSearch';
+            const marker = L.marker([loc.latitud, loc.longitud], {
+                icon: isPartner ? partnerIcon : regularIcon
+            });
+
+            const partnerBadge = isPartner
+                ? `<div style="background:#10b981;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:4px">FARMACIA ASOCIADA</div>`
+                : '';
+
+            let popupHtml = `
+                <div class="pharmacy-popup">
+                    ${partnerBadge}
+                    <h3>${escapeHtml(loc.nombre_tienda)}</h3>
+                    <p>${escapeHtml(loc.direccion)}</p>
+                    ${loc.telefono ? `<p>📞 ${escapeHtml(loc.telefono)}</p>` : ''}
+                    ${loc.horario ? `<p>🕐 ${escapeHtml(loc.horario)}</p>` : ''}
+                </div>`;
+
+            marker.bindPopup(popupHtml, { maxWidth: 280 });
+            marker.locationData = loc;
+            return marker;
+        }
+
+        // Load locations
+        async function loadLocations() {
+            try {
+                const resp = await fetch('/api/farmacias/ubicaciones');
+                allLocations = await resp.json();
+                renderLocations();
+            } catch (err) {
+                document.getElementById('sidebarList').innerHTML = '<div class="sidebar-empty">Error al cargar</div>';
+                document.getElementById('sidebarCount').textContent = 'Error';
+            }
+        }
+
+        function renderLocations() {
+            // Clear markers
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            let filtered = currentFilter === 'all'
+                ? [...allLocations]
+                : allLocations.filter(l => l.farmacia === currentFilter);
+
+            // Filter by distance if user location is set
+            const radius = parseInt(document.getElementById('radiusSelect').value);
+            if (userLat !== null) {
+                filtered = filtered.map(loc => {
+                    loc._dist = haversine(userLat, userLng, loc.latitud, loc.longitud);
+                    return loc;
+                }).filter(loc => loc._dist <= radius);
+                filtered.sort((a, b) => a._dist - b._dist);
+            }
+
+            // Update count
+            document.getElementById('sidebarCount').textContent = `${filtered.length} farmacia${filtered.length !== 1 ? 's' : ''} encontrada${filtered.length !== 1 ? 's' : ''}`;
+
+            // Sidebar list
+            const list = document.getElementById('sidebarList');
+            if (filtered.length === 0) {
+                list.innerHTML = userLat !== null
+                    ? '<div class="sidebar-empty">No hay farmacias en este radio.<br>Prueba a aumentar el radio de búsqueda.</div>'
+                    : '<div class="sidebar-empty">No hay farmacias con esta selección.<br>Las farmacias pueden añadir sus ubicaciones desde el panel.</div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((loc, idx) => {
+                const marker = createMarker(loc);
+                marker.addTo(map);
+                markers.push(marker);
+
+                const distText = loc._dist !== undefined
+                    ? (loc._dist < 1000 ? `${Math.round(loc._dist)} m` : `${(loc._dist / 1000).toFixed(1)} km`)
+                    : '';
+
+                const isPartner = loc.farmacia === 'FarmaSearch';
+                const chainLabel = isPartner
+                    ? `<span style="background:#10b981;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.65rem;font-weight:700">ASOCIADA</span>`
+                    : '';
+
+                html += `
+                    <div class="sidebar-item" onclick="flyToLocation(${idx})" style="${isPartner ? 'border-left:3px solid #10b981;background:#f0fdf4' : ''}">
+                        <div class="sidebar-item-chain">${chainLabel}${distText ? `${chainLabel ? ' ' : ''}<span style="color:#f57c00;font-weight:400">${distText}</span>` : ''}</div>
+                        <div class="sidebar-item-name">${escapeHtml(loc.nombre_tienda)}</div>
+                        <div class="sidebar-item-address">${escapeHtml(loc.direccion)}</div>
+                        ${loc.telefono || loc.horario ? `<div class="sidebar-item-details">${loc.telefono ? escapeHtml(loc.telefono) : ''} ${loc.horario ? '· ' + escapeHtml(loc.horario) : ''}</div>` : ''}
+                    </div>`;
+            });
+            list.innerHTML = html;
+
+            // Don't auto-fit when user has set location
+            if (!userLat && markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        function flyToLocation(idx) {
+            if (markers[idx]) {
+                const loc = markers[idx].locationData;
+                map.flyTo([loc.latitud, loc.longitud], 16);
+                markers[idx].openPopup();
+            }
+        }
+
+        function filterFarmacias(filter) {
+            currentFilter = filter;
+
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+
+            renderLocations();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Init
+        loadLocations();
+    </script>
+</body>
+
+</html>

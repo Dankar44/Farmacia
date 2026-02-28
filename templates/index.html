@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmaSearch - Comparador de Precios de Farmacia</title>
+    <meta name="description"
+        content="Busca y compara precios de productos de farmacia en las principales tiendas online de España.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-body: #f4f6f8;
+            --bg-white: #ffffff;
+            --bg-light: #f9fafb;
+            --bg-input: #ffffff;
+            --primary: #00a99d;
+            --primary-dark: #008f85;
+            --primary-light: #e0f7f5;
+            --primary-glow: rgba(0, 169, 157, 0.12);
+            --accent-orange: #f57c00;
+            --accent-orange-bg: rgba(245, 124, 0, 0.08);
+            --text-dark: #1a1a2e;
+            --text-body: #333333;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --green: #2e7d32;
+            --green-light: #e8f5e9;
+            --red: #c62828;
+            --red-light: #ffebee;
+            --border: #e0e0e0;
+            --border-light: #eeeeee;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+            --radius: 10px;
+            --radius-lg: 14px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOP BAR (promo banner) ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 100%);
+            color: #fff;
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .top-bar span {
+            opacity: 0.95;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-light);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            gap: 24px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00a99d, #00c9bc);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .nav-logo-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo-sub {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: -2px;
+        }
+
+        /* Search in navbar */
+        .nav-search {
+            flex: 1;
+            max-width: 560px;
+            position: relative;
+        }
+
+        .nav-search-input {
+            width: 100%;
+            padding: 11px 16px 11px 44px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            background: var(--bg-light);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-body);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .nav-search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .nav-search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background: var(--bg-white);
+        }
+
+        .nav-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.25s;
+        }
+
+        .nav-search-input:focus~.nav-search-icon {
+            color: var(--primary);
+        }
+
+        /* Nav links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .nav-pill {
+            padding: 7px 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-pill:hover {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .nav-pill.active {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        /* ===== CATEGORY BAR ===== */
+        .category-bar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-light);
+            padding: 0 24px;
+        }
+
+        .category-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 44px;
+            overflow-x: auto;
+        }
+
+        .category-bar-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-link {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .cat-link:hover {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .cat-link.highlight {
+            background: var(--accent-orange);
+            color: #fff;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2px;
+            margin-bottom: 14px;
+            min-height: 24px;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* ===== SORT BAR ===== */
+        .sort-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sort-bar.active {
+            display: flex;
+        }
+
+        .sort-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+        }
+
+        .sort-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sort-btn.active:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ===== LOADER ===== */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 14px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== HERO STATE ===== */
+        .hero-state {
+            padding: 0;
+        }
+
+        /* Hero banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 40%, #00d4aa 100%);
+            border-radius: var(--radius-lg);
+            padding: 40px 36px 32px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(4px);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #80ffb4;
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.5);
+            }
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-sub {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            max-width: 480px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        /* Hero stats */
+        .hero-stats {
+            display: flex;
+            gap: 28px;
+            margin-top: 24px;
+        }
+
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .hero-stat-label {
+            font-size: 0.72rem;
+            opacity: 0.8;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Hero features row */
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-feature-icon {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Category grid */
+        .categories-section {
+            margin-bottom: 20px;
+        }
+
+        .categories-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .categories-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .categories-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .cat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 10px 14px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .cat-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .cat-card:hover .cat-card-icon {
+            background: var(--primary);
+        }
+
+        .cat-card:hover .cat-card-icon svg {
+            stroke: #fff;
+        }
+
+        .cat-card-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .cat-card-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.2s;
+        }
+
+        .cat-card-name {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-body);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .hero-banner {
+                padding: 28px 22px 24px;
+            }
+
+            .hero-title {
+                font-size: 1.4rem;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-features {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* ===== PRODUCT CARDS ===== */
+        .results {
+            padding-bottom: 20px;
+        }
+
+        .product-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            animation: fadeInUp 0.3s ease forwards;
+            opacity: 0;
+        }
+
+        .product-card:hover {
+            border-color: var(--border);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .product-card.expanded {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow), var(--shadow-md);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card header */
+        .product-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            gap: 16px;
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 14px;
+            margin-top: 4px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .product-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-price-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .best-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .price-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .expand-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+            background: var(--bg-light);
+            border-radius: 50%;
+        }
+
+        .product-card.expanded .expand-icon {
+            transform: rotate(180deg);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Detail panel */
+        .product-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .product-card.expanded .product-detail {
+            max-height: 600px;
+        }
+
+        .detail-inner {
+            padding: 0 20px 16px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .pharmacy-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            gap: 12px;
+        }
+
+        .pharmacy-row:last-child {
+            border-bottom: none;
+        }
+
+        .pharmacy-name {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-body);
+            min-width: 130px;
+        }
+
+        .pharmacy-price {
+            font-size: 1rem;
+            font-weight: 700;
+            min-width: 74px;
+            text-align: right;
+        }
+
+        .pharmacy-price.best {
+            color: var(--primary-dark);
+        }
+
+        .pharmacy-price.normal {
+            color: var(--text-secondary);
+        }
+
+        .stock-badge {
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 70px;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+
+        .stock-badge.in-stock {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .stock-badge.out-stock {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .buy-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            padding: 7px 16px;
+            background: var(--primary);
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .buy-link:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 2px 8px rgba(0, 169, 157, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.05rem;
+            color: var(--text-body);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .empty-sub {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-light);
+            padding: 20px 24px;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-item-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .footer-item-text strong {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.82rem;
+        }
+
+        .footer-item-text span {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 14px 24px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            background: var(--bg-white);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .navbar-inner {
+                gap: 12px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-logo-sub {
+                display: none;
+            }
+
+            .category-bar-inner {
+                gap: 2px;
+            }
+
+            .cat-link {
+                padding: 5px 10px;
+                font-size: 0.72rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar-inner {
+                height: 56px;
+            }
+
+            .nav-logo-text {
+                font-size: 1.1rem;
+            }
+
+            .nav-logo-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+
+            .nav-search-input {
+                padding: 9px 14px 9px 38px;
+                font-size: 0.85rem;
+            }
+
+            .product-header {
+                padding: 14px 16px;
+            }
+
+            .pharmacy-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .pharmacy-name {
+                min-width: 100%;
+                font-size: 0.82rem;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .top-bar {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Highlight match */
+        mark.search-highlight {
+            background: rgba(0, 169, 157, 0.18);
+            color: inherit;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top promo bar -->
+    <div class="top-bar">
+        <span><svg style="display:inline-block;vertical-align:middle;width:18px;height:18px;margin-right:6px"
+                viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 17h4V5H2v12h3" stroke="#fff" />
+                <path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h2" stroke="#fff" />
+                <circle cx="7.5" cy="17.5" r="2.5" stroke="#ffe0b2" />
+                <circle cx="17.5" cy="17.5" r="2.5" stroke="#ffe0b2" />
+            </svg>Compara precios en las 5 principales farmacias online de España · Encuentra siempre el mejor
+            precio</span>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a class="nav-logo" href="/" title="FarmaSearch">
+                <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="width:22px;height:22px">
+                        <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
+                        <path d="m8.5 8.5 7 7" stroke="#fff" />
+                        <path d="M14 6 6 14" stroke="#ffe0b2" />
+                    </svg></div>
+                <div>
+                    <div class="nav-logo-text">FarmaSearch</div>
+                    <div class="nav-logo-sub">Comparador</div>
+                </div>
+            </a>
+
+            <div class="nav-search">
+                <input type="text" id="searchInput" class="nav-search-input" placeholder="¿Qué estás buscando?"
+                    autocomplete="off" autofocus>
+                <span class="nav-search-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                        <circle cx="11" cy="11" r="8" stroke="#00a99d" />
+                        <path d="m21 21-4.3-4.3" stroke="#f57c00" />
+                    </svg></span>
+            </div>
+
+            <div class="nav-links">
+                <button class="nav-pill active">Buscar</button>
+                <a href="/mapa" class="nav-pill" style="text-decoration:none">Mapa</a>
+                <a href="/login" class="nav-pill" style="text-decoration:none;opacity:0.7">Acceso</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Category bar -->
+    <div class="category-bar">
+        <div class="category-bar-inner">
+            <a href="https://www.dosfarma.com" target="_blank" rel="noopener" class="cat-link">DosFarma</a>
+            <a href="https://www.farmaciasdirect.com" target="_blank" rel="noopener"
+                class="cat-link">FarmaciasDirect</a>
+            <a href="https://www.promofarma.com" target="_blank" rel="noopener" class="cat-link">PromoFarma</a>
+            <a href="https://www.atida.com/es-es" target="_blank" rel="noopener" class="cat-link">Atida</a>
+            <a href="https://www.farmaciasvazquez.com" target="_blank" rel="noopener"
+                class="cat-link">FarmaciasVazquez</a>
+            <span class="cat-link highlight">5 farmacias</span>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="main">
+        <div class="status-bar" id="statusBar" style="display:none">
+            <span class="status-text" id="statusText"></span>
+            <span class="status-count" id="statusCount"></span>
+        </div>
+
+        <div class="sort-bar" id="sortBar">
+            <span class="sort-label"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" style="width:16px;height:16px">
+                    <path d="m6 9 6 6 6-6" stroke="#00a99d" />
+                </svg> Ordenar por:</span>
+            <div class="sort-options">
+                <button class="sort-btn active" data-sort="relevancia"
+                    onclick="setSort('relevancia')">Relevancia</button>
+                <button class="sort-btn" data-sort="nombre-asc" onclick="setSort('nombre-asc')">A → Z</button>
+                <button class="sort-btn" data-sort="nombre-desc" onclick="setSort('nombre-desc')">Z → A</button>
+                <button class="sort-btn" data-sort="precio-asc" onclick="setSort('precio-asc')">Precio ↑</button>
+                <button class="sort-btn" data-sort="precio-desc" onclick="setSort('precio-desc')">Precio ↓</button>
+                <button class="sort-btn" data-sort="farmacias-desc" onclick="setSort('farmacias-desc')">Más
+                    farmacias</button>
+                <button class="sort-btn" data-sort="stock" onclick="setSort('stock')"
+                    style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                        style="width:14px;height:14px">
+                        <path d="M20 6 9 17l-5-5" stroke="#2e7d32" />
+                    </svg> En stock</button>
+            </div>
+        </div>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div class="loader-text">Buscando productos...</div>
+        </div>
+
+        <div id="heroState" class="hero-state">
+            <!-- Gradient banner -->
+            <div class="hero-banner">
+                <div class="hero-banner-content">
+                    <div class="hero-badge">
+                        <span class="hero-badge-dot"></span>
+                        Comparador activo
+                    </div>
+                    <div class="hero-title">Encuentra el mejor precio<br>en farmacia online</div>
+                    <div class="hero-sub">Compara precios de 5 farmacias en tiempo real. Busca cualquier producto y te
+                        mostramos dónde está más barato.</div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">5</span>
+                            <span class="hero-stat-label">Farmacias</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">244K+</span>
+                            <span class="hero-stat-label">Productos</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">100%</span>
+                            <span class="hero-stat-label">Gratuito</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature pills -->
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <span class="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                            <circle cx="11" cy="11" r="8" stroke="#00a99d" />
+                            <path d="m21 21-4.3-4.3" stroke="#f57c00" />
+                        </svg></span>
+                    Búsqueda instantánea
+                </div>
+                <div class="hero-feature">
+                    <span class="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"
+                                stroke="#00a99d" />
+                            <path d="M7 7h.01" stroke="#f57c00" stroke-width="3" />
+                        </svg></span>
+                    Mejor precio destacado
+                </div>
+                <div class="hero-feature">
+                    <span class="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                            <circle cx="8" cy="21" r="1" stroke="#f57c00" stroke-width="2" />
+                            <circle cx="19" cy="21" r="1" stroke="#f57c00" stroke-width="2" />
+                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+                                stroke="#00a99d" />
+                        </svg></span>
+                    Enlace directo a la tienda
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="categories-section">
+                <div class="categories-header">
+                    <span class="categories-title">Explorar por categoría</span>
+                    <span class="categories-subtitle">Haz clic para buscar</span>
+                </div>
+                <div class="categories-grid">
+                    <div class="cat-card" onclick="searchCategory('crema hidratante')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M2 12h20" />
+                                <path d="M12 2v20" />
+                                <circle cx="12" cy="12" r="10" />
+                            </svg></div>
+                        <span class="cat-card-name">Cremas</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('champú')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M12 2a5 5 0 0 1 5 5v3H7V7a5 5 0 0 1 5-5Z" />
+                                <path d="M7 10h10v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V10Z" />
+                            </svg></div>
+                        <span class="cat-card-name">Cabello</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('higiene íntima')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M7 21h10" />
+                                <path d="M12 3v18" />
+                                <path d="M3 7c3 0 4 2 5 4s2 4 5 4" />
+                                <path d="M21 7c-3 0-4 2-5 4s-2 4-5 4" />
+                            </svg></div>
+                        <span class="cat-card-name">Higiene Íntima</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('proteccion solar')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2" />
+                                <path d="M12 20v2" />
+                                <path d="m4.93 4.93 1.41 1.41" />
+                                <path d="m17.66 17.66 1.41 1.41" />
+                                <path d="M2 12h2" />
+                                <path d="M20 12h2" />
+                                <path d="m6.34 17.66-1.41 1.41" />
+                                <path d="m19.07 4.93-1.41 1.41" />
+                            </svg></div>
+                        <span class="cat-card-name">Solar</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('bebé')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M9 12h.01" />
+                                <path d="M15 12h.01" />
+                                <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
+                                <path
+                                    d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" />
+                            </svg></div>
+                        <span class="cat-card-name">Bebés</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('esmalte uñas')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="m12 3-4 7h8L12 3Z" />
+                                <path
+                                    d="M8 10C4.68 10 2 12.69 2 16c0 3.31 2.68 6 6 6h8c3.31 0 6-2.69 6-6 0-3.31-2.68-6-6-6H8Z" />
+                            </svg></div>
+                        <span class="cat-card-name">Esmaltes</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('jabón')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                                <path d="M15 18a3 3 0 1 0-6 0" />
+                                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-5-5Z" />
+                            </svg></div>
+                        <span class="cat-card-name">Jabón</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('compresas')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                            </svg></div>
+                        <span class="cat-card-name">Menstrual</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('vitamina')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+                                <path d="m8.5 8.5 7 7" />
+                            </svg></div>
+                        <span class="cat-card-name">Vitaminas</span>
+                    </div>
+                    <div class="cat-card" onclick="searchCategory('spray nasal')">
+                        <div class="cat-card-icon"><svg viewBox="0 0 24 24">
+                                <path d="M3 21h18" />
+                                <path d="M5 21V7l7-4 7 4v14" />
+                                <path d="M12 10v4" />
+                                <path d="M10 12h4" />
+                            </svg></div>
+                        <span class="cat-card-name">Salud</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="footer-inner">
+            <div class="footer-item">
+                <div class="footer-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                        <circle cx="11" cy="11" r="8" stroke="#00a99d" />
+                        <path d="m21 21-4.3-4.3" stroke="#f57c00" />
+                    </svg></div>
+                <div class="footer-item-text">
+                    <strong>Comparador gratuito</strong>
+                    <span>Sin coste ni registro</span>
+                </div>
+            </div>
+            <div class="footer-item">
+                <div class="footer-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                        <path d="M3 21h18" stroke="#00a99d" />
+                        <path d="M5 21V7l7-4 7 4v14" stroke="#00a99d" />
+                        <path d="M12 10v4" stroke="#f57c00" />
+                        <path d="M10 12h4" stroke="#f57c00" />
+                    </svg></div>
+                <div class="footer-item-text">
+                    <strong>5 farmacias online</strong>
+                    <span>Las principales de España</span>
+                </div>
+            </div>
+            <div class="footer-item">
+                <div class="footer-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                        <rect width="20" height="14" x="2" y="5" rx="2" stroke="#00a99d" />
+                        <path d="M2 10h20" stroke="#f57c00" />
+                    </svg></div>
+                <div class="footer-item-text">
+                    <strong>Pago seguro</strong>
+                    <span>Directamente en la farmacia</span>
+                </div>
+            </div>
+            <div class="footer-item">
+                <div class="footer-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                            stroke="#00a99d" />
+                        <path d="M3.27 6.96 12 12.01l8.73-5.05" stroke="#00a99d" />
+                        <path d="M12 22.08V12" stroke="#f57c00" />
+                    </svg></div>
+                <div class="footer-item-text">
+                    <strong>Stock en tiempo real</strong>
+                    <span>Disponibilidad actualizada</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="footer-bottom">
+        © 2026 FarmaSearch — Comparador de precios de farmacia online
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+        const loader = document.getElementById('loader');
+        const heroState = document.getElementById('heroState');
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const statusCount = document.getElementById('statusCount');
+        const sortBar = document.getElementById('sortBar');
+        const footer = document.getElementById('footer');
+        let debounceTimer = null;
+        let currentQuery = '';
+        let currentData = [];
+        let currentSort = 'relevancia';
+
+        function searchCategory(term) {
+            searchInput.value = term;
+            heroState.style.display = 'none';
+            doSearch(term);
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const q = searchInput.value.trim();
+
+            if (q.length < 2) {
+                resultsDiv.innerHTML = '';
+                statusBar.style.display = 'none';
+                sortBar.classList.remove('active');
+                heroState.style.display = q.length === 0 ? 'block' : 'none';
+                loader.classList.remove('active');
+                return;
+            }
+
+            heroState.style.display = 'none';
+
+            debounceTimer = setTimeout(() => {
+                doSearch(q);
+            }, 300);
+        });
+
+        async function doSearch(q) {
+            currentQuery = q;
+            loader.classList.add('active');
+            resultsDiv.innerHTML = '';
+            statusBar.style.display = 'none';
+            sortBar.classList.remove('active');
+
+            try {
+                const resp = await fetch(`/api/buscar?q=${encodeURIComponent(q)}`);
+                const data = await resp.json();
+
+                if (q !== currentQuery) return;
+
+                loader.classList.remove('active');
+                currentData = data;
+                currentSort = 'relevancia';
+                updateSortButtons();
+                renderResults(sortData(data), q);
+            } catch (err) {
+                loader.classList.remove('active');
+                resultsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" stroke="#c62828"/><path d="M12 9v4" stroke="#c62828"/><path d="M12 17h.01" stroke="#c62828" stroke-width="3"/></svg></div>
+                        <div class="empty-title">Error de conexión</div>
+                        <div class="empty-sub">No se pudo conectar al servidor. Verifica que la app esté corriendo.</div>
+                    </div>`;
+            }
+        }
+
+        function setSort(sortType) {
+            currentSort = sortType;
+            updateSortButtons();
+            renderResults(sortData(currentData), currentQuery);
+        }
+
+        function updateSortButtons() {
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.sort === currentSort);
+            });
+        }
+
+        function sortData(data) {
+            const sorted = [...data];
+            switch (currentSort) {
+                case 'nombre-asc':
+                    sorted.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+                    break;
+                case 'nombre-desc':
+                    sorted.sort((a, b) => b.nombre.localeCompare(a.nombre, 'es'));
+                    break;
+                case 'precio-asc':
+                    sorted.sort((a, b) => (a.mejor_precio || 9999) - (b.mejor_precio || 9999));
+                    break;
+                case 'precio-desc':
+                    sorted.sort((a, b) => (b.mejor_precio || 0) - (a.mejor_precio || 0));
+                    break;
+                case 'farmacias-desc':
+                    sorted.sort((a, b) => b.num_farmacias - a.num_farmacias);
+                    break;
+                case 'stock':
+                    sorted.sort((a, b) => {
+                        const aStock = a.farmacias.filter(f => f.en_stock).length;
+                        const bStock = b.farmacias.filter(f => f.en_stock).length;
+                        if (aStock > 0 && bStock === 0) return -1;
+                        if (aStock === 0 && bStock > 0) return 1;
+                        return bStock - aStock;
+                    });
+                    break;
+                default: // relevancia - keep original order
+                    break;
+            }
+            return sorted;
+        }
+
+        function renderResults(data, query) {
+            if (data.length === 0) {
+                statusBar.style.display = 'none';
+                sortBar.classList.remove('active');
+                resultsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="11" cy="11" r="8" stroke="#00a99d"/><path d="m21 21-4.3-4.3" stroke="#f57c00"/></svg></div>
+                        <div class="empty-title">Sin resultados para "${escapeHtml(query)}"</div>
+                        <div class="empty-sub">Prueba con otro término de búsqueda.</div>
+                    </div>`;
+                return;
+            }
+
+            statusBar.style.display = 'flex';
+            sortBar.classList.add('active');
+            statusText.textContent = `Resultados para "${query}"`;
+            statusCount.textContent = `${data.length} producto${data.length !== 1 ? 's' : ''}`;
+
+            let html = '';
+            data.forEach((prod, idx) => {
+                const priceStr = prod.mejor_precio ? `${prod.mejor_precio.toFixed(2)} €` : '—';
+                const isValidEan = prod.ean && /^\d{1,13}$/.test(prod.ean.trim());
+                const eanStr = isValidEan ? `EAN: ${prod.ean}` : '';
+
+                let farmaciasHtml = '';
+                const bestPrice = prod.mejor_precio;
+
+                prod.farmacias.forEach(f => {
+                    const isBest = f.precio === bestPrice;
+                    const priceClass = isBest ? 'best' : 'normal';
+                    const stockClass = f.en_stock ? 'in-stock' : 'out-stock';
+                    const stockLabel = f.en_stock ? 'Disponible' : 'Sin stock';
+                    const precioStr = f.precio ? `${f.precio.toFixed(2)} €` : '—';
+
+                    farmaciasHtml += `
+                        <div class="pharmacy-row">
+                            <span class="pharmacy-name">${escapeHtml(f.farmacia)}</span>
+                            <span class="pharmacy-price ${priceClass}">${precioStr}</span>
+                            <span class="stock-badge ${stockClass}">${stockLabel}</span>
+                            <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar →</a>
+                        </div>`;
+                });
+
+                html += `
+                    <div class="product-card" id="card-${idx}" onclick="toggleCard(${idx})" style="animation-delay: ${idx * 0.04}s">
+                        <div class="product-header">
+                            <div class="product-info">
+                                <div class="product-name" title="${escapeHtml(prod.nombre)}">${highlightMatch(prod.nombre, query)}</div>
+                                <div class="product-meta">
+                                    <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><path d="M3 21h18" stroke="#00a99d"/><path d="M5 21V7l7-4 7 4v14" stroke="#00a99d"/><path d="M12 10v4" stroke="#f57c00"/><path d="M10 12h4" stroke="#f57c00"/></svg> ${prod.num_farmacias} farmacia${prod.num_farmacias !== 1 ? 's' : ''}</span>
+                                    ${eanStr ? `<span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#00a99d"/><path d="M3.27 6.96 12 12.01l8.73-5.05" stroke="#00a99d"/><path d="M12 22.08V12" stroke="#f57c00"/></svg> ${eanStr}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="product-price-badge">
+                                <div class="best-price">${priceStr}</div>
+                                <div class="price-label">mejor precio</div>
+                            </div>
+                            <div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>
+                        </div>
+                        <div class="product-detail">
+                            <div class="detail-inner">
+                                ${farmaciasHtml}
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function toggleCard(idx) {
+            const card = document.getElementById(`card-${idx}`);
+            card.classList.toggle('expanded');
+        }
+
+        function highlightMatch(text, query) {
+            const escaped = escapeHtml(text);
+            const queryEscaped = escapeHtml(query);
+            const regex = new RegExp(`(${queryEscaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return escaped.replace(regex, '<mark class="search-highlight">$1</mark>');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>
