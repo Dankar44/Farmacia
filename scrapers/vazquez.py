@@ -138,7 +138,12 @@ def extraer_datos_producto(hit):
     """Extrae datos relevantes de un producto de Doofinder."""
     nombre = hit.get("title", "Sin nombre")
     url = hit.get("link", "")
-    sku = hit.get("dfid", "")
+    
+    sku = hit.get("ean13", "").strip()
+    if not sku:
+        sku = hit.get("reference", "").strip()
+    if not sku:
+        sku = hit.get("mpn", "").strip()
     
     # Doofinder de Vázquez tiene stock como int (cantidad)
     stock_q = hit.get("stock_quantity", 0)

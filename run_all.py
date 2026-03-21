@@ -18,34 +18,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# Email config - load from .env or hardcode for now
-EMAIL_SENDER = os.getenv("SMTP_USER", "danisuperk@gmail.com") 
-EMAIL_PASSWORD = os.getenv("SMTP_PASS", "urxvfyzsjkrfnlmw")
-EMAIL_RECEIVER = "daniel.karimi@alumnos.upm.es"
-
-def send_email(subject, body):
-    if EMAIL_SENDER == "your-email@gmail.com":
-        logging.warning("Email credentials not configured. Skipping email sent.")
-        print("⚠️ Configura SMTP_USER y SMTP_PASS en run_all.py para enviar correos.")
-        return
-
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_SENDER
-    msg['To'] = EMAIL_RECEIVER
-    msg['Subject'] = subject
-
-    msg.attach(MIMEText(body, 'html'))
-
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        text = msg.as_string()
-        server.sendmail(EMAIL_SENDER, EMAIL_RECEIVER, text)
-        server.quit()
-        logging.info("Email sent successfully")
-    except Exception as e:
-        logging.error(f"Failed to send email: {e}")
+from utils.email_utils import send_email
 
 def backup_database():
     logging.info("Starting database backup...")
@@ -135,6 +108,9 @@ def main():
         "scrapers/farmaciasdirect.py",
         "scrapers/promofarma.py",
         "scrapers/atida.py",
+        "scrapers/farmacoslada.py",
+        "scrapers/okfarma.py",
+        "scrapers/farmaciabarata.py",
         "scrapers/vazquez.py"
     ]
     

@@ -21,6 +21,9 @@ FARMACIAS_USERS = {
     'promofarma':      {'password': '1234', 'nombre': 'PromoFarma'},
     'atida':           {'password': '1234', 'nombre': 'Atida'},
     'farmaciasvazquez':{'password': '1234', 'nombre': 'FarmaciasVazquez'},
+    'farmacoslada':    {'password': '1234', 'nombre': 'Farmacoslada'},
+    'okfarma':         {'password': '1234', 'nombre': 'Okfarma'},
+    'farmaciabarata':  {'password': '1234', 'nombre': 'FarmaciaBarata'},
 }
 
 
@@ -105,9 +108,9 @@ def buscar():
         order_clause = "tiene_stock DESC, key_name ASC"
 
     count_query = text("""
-        SELECT COUNT(DISTINCT LOWER(nombre))
+        SELECT COUNT(DISTINCT nombre_normalizado)
         FROM productos
-        WHERE LOWER(nombre) LIKE :search
+        WHERE nombre_normalizado LIKE '%' || normalize_product_name(:search_raw) || '%'
     """)
 
     keys_query = text(f"""
@@ -119,34 +122,39 @@ def buscar():
         ),
         product_stats AS (
             SELECT 
-                LOWER(p.nombre) as key_name,
+                p.nombre_normalizado as key_name,
                 MIN(pr.precio) as mejor_precio,
                 COUNT(p.id) as num_farmacias,
-                BOOL_OR(pr.en_stock) as tiene_stock
+                BOOL_OR(pr.en_stock) as tiene_stock,
+                -- We get one original name to show in the UI (the shortest one is usually cleanest)
+                (SELECT nombre FROM productos p2 WHERE p2.nombre_normalizado = p.nombre_normalizado ORDER BY LENGTH(nombre) ASC LIMIT 1) as display_name
             FROM productos p
             LEFT JOIN latest_prices pr ON p.id = pr.producto_id
-            WHERE LOWER(p.nombre) LIKE :search
-            GROUP BY LOWER(p.nombre)
+            WHERE p.nombre_normalizado LIKE '%' || normalize_product_name(:search_raw) || '%'
+            GROUP BY p.nombre_normalizado
         )
-        SELECT key_name FROM product_stats
+        SELECT key_name, display_name FROM product_stats
         ORDER BY {order_clause}
         LIMIT :limit OFFSET :offset
     """)
 
     with engine.connect() as con:
-        count = con.execute(count_query, {"search": search_term}).scalar()
+        count = con.execute(count_query, {"search_raw": q}).scalar()
         
         if count == 0:
             return jsonify({"total": 0, "items": []})
             
-        keys = [row.key_name for row in con.execute(keys_query, {"search": search_term, "limit": limit, "offset": offset}).fetchall()]
+        
+        keys_and_names = con.execute(keys_query, {"search_raw": q, "limit": limit, "offset": offset}).fetchall()
+        keys = [row.key_name for row in keys_and_names]
+        display_names = {row.key_name: row.display_name for row in keys_and_names}
         
         if not keys:
             return jsonify({"total": count, "items": []})
 
         data_query = text("""
             SELECT
-                p.nombre, p.farmacia, p.url, p.ean,
+                p.nombre_normalizado, p.farmacia, p.url, p.ean,
                 pr.precio, pr.en_stock
             FROM productos p
             LEFT JOIN (
@@ -155,19 +163,19 @@ def buscar():
                 FROM precios
                 ORDER BY producto_id, fecha_captura DESC
             ) pr ON p.id = pr.producto_id
-            WHERE LOWER(p.nombre) = ANY(:keys)
+            WHERE p.nombre_normalizado = ANY(:keys)
         """)
         
         rows = con.execute(data_query, {"keys": keys}).fetchall()
 
     productos = {}
     for row in rows:
-        nombre = row.nombre.strip()
-        key = nombre.lower()
+        key = row.nombre_normalizado
 
         if key not in productos:
+            d_name = display_names.get(key, "Producto Desconocido")
             productos[key] = {
-                "nombre": nombre[:1].upper() + nombre[1:].lower() if nombre else nombre,
+                "nombre": d_name[:1].upper() + d_name[1:].lower(),
                 "ean": row.ean if row.ean else None,
                 "farmacias": []
             }
@@ -329,6 +337,47 @@ def mis_ubicaciones():
         })
 
     return jsonify(ubicaciones)
+
+
+from utils.email_utils import send_email
+
+@app.route('/api/report_error', methods=['POST'])
+def report_error():
+    data = request.json
+    if not data or 'producto' not in data or 'mensaje' not in data:
+        return jsonify({"error": "Faltan datos en el reporte."}), 400
+        
+    producto = data.get('producto', 'Desconocido')
+    farmacias = data.get('farmacias', [])
+    mensaje = data.get('mensaje', '')
+    
+    # Construir el cuerpo del correo de alerta
+    farmacias_str = ", ".join(farmacias) if farmacias else "Ninguna especificada"
+    texto_email = f"""
+    <h2>⚠️ Alerta de Agrupación Incorrecta</h2>
+    <p>Un usuario ha reportado un problema con el siguiente grupo de productos:</p>
+    <ul>
+        <li><b>Producto agrupado:</b> {producto}</li>
+        <li><b>Farmacias implicadas:</b> {farmacias_str}</li>
+    </ul>
+    <h3>Comentario del usuario:</h3>
+    <blockquote style="background: #f9f9f9; border-left: 4px solid #f57c00; padding: 10px;">
+        {mensaje}
+    </blockquote>
+    <p><i>Revisa la base de datos para ajustar las reglas de normalización si es necesario.</i></p>
+    """
+    
+    # Enviar correo asíncronamente (o síncrono si es rápido, lo ideal sería asíncrono pero para MVP síncrono vale)
+    # Importar y usar `send_email` del utils
+    exito = send_email(
+        subject=f"🚨 FarmaSearch: Error reportado en '{producto[:30]}...'",
+        body=texto_email
+    )
+    
+    if exito:
+        return jsonify({"message": "Reporte enviado con éxito."})
+    else:
+        return jsonify({"error": "No se pudo enviar el email, pero gracias por avisar."}), 500
 
 
 if __name__ == '__main__':

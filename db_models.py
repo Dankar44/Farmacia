@@ -35,6 +35,22 @@ class Precio(Base):
     producto = relationship("Producto", back_populates="precios")
 
 
+class CimaMedicamento(Base):
+    __tablename__ = 'cima_medicamentos'
+
+    id = Column(Integer, primary_key=True)
+    nregistro = Column(String(50), nullable=False)
+    cn = Column(String(50), unique=True, nullable=False)
+    nombre = Column(String(500), nullable=False)
+    pactivos = Column(String(1000))
+    labtitular = Column(String(200))
+    cpresc = Column(String(100))
+    url_foto = Column(String(500))
+    url_prospecto = Column(String(500))
+    url_ficha = Column(String(500))
+    receta = Column(Boolean, default=False)
+    fecha_actualizacion = Column(TIMESTAMP, default=datetime.utcnow)
+
 class FarmaciaUbicacion(Base):
     __tablename__ = 'farmacia_ubicaciones'
 

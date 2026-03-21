@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FarmaSearch - Comparador de Precios de Farmacia</title>
+    <!-- Favicon Personalizado -->
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+
     <meta name="description"
         content="Busca y compara precios de productos de farmacia en las principales tiendas online de España.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -85,65 +88,83 @@
             margin: 0 auto;
             display: flex;
             align-items: center;
-            height: 64px;
-            gap: 24px;
+            height: 84px;
+            /* Aumentado de 64px a 84px */
+            gap: 28px;
+            /* Aumentado de 24px */
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            /* Aumentado de 8px */
             text-decoration: none;
             flex-shrink: 0;
         }
 
         .nav-logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #00a99d, #00c9bc);
-            border-radius: 9px;
+            width: 48px;
+            /* Aumentado de 36px */
+            height: 48px;
+            /* Aumentado de 36px */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            color: white;
-            font-weight: 700;
+            /* Fondo eliminado a petición del usuario */
+            background: transparent;
+            border-radius: 0;
+            /* Borde eliminado */
+            font-size: 0;
+            /* Texto del icono eliminado */
+            color: transparent;
+            /* Texto del icono eliminado */
+            font-weight: normal;
+            /* Texto del icono eliminado */
         }
 
         .nav-logo-text {
-            font-size: 1.35rem;
-            font-weight: 700;
+            font-size: 1.7rem;
+            /* Aumentado de 1.35rem */
+            font-weight: 800;
+            /* Un poco más grueso */
             color: var(--primary);
             letter-spacing: -0.5px;
         }
 
         .nav-logo-sub {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
+            /* Aumentado de 0.65rem */
             color: var(--text-muted);
-            font-weight: 400;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: -2px;
+            letter-spacing: 1.5px;
+            margin-top: -3px;
         }
 
         /* Search in navbar */
         .nav-search {
             flex: 1;
-            max-width: 560px;
+            max-width: 600px;
+            margin: 0 40px;
             position: relative;
         }
 
         .nav-search-input {
             width: 100%;
-            padding: 11px 16px 11px 44px;
-            font-size: 0.92rem;
-            font-family: inherit;
+            height: 48px;
+            /* Aumentado de 38px a 48px */
+            padding: 0 20px 0 45px;
+            /* Ajuste de padding */
+            border: 1.5px solid var(--border-light);
+            border-radius: 24px;
             background: var(--bg-light);
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-body);
+            font-size: 1.05rem;
+            /* Aumentado tamaño de fuente */
+            transition: all 0.25s;
+            color: var(--text-dark);
+            font-family: inherit;
             outline: none;
-            transition: all 0.25s ease;
         }
 
         .nav-search-input::placeholder {
@@ -158,11 +179,13 @@
 
         .nav-search-icon {
             position: absolute;
-            left: 14px;
+            left: 16px;
+            /* Ajustado por el nuevo tamaño */
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.2rem;
+            /* Icono un poco más grande (era 1rem) */
             pointer-events: none;
             transition: color 0.25s;
         }
@@ -180,9 +203,12 @@
         }
 
         .nav-pill {
-            padding: 7px 14px;
-            font-size: 0.8rem;
-            font-weight: 500;
+            padding: 9px 18px;
+            /* Aumentado padding general */
+            font-size: 0.95rem;
+            /* Aumentado tamaño de fuente (antes 0.8) */
+            font-weight: 600;
+            /* Un poco más grueso */
             border-radius: 20px;
             text-decoration: none;
             color: var(--text-secondary);
@@ -201,7 +227,7 @@
         .nav-pill.active {
             background: var(--primary-light);
             color: var(--primary-dark);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         /* ===== CATEGORY BAR ===== */
@@ -1007,6 +1033,161 @@
             }
         }
 
+        /* ===== REPORT ERROR MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 480px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .modal-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .modal-product-name {
+            padding: 10px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background: var(--border-light);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .report-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .report-btn:hover {
+            color: var(--red);
+            background: var(--red-light);
+        }
+
         /* Highlight match */
         mark.search-highlight {
             background: rgba(0, 169, 157, 0.18);
@@ -1034,12 +1215,36 @@
     <nav class="navbar">
         <div class="navbar-inner">
             <a class="nav-logo" href="/" title="FarmaSearch">
-                <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" style="width:22px;height:22px">
-                        <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
-                        <path d="m8.5 8.5 7 7" stroke="#fff" />
-                        <path d="M14 6 6 14" stroke="#ffe0b2" />
-                    </svg></div>
+                <div class="nav-logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="width:46px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,169,157,0.3))">
+                        <!-- Cruz Médica -->
+                        <path
+                            d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z"
+                            fill="url(#crossGrad)" />
+
+                        <!-- Lupa Borde -->
+                        <circle cx="12" cy="12" r="5.5" fill="#ffffff" stroke="#00796b" stroke-width="2" />
+
+                        <!-- Hoja Interior -->
+                        <path d="M14 8.5C14 8.5 15 9.5 15.5 10.5C16 11.5 14 13.5 11 14.5C11 14.5 9 10.5 14 8.5Z"
+                            fill="#00a99d" />
+                        <path d="M11 14.5C11 14.5 12 12 14 10" stroke="#ffffff" stroke-width="1"
+                            stroke-linecap="round" />
+
+                        <!-- Mango Lupa -->
+                        <path d="M16 16L20.5 20.5" stroke="#00796b" stroke-width="3.5" stroke-linecap="round" />
+                        <path d="M17.5 17.5L20.5 20.5" stroke="#4db6ac" stroke-width="1.5" stroke-linecap="round" />
+
+                        <!-- Gradientes -->
+                        <defs>
+                            <linearGradient id="crossGrad" x1="3" y1="3" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#26a69a" />
+                                <stop offset="1" stop-color="#00695c" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
                 <div>
                     <div class="nav-logo-text">FarmaSearch</div>
                     <div class="nav-logo-sub">Comparador</div>
@@ -1074,7 +1279,10 @@
             <a href="https://www.atida.com/es-es" target="_blank" rel="noopener" class="cat-link">Atida</a>
             <a href="https://www.farmaciasvazquez.com" target="_blank" rel="noopener"
                 class="cat-link">FarmaciasVazquez</a>
-            <span class="cat-link highlight">5 farmacias</span>
+            <a href="https://farmacoslada.com" target="_blank" rel="noopener" class="cat-link">FarmaCoslada</a>
+            <a href="https://okfarma.es" target="_blank" rel="noopener" class="cat-link">Okfarma</a>
+            <a href="https://www.farmaciabarata.es" target="_blank" rel="noopener" class="cat-link">FarmaciaBarata</a>
+            <span class="cat-link highlight">8 farmacias</span>
         </div>
     </div>
 
@@ -1122,11 +1330,11 @@
                         Comparador activo
                     </div>
                     <div class="hero-title">Encuentra el mejor precio<br>en farmacia online</div>
-                    <div class="hero-sub">Compara precios de 5 farmacias en tiempo real. Busca cualquier producto y te
+                    <div class="hero-sub">Compara precios de 8 farmacias en tiempo real. Busca cualquier producto y te
                         mostramos dónde está más barato.</div>
                     <div class="hero-stats">
                         <div class="hero-stat">
-                            <span class="hero-stat-value">5</span>
+                            <span class="hero-stat-value">8</span>
                             <span class="hero-stat-label">Farmacias</span>
                         </div>
                         <div class="hero-stat">
@@ -1271,6 +1479,41 @@
 
         <div class="results" id="results"></div>
         <div id="sentinel" style="height: 10px; margin-top: 20px;"></div>
+
+        <!-- Error Reporting Modal -->
+        <div class="modal-overlay" id="reportModal" onclick="if(event.target === this) closeReportModal()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                            <path d="M12 9v4" />
+                            <path d="M12 17h.01" stroke-width="3" />
+                        </svg>
+                        Reportar error en producto
+                    </div>
+                    <button class="modal-close" onclick="closeReportModal()">&times;</button>
+                </div>
+                <div class="modal-subtitle">¿Hay alguna farmacia que haya agrupado un producto diferente aquí?</div>
+                <div class="modal-product-name" id="reportProductName">Nombre del producto...</div>
+                <input type="hidden" id="reportProductData">
+                <textarea id="reportMessage" class="modal-textarea"
+                    placeholder="Ej: Atida ha puesto una lata de pimentón en vez del champú..."
+                    maxlength="500"></textarea>
+                <div class="modal-actions">
+                    <button class="btn-btn btn-cancel" onclick="closeReportModal()">Cancelar</button>
+                    <button class="btn-btn btn-submit" id="reportSubmitBtn" onclick="submitReport()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                        Enviar reporte
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -1473,8 +1716,20 @@
             data.forEach((prod, idx) => {
                 const globalIdx = startIndex + idx;
                 const priceStr = prod.mejor_precio ? `${prod.mejor_precio.toFixed(2)} €` : '—';
-                const isValidEan = prod.ean && /^\\d{1,13}$/.test(prod.ean.trim());
+                const isValidEan = prod.ean && /^\d{1,13}$/.test(prod.ean.trim());
                 const eanStr = isValidEan ? `EAN: ${prod.ean}` : '';
+
+                let cnStr = "CN: No obtenido";
+                if (isValidEan) {
+                    // Calculamos el CN desde el EAN: los dígitos 6 a 12 (7 números) si empieza por 847000
+                    if (prod.ean.startsWith("847000") && prod.ean.length === 13) {
+                        const cn = prod.ean.substring(6, 12);
+                        cnStr = `CN: ${cn}`;
+                    } else if (prod.ean.length === 7 || prod.ean.length === 6) {
+                        cnStr = `CN: ${prod.ean}`;
+                    }
+                }
+                const visualEanStr = isValidEan ? `EAN: ${prod.ean}` : 'EAN: No obtenido';
 
                 let farmaciasHtml = '';
                 const bestPrice = prod.mejor_precio;
@@ -1502,13 +1757,17 @@
                                 <div class="product-name" title="${escapeHtml(prod.nombre)}">${highlightMatch(prod.nombre, query)}</div>
                                 <div class="product-meta">
                                     <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><path d="M3 21h18" stroke="#00a99d"/><path d="M5 21V7l7-4 7 4v14" stroke="#00a99d"/><path d="M12 10v4" stroke="#f57c00"/><path d="M10 12h4" stroke="#f57c00"/></svg> ${prod.num_farmacias} farmacia${prod.num_farmacias !== 1 ? 's' : ''}</span>
-                                    ${eanStr ? `<span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#00a99d"/><path d="M3.27 6.96 12 12.01l8.73-5.05" stroke="#00a99d"/><path d="M12 22.08V12" stroke="#f57c00"/></svg> ${eanStr}</span>` : ''}
+                                    <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#00a99d"/><path d="M3.27 6.96 12 12.01l8.73-5.05" stroke="#00a99d"/><path d="M12 22.08V12" stroke="#f57c00"/></svg> ${visualEanStr}</span>
+                                    <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:2px"><rect width="20" height="14" x="2" y="5" rx="2" stroke="#00a99d"/><path d="M2 10h20" stroke="#f57c00"/></svg> ${cnStr}</span>
                                 </div>
                             </div>
                             <div class="product-price-badge">
                                 <div class="best-price">${priceStr}</div>
                                 <div class="price-label">mejor precio</div>
                             </div>
+                            <button class="report-btn" title="Reportar error visual o agrupación incorrecta" onclick="event.stopPropagation(); openReportModal('${escapeHtml(prod.nombre).replace(/'/g, "\\'")}', '${escapeHtml(JSON.stringify(prod.farmacias.map(f => f.farmacia))).replace(/'/g, "\\'")}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01" stroke-width="3"/></svg>
+                            </button>
                             <div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>
                         </div>
                         <div class="product-detail">
@@ -1542,6 +1801,69 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // --- Error Reporting Modal ---
+        const reportModal = document.getElementById('reportModal');
+        const reportProductName = document.getElementById('reportProductName');
+        const reportProductData = document.getElementById('reportProductData');
+        const reportMessage = document.getElementById('reportMessage');
+        const reportSubmitBtn = document.getElementById('reportSubmitBtn');
+
+        function openReportModal(productName, farmaciasJsonStr) {
+            // Unescape HTML entities that might be in the stringified JSON
+            const div = document.createElement('div');
+            div.innerHTML = farmaciasJsonStr;
+            const unescapedFarmacias = div.textContent;
+
+            reportProductName.textContent = productName;
+            reportProductData.value = JSON.stringify({
+                producto: productName,
+                farmacias: JSON.parse(unescapedFarmacias)
+            });
+            reportMessage.value = '';
+            reportModal.classList.add('active');
+            setTimeout(() => reportMessage.focus(), 100);
+        }
+
+        function closeReportModal() {
+            reportModal.classList.remove('active');
+        }
+
+        async function submitReport() {
+            const msg = reportMessage.value.trim();
+            if (!msg) {
+                alert("Por favor, escribe un breve comentario explicando el error.");
+                return;
+            }
+
+            const dataObj = JSON.parse(reportProductData.value);
+            dataObj.mensaje = msg;
+
+            reportSubmitBtn.disabled = true;
+            reportSubmitBtn.innerHTML = '<div class="spinner" style="width:14px;height:14px;margin:0;border-width:2px;border-top-color:#fff;display:inline-block"></div>';
+
+            try {
+                const res = await fetch('/api/report_error', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataObj)
+                });
+
+                if (res.ok) {
+                    alert("¡Gracias por tu ayuda! El reporte ha sido enviado.");
+                    closeReportModal();
+                } else {
+                    const err = await res.json();
+                    alert("Aviso: " + (err.error || "Ocurrió un error al enviar tu reporte, inténtalo más tarde."));
+                    closeReportModal();
+                }
+            } catch (e) {
+                alert("Hubo un problema de conexión al enviar el reporte.");
+            } finally {
+                reportSubmitBtn.disabled = false;
+                reportSubmitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar reporte';
+            }
         }
     </script>
 </body>
