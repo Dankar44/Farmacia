@@ -748,6 +748,45 @@
         </div>
     </div>
 
+    <!-- AUTH WALL (shown when not logged in) -->
+    <div id="authWall" style="display:flex;min-height:100vh;width:100%">
+        <div style="width:50%;background:linear-gradient(160deg,#00a99d 0%,#00c9bc 40%,#00d4aa 100%);display:flex;flex-direction:column;justify-content:center;padding:60px;color:#fff;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-20%;right:-15%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);border-radius:50%"></div>
+            <div style="position:relative;z-index:1;max-width:480px">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:40px">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:50px;height:50px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15))"><path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="rgba(255,255,255,0.3)"/><circle cx="12" cy="12" r="5.5" fill="#fff" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><path d="M16 16L20.5 20.5" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    <span style="font-size:2rem;font-weight:800">FarmaSearch</span>
+                </div>
+                <h1 style="font-size:2.4rem;font-weight:800;line-height:1.15;margin-bottom:16px">Compara precios en farmacias de toda Espana</h1>
+                <p style="font-size:1.05rem;opacity:0.9;line-height:1.6;margin-bottom:40px">Busca cualquier producto de parafarmacia y encuentra el mejor precio entre 8 farmacias online.</p>
+                <div style="display:flex;gap:32px">
+                    <div><div style="font-size:2rem;font-weight:800">8</div><div style="font-size:0.75rem;opacity:0.8;text-transform:uppercase">Farmacias</div></div>
+                    <div><div style="font-size:2rem;font-weight:800">280K+</div><div style="font-size:0.75rem;opacity:0.8;text-transform:uppercase">Productos</div></div>
+                </div>
+            </div>
+        </div>
+        <div style="width:50%;display:flex;align-items:center;justify-content:center;padding:40px;background:#f5f6f8">
+            <div style="width:100%;max-width:400px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.08);padding:40px 36px;border:1px solid #f3f4f6">
+                <div style="display:flex;gap:0;margin-bottom:24px;background:#f3f4f6;border-radius:10px;padding:3px">
+                    <button id="wallTabLogin" onclick="switchWallTab('login')" style="flex:1;padding:10px;text-align:center;font-size:0.88rem;font-weight:600;color:#1a1a2e;background:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.06)">Iniciar sesion</button>
+                    <button id="wallTabReg" onclick="switchWallTab('register')" style="flex:1;padding:10px;text-align:center;font-size:0.88rem;font-weight:600;color:#6b7280;background:transparent;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Crear cuenta</button>
+                </div>
+                <div id="wallLogin">
+                    <div style="margin-bottom:16px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Email</label><input type="email" id="wallEmail" placeholder="tu@email.com" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
+                    <div style="margin-bottom:20px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Contrasena</label><input type="password" id="wallPass" placeholder="Tu contrasena" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'" onkeypress="if(event.key==='Enter')wallLogin()"></div>
+                    <button onclick="wallLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00a99d,#00c9bc);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Iniciar sesion</button>
+                </div>
+                <div id="wallReg" style="display:none">
+                    <div style="margin-bottom:14px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Nombre</label><input type="text" id="wallRegName" placeholder="Tu nombre" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
+                    <div style="margin-bottom:14px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Email</label><input type="email" id="wallRegEmail" placeholder="tu@email.com" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
+                    <div style="margin-bottom:18px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Contrasena</label><input type="password" id="wallRegPass" placeholder="Minimo 6 caracteres" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
+                    <button onclick="wallRegister()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00a99d,#00c9bc);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Crear cuenta</button>
+                </div>
+                <div id="wallMsg" style="margin-top:12px;font-size:0.82rem;text-align:center;color:#dc2626;display:none"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-to-top" id="backToTop" aria-label="Volver arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="m18 15-6-6-6 6"/></svg></button>
 
@@ -814,7 +853,9 @@
             document.getElementById('sidebarOverlay').classList.toggle('open');
         }
 
-        // ===== AUTH MODAL =====
+        // ===== AUTH =====
+        let currentUser = JSON.parse(localStorage.getItem('fs_user') || 'null');
+
         function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
         function switchAuthTab(tab) {
@@ -824,28 +865,126 @@
             document.getElementById('authRegisterForm').style.display = tab === 'register' ? 'block' : 'none';
             document.getElementById('authModalTitle').textContent = tab === 'login' ? 'Iniciar sesion' : 'Crear cuenta';
         }
-        function doLogin() {
-            // Placeholder - Supabase Auth will be connected later
+
+        async function doLogin() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             if (!email || !password) { showToast('Completa todos los campos', 'error'); return; }
-            showToast('Autenticacion con Supabase Auth pendiente de configurar', 'info');
-            closeAuthModal();
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_login', {
+                    method: 'POST', headers: supabaseHeaders(),
+                    body: JSON.stringify({ user_email: email, user_password: password })
+                });
+                const data = await res.json();
+                if (data.error) { showToast(data.error, 'error'); return; }
+                currentUser = data;
+                localStorage.setItem('fs_user', JSON.stringify(data));
+                closeAuthModal();
+                applyAuthState();
+                showToast('Bienvenido, ' + data.nombre, 'success');
+            } catch(e) { showToast('Error de conexion', 'error'); }
         }
-        function doRegister() {
+
+        async function doRegister() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             if (!name || !email || !password) { showToast('Completa todos los campos', 'error'); return; }
-            if (password.length < 6) { showToast('La contrasena debe tener al menos 6 caracteres', 'error'); return; }
-            showToast('Registro con Supabase Auth pendiente de configurar', 'info');
-            closeAuthModal();
+            if (password.length < 6) { showToast('Minimo 6 caracteres', 'error'); return; }
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_register', {
+                    method: 'POST', headers: supabaseHeaders(),
+                    body: JSON.stringify({ user_nombre: name, user_email: email, user_password: password })
+                });
+                const data = await res.json();
+                if (data.error) { showToast(data.error, 'error'); return; }
+                currentUser = data;
+                localStorage.setItem('fs_user', JSON.stringify(data));
+                closeAuthModal();
+                applyAuthState();
+                showToast('Cuenta creada. Bienvenido!', 'success');
+            } catch(e) { showToast('Error de conexion', 'error'); }
         }
+
         function doLogout() {
+            currentUser = null;
+            localStorage.removeItem('fs_user');
+            applyAuthState();
             showToast('Sesion cerrada', 'info');
-            document.getElementById('sidebarUser').style.display = 'none';
-            document.getElementById('sidebarLogin').style.display = 'flex';
         }
+
+        function applyAuthState() {
+            const sidebar = document.querySelector('.sidebar');
+            const appMain = document.querySelector('.app-main');
+            const authWall = document.getElementById('authWall');
+            if (currentUser) {
+                if (sidebar) sidebar.style.display = 'flex';
+                if (appMain) appMain.style.display = 'flex';
+                if (authWall) authWall.style.display = 'none';
+                const userEl = document.getElementById('sidebarUser');
+                const loginEl = document.getElementById('sidebarLogin');
+                if (userEl) { userEl.style.display = 'flex'; userEl.querySelector('.sidebar-user-name').textContent = currentUser.nombre; }
+                if (loginEl) loginEl.style.display = 'none';
+            } else {
+                if (sidebar) sidebar.style.display = 'none';
+                if (appMain) appMain.style.display = 'none';
+                if (authWall) authWall.style.display = 'flex';
+            }
+        }
+
+        // ===== AUTH WALL FUNCTIONS =====
+        function switchWallTab(tab) {
+            document.getElementById('wallLogin').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('wallReg').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('wallTabLogin').style.background = tab === 'login' ? '#fff' : 'transparent';
+            document.getElementById('wallTabLogin').style.color = tab === 'login' ? '#1a1a2e' : '#6b7280';
+            document.getElementById('wallTabLogin').style.boxShadow = tab === 'login' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
+            document.getElementById('wallTabReg').style.background = tab === 'register' ? '#fff' : 'transparent';
+            document.getElementById('wallTabReg').style.color = tab === 'register' ? '#1a1a2e' : '#6b7280';
+            document.getElementById('wallTabReg').style.boxShadow = tab === 'register' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
+            document.getElementById('wallMsg').style.display = 'none';
+        }
+        function showWallMsg(msg) {
+            const el = document.getElementById('wallMsg');
+            el.textContent = msg; el.style.display = 'block';
+        }
+        async function wallLogin() {
+            const email = document.getElementById('wallEmail').value.trim();
+            const pass = document.getElementById('wallPass').value;
+            if (!email || !pass) { showWallMsg('Completa todos los campos'); return; }
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_login', {
+                    method: 'POST', headers: supabaseHeaders(),
+                    body: JSON.stringify({ user_email: email, user_password: pass })
+                });
+                const data = await res.json();
+                if (data.error) { showWallMsg(data.error); return; }
+                currentUser = data;
+                localStorage.setItem('fs_user', JSON.stringify(data));
+                applyAuthState();
+            } catch(e) { showWallMsg('Error de conexion'); }
+        }
+        async function wallRegister() {
+            const name = document.getElementById('wallRegName').value.trim();
+            const email = document.getElementById('wallRegEmail').value.trim();
+            const pass = document.getElementById('wallRegPass').value;
+            if (!name || !email || !pass) { showWallMsg('Completa todos los campos'); return; }
+            if (pass.length < 6) { showWallMsg('Minimo 6 caracteres'); return; }
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_register', {
+                    method: 'POST', headers: supabaseHeaders(),
+                    body: JSON.stringify({ user_nombre: name, user_email: email, user_password: pass })
+                });
+                const data = await res.json();
+                if (data.error) { showWallMsg(data.error); return; }
+                currentUser = data;
+                localStorage.setItem('fs_user', JSON.stringify(data));
+                applyAuthState();
+            } catch(e) { showWallMsg('Error de conexion'); }
+        }
+
+        // Apply auth state on load
+        applyAuthState();
 
         // ===== DOM REFS =====
         const searchInput = document.getElementById('searchInput');
