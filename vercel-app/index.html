@@ -245,8 +245,6 @@
             border-radius:6px; transition:all 0.1s; width:100%;
         }
         .search-dd-item:hover { background:var(--primary-light); color:var(--primary-dark); }
-        @media (max-width:600px) { .search-dd-grid { grid-template-columns:1fr 1fr; } }
-
         /* Content area */
         .content { max-width:900px; margin:0 auto; padding:20px 28px 60px; width:100%; flex:1; }
 
@@ -363,6 +361,124 @@
         .back-to-top.visible { opacity:1; visibility:visible; transform:translateY(0); }
         .back-to-top:hover { transform:translateY(-2px); }
 
+        /* ===== CHATBOT ===== */
+        .chatbot-bubble, .chatbot-window { display:none; }
+        body.authenticated .chatbot-bubble { display:flex; }
+        body.authenticated .chatbot-window { display:flex; }
+        .chatbot-bubble {
+            position:fixed; bottom:80px; right:24px; z-index:60;
+            width:56px; height:56px; border-radius:50%;
+            background:linear-gradient(135deg,var(--primary),#00c9bc);
+            color:#fff; border:none; cursor:pointer;
+            align-items:center; justify-content:center;
+            box-shadow:0 4px 16px rgba(0,169,157,0.4);
+            transition:all 0.3s ease;
+        }
+        .chatbot-bubble:hover { transform:scale(1.08); box-shadow:0 6px 24px rgba(0,169,157,0.5); }
+        .chatbot-bubble.active { background:var(--text-dark); }
+        .chatbot-bubble svg { width:24px; height:24px; transition:transform 0.3s; }
+        .chatbot-bubble.active svg { transform:rotate(90deg); }
+        .chatbot-bubble .chatbot-dot {
+            position:absolute; top:2px; right:2px; width:12px; height:12px;
+            background:#f57c00; border:2px solid #fff; border-radius:50%;
+            animation:pulse-dot 2s ease-in-out infinite;
+        }
+        .chatbot-bubble.active .chatbot-dot { display:none; }
+        @keyframes chatbot-pulse { 0%,100%{box-shadow:0 4px 16px rgba(0,169,157,0.4)} 50%{box-shadow:0 4px 24px rgba(0,169,157,0.6)} }
+        .chatbot-bubble:not(.active) { animation:chatbot-pulse 3s ease-in-out infinite; }
+
+        .chatbot-window {
+            position:fixed; bottom:146px; right:24px;
+            width:380px; max-height:520px; height:520px;
+            background:var(--bg-white); border-radius:var(--radius-lg);
+            box-shadow:0 10px 40px rgba(0,0,0,0.15);
+            flex-direction:column; z-index:61; overflow:hidden;
+            opacity:0; transform:translateY(20px) scale(0.95);
+            pointer-events:none; transition:opacity 0.3s ease, transform 0.3s ease;
+        }
+        .chatbot-window.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+        .chatbot-header {
+            background:linear-gradient(135deg,var(--primary),#00c9bc);
+            padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+            color:#fff; flex-shrink:0;
+        }
+        .chatbot-header-info { display:flex; align-items:center; gap:10px; }
+        .chatbot-avatar {
+            width:36px; height:36px; border-radius:50%;
+            background:rgba(255,255,255,0.2); display:flex;
+            align-items:center; justify-content:center;
+        }
+        .chatbot-avatar svg { width:20px; height:20px; }
+        .chatbot-header-name { font-size:0.92rem; font-weight:700; }
+        .chatbot-header-status { font-size:0.68rem; opacity:0.85; }
+        .chatbot-close {
+            background:rgba(255,255,255,0.15); border:none; color:#fff;
+            width:30px; height:30px; border-radius:50%; cursor:pointer;
+            font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+            transition:background 0.2s;
+        }
+        .chatbot-close:hover { background:rgba(255,255,255,0.3); }
+        .chatbot-messages {
+            flex:1; overflow-y:auto; padding:16px; display:flex;
+            flex-direction:column; gap:10px; scroll-behavior:smooth;
+        }
+        .chatbot-messages::-webkit-scrollbar { width:4px; }
+        .chatbot-messages::-webkit-scrollbar-track { background:transparent; }
+        .chatbot-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+        .chatbot-msg {
+            padding:10px 14px; font-size:0.84rem; line-height:1.5;
+            max-width:85%; animation:fadeInUp 0.3s ease forwards;
+            word-wrap:break-word;
+        }
+        .chatbot-msg.bot {
+            background:var(--bg-light); color:var(--text-body);
+            border-radius:12px 12px 12px 4px; align-self:flex-start;
+            border:1px solid var(--border-light);
+        }
+        .chatbot-msg.user {
+            background:var(--primary); color:#fff;
+            border-radius:12px 12px 4px 12px; align-self:flex-end;
+        }
+        .chatbot-msg b { font-weight:600; }
+        .chatbot-typing { display:flex; gap:4px; padding:12px 16px; }
+        .chatbot-typing span {
+            width:7px; height:7px; background:var(--text-muted);
+            border-radius:50%; display:inline-block;
+            animation:chatbotDot 1.4s ease-in-out infinite;
+        }
+        .chatbot-typing span:nth-child(2) { animation-delay:0.2s; }
+        .chatbot-typing span:nth-child(3) { animation-delay:0.4s; }
+        @keyframes chatbotDot { 0%,80%,100%{transform:scale(0.4);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+        .chatbot-suggestions {
+            padding:6px 14px 2px; display:flex; gap:6px;
+            flex-wrap:wrap; flex-shrink:0;
+        }
+        .chatbot-chip {
+            padding:6px 12px; font-size:0.72rem; font-weight:500;
+            background:var(--bg-white); border:1px solid var(--border);
+            border-radius:20px; cursor:pointer; font-family:inherit;
+            color:var(--primary-dark); transition:all 0.2s; white-space:nowrap;
+        }
+        .chatbot-chip:hover { background:var(--primary-light); border-color:var(--primary); }
+        .chatbot-input-area {
+            border-top:1px solid var(--border-light); padding:12px;
+            display:flex; gap:8px; flex-shrink:0; background:var(--bg-white);
+        }
+        .chatbot-input {
+            flex:1; padding:10px 14px; border:2px solid var(--border);
+            border-radius:10px; font-size:0.85rem; font-family:inherit;
+            outline:none; transition:border-color 0.2s; background:var(--bg-light);
+        }
+        .chatbot-input:focus { border-color:var(--primary); background:var(--bg-white); }
+        .chatbot-send {
+            width:40px; height:40px; border-radius:50%; border:none;
+            background:var(--primary); color:#fff; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:all 0.2s; flex-shrink:0;
+        }
+        .chatbot-send:hover { background:var(--primary-dark); }
+        .chatbot-send svg { width:18px; height:18px; }
+
         /* ===== SIDEBAR VIEWS ===== */
         .view-panel { display:none; }
         .view-panel.active { display:block; }
@@ -390,23 +506,167 @@
         .auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-glow); }
         .auth-input-label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dark); margin-bottom:4px; }
 
+        /* ===== AUTH WALL ===== */
+        .auth-wall { display:flex; min-height:100vh; width:100%; }
+        .auth-wall-brand {
+            width:50%; background:linear-gradient(160deg,#00a99d 0%,#00c9bc 40%,#00d4aa 100%);
+            display:flex; flex-direction:column; justify-content:center;
+            padding:60px; color:#fff; position:relative; overflow:hidden;
+        }
+        .auth-wall-brand-decor {
+            position:absolute; top:-20%; right:-15%; width:500px; height:500px;
+            background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%); border-radius:50%;
+        }
+        .auth-wall-brand-inner { position:relative; z-index:1; max-width:480px; }
+        .auth-wall-brand-logo { display:flex; align-items:center; gap:14px; margin-bottom:40px; }
+        .auth-wall-brand-title { font-size:2.4rem; font-weight:800; line-height:1.15; margin-bottom:16px; }
+        .auth-wall-brand-sub { font-size:1.05rem; opacity:0.9; line-height:1.6; margin-bottom:40px; }
+        .auth-wall-stats { display:flex; gap:32px; }
+        .auth-wall-stat-value { font-size:2rem; font-weight:800; }
+        .auth-wall-stat-label { font-size:0.75rem; opacity:0.8; text-transform:uppercase; }
+        .auth-wall-form {
+            width:50%; display:flex; align-items:center; justify-content:center;
+            padding:40px; background:#f5f6f8;
+        }
+        .auth-wall-card {
+            width:100%; max-width:400px; background:#fff; border-radius:16px;
+            box-shadow:0 10px 40px rgba(0,0,0,0.08); padding:40px 36px;
+            border:1px solid #f3f4f6;
+        }
+        .auth-wall-tabs { display:flex; gap:0; margin-bottom:24px; background:#f3f4f6; border-radius:10px; padding:3px; }
+        .auth-wall-tab {
+            flex:1; padding:10px; text-align:center; font-size:0.88rem; font-weight:600;
+            color:#6b7280; background:transparent; border:none; border-radius:8px;
+            cursor:pointer; font-family:inherit; transition:all var(--transition);
+        }
+        .auth-wall-tab.active { color:#1a1a2e; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+        .auth-wall-field { margin-bottom:16px; }
+        .auth-wall-field:last-of-type { margin-bottom:20px; }
+        .auth-wall-label { display:block; font-size:0.8rem; font-weight:600; color:#1a1a2e; margin-bottom:6px; }
+        .auth-wall-input {
+            width:100%; padding:12px 14px; border:2px solid #e5e7eb; border-radius:10px;
+            font-size:0.9rem; font-family:inherit; outline:none; transition:border-color 0.2s;
+        }
+        .auth-wall-input:focus { border-color:#00a99d; }
+        .auth-wall-submit {
+            width:100%; padding:14px; background:linear-gradient(135deg,#00a99d,#00c9bc);
+            color:#fff; border:none; border-radius:10px; font-size:0.95rem; font-weight:700;
+            cursor:pointer; font-family:inherit; transition:all var(--transition);
+        }
+        .auth-wall-submit:hover { opacity:0.9; }
+        #wallMsg { margin-top:12px; font-size:0.82rem; text-align:center; color:#dc2626; display:none; }
+
         /* ===== RESPONSIVE ===== */
+
+        /* --- Tablet / sidebar collapse (<=900px) --- */
         @media (max-width:900px) {
+            /* Sidebar */
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
             .sidebar-overlay.open { display:block; }
             .hamburger { display:flex; }
             .app-main { margin-left:0 !important; }
-            .topbar { padding-left:64px; }
+            /* Topbar */
+            .topbar { padding:12px 16px 12px 56px; }
+            /* Auth wall: stack vertically */
+            .auth-wall { flex-direction:column; }
+            .auth-wall-brand { width:100%; padding:40px 28px 32px; min-height:auto; }
+            .auth-wall-form { width:100%; padding:24px 20px 40px; }
+            .auth-wall-card { padding:28px 24px; }
         }
+
+        /* --- Mobile (<=600px) --- */
         @media (max-width:600px) {
-            .categories-grid { grid-template-columns:repeat(3,1fr); }
+            /* Content & topbar padding */
+            .content { padding:16px 16px 48px; }
+            .topbar { padding:10px 12px 10px 52px; }
+            /* Search */
             .search-input { height:40px; font-size:0.88rem; }
+            .search-dropdown { padding:12px 14px; }
+            .search-dd-grid { grid-template-columns:1fr 1fr; }
+            .pharm-badges { display:none; }
+            /* Hero banner */
+            .hero-banner { padding:24px 20px 20px; margin-bottom:16px; }
+            .hero-title { font-size:1.3rem; }
+            .hero-sub { font-size:0.82rem; max-width:none; }
+            .hero-stats { gap:20px; margin-top:16px; flex-wrap:wrap; }
+            .hero-stat-value { font-size:1.15rem; }
+            .hero-badge { font-size:0.65rem; padding:4px 10px; margin-bottom:10px; }
+            /* Categories */
+            .categories-grid { grid-template-columns:repeat(3,1fr); gap:6px; }
+            .categories-section { margin-bottom:14px; }
+            .cat-card { padding:10px 6px 8px; }
+            .cat-card-icon { width:32px; height:32px; border-radius:8px; }
+            .cat-card-icon svg { width:15px; height:15px; }
+            .cat-card-name { font-size:0.66rem; }
+            /* Product cards */
+            .product-header { padding:12px 14px; gap:10px; }
+            .product-name { font-size:0.84rem; }
+            .best-price { font-size:1.05rem; }
+            .expand-icon { width:22px; height:22px; }
+            .product-meta { font-size:0.68rem; gap:8px; }
+            .savings-badge { font-size:0.62rem; padding:2px 6px; }
+            .price-label { font-size:0.6rem; }
+            /* Pharmacy rows */
             .pharmacy-row { flex-wrap:wrap; gap:6px; }
             .pharmacy-name { min-width:100%; }
-            .pharm-badges { display:none; }
+            .buy-link { width:100%; text-align:center; padding:10px 14px; display:block; }
+            .detail-inner { padding:0 12px 12px; }
+            /* Sort bar */
+            .sort-bar { padding:8px 10px; gap:8px; }
+            .sort-btn { padding:8px 14px; font-size:0.78rem; }
+            /* Status bar */
+            .status-text { font-size:0.75rem; }
+            .status-count { font-size:0.75rem; padding:3px 10px; }
+            /* Skeleton */
+            .skeleton-card { padding:14px; gap:12px; }
+            /* Toasts */
+            .toast-container { top:12px; right:12px; left:12px; }
+            .toast { max-width:100%; }
+            /* Modal */
+            .modal-content { padding:20px 16px; }
+            .modal-textarea { min-height:60px; padding:10px; }
+            /* Empty states */
+            .empty-state { padding:40px 16px; }
+            .view-empty { padding:40px 16px; }
+            /* View panels */
+            .view-title { font-size:1.15rem; }
+            .view-header { margin-bottom:20px; }
+            /* Back to top */
+            .back-to-top { bottom:16px; right:16px; width:40px; height:40px; }
+            /* Chatbot */
+            .chatbot-bubble { bottom:64px; right:16px; width:48px; height:48px; }
+            .chatbot-bubble svg { width:20px; height:20px; }
+            .chatbot-window.open {
+                position:fixed; inset:0; width:100%; max-height:100vh;
+                height:100%; border-radius:0; bottom:0; right:0;
+            }
+            /* Auth wall */
+            .auth-wall-brand { padding:32px 20px 24px; }
+            .auth-wall-brand-title { font-size:1.6rem; }
+            .auth-wall-brand-sub { font-size:0.92rem; margin-bottom:24px; }
+            .auth-wall-stats { gap:20px; }
+            .auth-wall-stat-value { font-size:1.5rem; }
+            .auth-wall-form { padding:20px 16px 32px; }
+            .auth-wall-card { padding:24px 20px; }
+            .auth-wall-brand-logo span { font-size:1.5rem; }
         }
-        @media (max-width:480px) { .categories-grid { grid-template-columns:repeat(2,1fr); } }
+
+        /* --- Small phones (<=480px) --- */
+        @media (max-width:480px) {
+            .content { padding:12px 12px 40px; }
+            .categories-grid { grid-template-columns:repeat(2,1fr); }
+            .hero-banner { padding:20px 16px 16px; }
+            .hero-title { font-size:1.15rem; }
+            .auth-wall-brand { padding:24px 16px 20px; }
+            .auth-wall-brand-title { font-size:1.35rem; }
+            .auth-wall-stats { gap:16px; }
+        }
+
+        /* --- Very small screens (<=400px) --- */
+        @media (max-width:400px) {
+            .search-dd-grid { grid-template-columns:1fr; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -755,46 +1015,68 @@
     </div>
 
     <!-- AUTH WALL (shown when not logged in) -->
-    <div id="authWall" style="display:flex;min-height:100vh;width:100%">
-        <div style="width:50%;background:linear-gradient(160deg,#00a99d 0%,#00c9bc 40%,#00d4aa 100%);display:flex;flex-direction:column;justify-content:center;padding:60px;color:#fff;position:relative;overflow:hidden">
-            <div style="position:absolute;top:-20%;right:-15%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);border-radius:50%"></div>
-            <div style="position:relative;z-index:1;max-width:480px">
-                <div style="display:flex;align-items:center;gap:14px;margin-bottom:40px">
+    <div id="authWall" class="auth-wall">
+        <div class="auth-wall-brand">
+            <div class="auth-wall-brand-decor"></div>
+            <div class="auth-wall-brand-inner">
+                <div class="auth-wall-brand-logo">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:50px;height:50px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15))"><path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="rgba(255,255,255,0.3)"/><circle cx="12" cy="12" r="5.5" fill="#fff" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><path d="M16 16L20.5 20.5" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
                     <span style="font-size:2rem;font-weight:800">FarmaSearch</span>
                 </div>
-                <h1 style="font-size:2.4rem;font-weight:800;line-height:1.15;margin-bottom:16px">Compara precios en farmacias de toda Espana</h1>
-                <p style="font-size:1.05rem;opacity:0.9;line-height:1.6;margin-bottom:40px">Busca cualquier producto de parafarmacia y encuentra el mejor precio entre 8 farmacias online.</p>
-                <div style="display:flex;gap:32px">
-                    <div><div style="font-size:2rem;font-weight:800">8</div><div style="font-size:0.75rem;opacity:0.8;text-transform:uppercase">Farmacias</div></div>
-                    <div><div style="font-size:2rem;font-weight:800">280K+</div><div style="font-size:0.75rem;opacity:0.8;text-transform:uppercase">Productos</div></div>
+                <h1 class="auth-wall-brand-title">Compara precios en farmacias de toda Espana</h1>
+                <p class="auth-wall-brand-sub">Busca cualquier producto de parafarmacia y encuentra el mejor precio entre 8 farmacias online.</p>
+                <div class="auth-wall-stats">
+                    <div><div class="auth-wall-stat-value">8</div><div class="auth-wall-stat-label">Farmacias</div></div>
+                    <div><div class="auth-wall-stat-value">280K+</div><div class="auth-wall-stat-label">Productos</div></div>
                 </div>
             </div>
         </div>
-        <div style="width:50%;display:flex;align-items:center;justify-content:center;padding:40px;background:#f5f6f8">
-            <div style="width:100%;max-width:400px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.08);padding:40px 36px;border:1px solid #f3f4f6">
-                <div style="display:flex;gap:0;margin-bottom:24px;background:#f3f4f6;border-radius:10px;padding:3px">
-                    <button id="wallTabLogin" onclick="switchWallTab('login')" style="flex:1;padding:10px;text-align:center;font-size:0.88rem;font-weight:600;color:#1a1a2e;background:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.06)">Iniciar sesion</button>
-                    <button id="wallTabReg" onclick="switchWallTab('register')" style="flex:1;padding:10px;text-align:center;font-size:0.88rem;font-weight:600;color:#6b7280;background:transparent;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Crear cuenta</button>
+        <div class="auth-wall-form">
+            <div class="auth-wall-card">
+                <div class="auth-wall-tabs">
+                    <button id="wallTabLogin" class="auth-wall-tab active" onclick="switchWallTab('login')">Iniciar sesion</button>
+                    <button id="wallTabReg" class="auth-wall-tab" onclick="switchWallTab('register')">Crear cuenta</button>
                 </div>
                 <div id="wallLogin">
-                    <div style="margin-bottom:16px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Email</label><input type="email" id="wallEmail" placeholder="tu@email.com" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
-                    <div style="margin-bottom:20px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Contrasena</label><input type="password" id="wallPass" placeholder="Tu contrasena" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'" onkeypress="if(event.key==='Enter')wallLogin()"></div>
-                    <button onclick="wallLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00a99d,#00c9bc);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Iniciar sesion</button>
+                    <div class="auth-wall-field"><label class="auth-wall-label">Email</label><input type="email" id="wallEmail" class="auth-wall-input" placeholder="tu@email.com"></div>
+                    <div class="auth-wall-field"><label class="auth-wall-label">Contrasena</label><input type="password" id="wallPass" class="auth-wall-input" placeholder="Tu contrasena" onkeypress="if(event.key==='Enter')wallLogin()"></div>
+                    <button onclick="wallLogin()" class="auth-wall-submit">Iniciar sesion</button>
                 </div>
                 <div id="wallReg" style="display:none">
-                    <div style="margin-bottom:14px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Nombre</label><input type="text" id="wallRegName" placeholder="Tu nombre" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
-                    <div style="margin-bottom:14px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Email</label><input type="email" id="wallRegEmail" placeholder="tu@email.com" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
-                    <div style="margin-bottom:18px"><label style="display:block;font-size:0.8rem;font-weight:600;color:#1a1a2e;margin-bottom:6px">Contrasena</label><input type="password" id="wallRegPass" placeholder="Minimo 6 caracteres" style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#00a99d'" onblur="this.style.borderColor='#e5e7eb'"></div>
-                    <button onclick="wallRegister()" style="width:100%;padding:14px;background:linear-gradient(135deg,#00a99d,#00c9bc);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Crear cuenta</button>
+                    <div class="auth-wall-field"><label class="auth-wall-label">Nombre</label><input type="text" id="wallRegName" class="auth-wall-input" placeholder="Tu nombre"></div>
+                    <div class="auth-wall-field"><label class="auth-wall-label">Email</label><input type="email" id="wallRegEmail" class="auth-wall-input" placeholder="tu@email.com"></div>
+                    <div class="auth-wall-field"><label class="auth-wall-label">Contrasena</label><input type="password" id="wallRegPass" class="auth-wall-input" placeholder="Minimo 6 caracteres"></div>
+                    <button onclick="wallRegister()" class="auth-wall-submit">Crear cuenta</button>
                 </div>
-                <div id="wallMsg" style="margin-top:12px;font-size:0.82rem;text-align:center;color:#dc2626;display:none"></div>
+                <div id="wallMsg"></div>
             </div>
         </div>
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-to-top" id="backToTop" aria-label="Volver arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="m18 15-6-6-6 6"/></svg></button>
+
+    <!-- Chatbot -->
+    <button class="chatbot-bubble" id="chatbotBubble" onclick="toggleChatbot()" aria-label="Asistente virtual FarmaBot">
+        <span class="chatbot-dot" id="chatbotDot"></span>
+        <svg id="chatbotIconChat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg id="chatbotIconClose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 14h.01M15 14h.01"/><path d="M10 17c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/></svg></div>
+                <div><div class="chatbot-header-name">FarmaBot</div><div class="chatbot-header-status">Asistente virtual</div></div>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">&times;</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages"></div>
+        <div class="chatbot-suggestions" id="chatbotSuggestions"></div>
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbotInput" class="chatbot-input" placeholder="Escribe tu pregunta..." autocomplete="off">
+            <button class="chatbot-send" onclick="sendChatMessage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+    </div>
 
     <script>
         // ===== SUPABASE CONFIG =====
@@ -935,12 +1217,8 @@
         function switchWallTab(tab) {
             document.getElementById('wallLogin').style.display = tab === 'login' ? 'block' : 'none';
             document.getElementById('wallReg').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('wallTabLogin').style.background = tab === 'login' ? '#fff' : 'transparent';
-            document.getElementById('wallTabLogin').style.color = tab === 'login' ? '#1a1a2e' : '#6b7280';
-            document.getElementById('wallTabLogin').style.boxShadow = tab === 'login' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
-            document.getElementById('wallTabReg').style.background = tab === 'register' ? '#fff' : 'transparent';
-            document.getElementById('wallTabReg').style.color = tab === 'register' ? '#1a1a2e' : '#6b7280';
-            document.getElementById('wallTabReg').style.boxShadow = tab === 'register' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
+            document.getElementById('wallTabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('wallTabReg').classList.toggle('active', tab === 'register');
             document.getElementById('wallMsg').style.display = 'none';
         }
         function showWallMsg(msg) {
@@ -1152,6 +1430,539 @@
             // Close sidebar on mobile
             if (window.innerWidth <= 900) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
         }
+
+        // ===== FARMABOT - CHATBOT SIMULADO =====
+
+        // --- Base de conocimiento (300+ Q&A) ---
+        const CHATBOT_QA = [
+            // ========== GENERAL (30+) ==========
+            {id:1,cat:'general',keywords:['que','farmasearch','aplicacion','app','pagina','web'],q:'Que es FarmaSearch',a:'FarmaSearch es un <b>comparador de precios de farmacia online</b>. Compara productos de parafarmacia en 8 farmacias de Espana para que encuentres el mejor precio sin tener que visitar cada web.'},
+            {id:2,cat:'general',keywords:['como','funciona','funcionamiento'],q:'Como funciona FarmaSearch',a:'Es muy sencillo: <b>escribe el nombre de un producto</b> en el buscador y te mostramos los precios en 8 farmacias. Puedes ordenar por precio, ver disponibilidad y acceder directamente a la farmacia para comprarlo.'},
+            {id:3,cat:'general',keywords:['gratis','gratuito','cuesta','precio','pagar','coste'],q:'Es gratis FarmaSearch',a:'Si, FarmaSearch es <b>100% gratuito</b>. Puedes buscar y comparar todos los productos que quieras sin ningun coste.'},
+            {id:4,cat:'general',keywords:['cuantas','farmacias','numero','cantidad'],q:'Cuantas farmacias compara',a:'Actualmente comparamos precios de <b>8 farmacias online</b> de Espana. Estamos trabajando para anadir mas en el futuro.'},
+            {id:5,cat:'general',keywords:['cuantos','productos','numero','catalogo'],q:'Cuantos productos tiene',a:'Tenemos mas de <b>280.000 productos</b> en nuestra base de datos, con mas de 327.000 registros de precios actualizados.'},
+            {id:6,cat:'general',keywords:['farmacia','online','comprar','tienda','vender'],q:'Es una farmacia online',a:'No, FarmaSearch <b>no es una farmacia</b>. Somos un comparador de precios. Cuando encuentras el producto que buscas, te redirigimos a la farmacia online donde puedes comprarlo directamente.'},
+            {id:7,cat:'general',keywords:['comprar','aqui','directamente','pedido'],q:'Puedo comprar aqui',a:'No directamente. FarmaSearch te muestra los precios y al pulsar <b>"Comprar"</b> te redirige a la web de la farmacia donde puedes realizar tu compra.'},
+            {id:8,cat:'general',keywords:['quien','creo','creador','desarrollador','hizo'],q:'Quien creo FarmaSearch',a:'FarmaSearch fue desarrollado como un proyecto de innovacion tecnologica enfocado en ayudar a los consumidores a <b>ahorrar en sus compras de farmacia</b>.'},
+            {id:9,cat:'general',keywords:['seguro','seguridad','fiable','confianza','privacidad'],q:'Es seguro usar FarmaSearch',a:'Si, FarmaSearch es totalmente seguro. <b>No almacenamos datos de pago</b>, no vendemos tus datos y la conexion esta cifrada con HTTPS. Solo guardamos tu email y nombre para tu cuenta.'},
+            {id:10,cat:'general',keywords:['privacidad','datos','informacion','personal','rgpd'],q:'Que datos almacenais',a:'Solo almacenamos tu <b>nombre, email y contrasena</b> (cifrada) para tu cuenta. No vendemos ni compartimos tus datos con terceros.'},
+            {id:11,cat:'general',keywords:['movil','app','android','ios','telefono','smartphone'],q:'Hay app para movil',a:'De momento no hay app nativa, pero la <b>web funciona perfectamente en el navegador de tu movil</b>. Esta disenada para ser responsive y adaptarse a cualquier pantalla.'},
+            {id:12,cat:'general',keywords:['espana','pais','paises','internacional','fuera'],q:'Funciona fuera de Espana',a:'Las farmacias que comparamos son <b>farmacias online espanolas</b>. Puedes acceder desde cualquier pais, pero los precios y envios son de Espana.'},
+            {id:13,cat:'general',keywords:['idioma','ingles','idiomas','english','language'],q:'En que idioma esta',a:'FarmaSearch esta <b>en espanol</b>. De momento no tenemos version en otros idiomas, pero lo tenemos en mente para el futuro.'},
+            {id:14,cat:'general',keywords:['contacto','contactar','email','correo','soporte','ayuda'],q:'Como puedo contactar con vosotros',a:'Puedes reportar errores o hacer sugerencias a traves de la aplicacion. Estamos trabajando en un <b>formulario de contacto directo</b>.'},
+            {id:15,cat:'general',keywords:['reportar','error','bug','problema','fallo','incidencia'],q:'Como reporto un error',a:'Si encuentras un error o un precio incorrecto, puedes reportarlo. Estamos implementando un <b>sistema de reporte</b> directamente desde las tarjetas de producto.'},
+            {id:16,cat:'general',keywords:['diferencia','google','shopping','kelkoo','comparador','otro'],q:'En que se diferencia de Google Shopping',a:'FarmaSearch esta <b>especializado en farmacia y parafarmacia</b>. A diferencia de Google Shopping, comparamos solo farmacias de confianza, mostramos disponibilidad en tiempo real y el precio unitario mas claro.'},
+            {id:17,cat:'general',keywords:['porque','usar','ventaja','beneficio','mejor'],q:'Por que usar FarmaSearch',a:'Porque te <b>ahorras tiempo y dinero</b>. En vez de visitar 8 webs distintas, ves todos los precios en un solo lugar. La diferencia media entre el mas caro y el mas barato puede ser de varios euros.'},
+            {id:18,cat:'general',keywords:['receta','medicamento','prescripcion','medico'],q:'Incluye medicamentos con receta',a:'No, FarmaSearch solo compara <b>productos de parafarmacia</b>: cosmetica, higiene, suplementos, etc. Los medicamentos con receta medica no se incluyen por normativa legal.'},
+            {id:19,cat:'general',keywords:['tipo','tipos','productos','parafarmacia','categoria'],q:'Que tipo de productos hay',a:'Encontraras productos de <b>parafarmacia</b>: cremas, champus, proteccion solar, vitaminas, dental, bebes, desodorantes, analgesicos (sin receta), optica y mucho mas.'},
+            {id:20,cat:'general',keywords:['preciso','precision','exacto','actualizado','fiable','precio'],q:'Los precios son exactos',a:'Los precios se actualizan periodicamente. Puede haber <b>pequenas variaciones</b> entre lo que mostramos y el precio actual en la farmacia, pero nos esforzamos por mantenerlos lo mas actualizados posible.'},
+            {id:21,cat:'general',keywords:['sugerir','anadir','nueva','farmacia','agregar'],q:'Puedo sugerir una farmacia nueva',a:'Estamos siempre buscando <b>ampliar nuestro catalogo</b> de farmacias. Agradecemos las sugerencias, estamos trabajando en un formulario para ello.'},
+            {id:22,cat:'general',keywords:['futuro','planes','roadmap','proximamente','nuevo'],q:'Que planes de futuro tiene FarmaSearch',a:'Estamos trabajando en: <b>alertas de precio</b>, listas de la compra, historial de busqueda, ofertas del dia, dashboard personal y app movil nativa. Muchas de estas funciones ya aparecen en el menu.'},
+            {id:23,cat:'general',keywords:['api','desarrollador','integrar','embed','widget'],q:'Tiene API publica',a:'De momento <b>no ofrecemos API publica</b>. Es algo que podriamos considerar en el futuro.'},
+            {id:24,cat:'general',keywords:['afiliado','comision','ganar','dinero','modelo','negocio'],q:'Como gana dinero FarmaSearch',a:'Actualmente FarmaSearch es un <b>proyecto gratuito</b>. En el futuro podria incluir un modelo de suscripcion premium con funciones avanzadas.'},
+            {id:25,cat:'general',keywords:['nuevo','novedades','actualizado','version','cambios'],q:'Que hay de nuevo en FarmaSearch',a:'Estamos constantemente mejorando la aplicacion. Las ultimas novedades incluyen el <b>sistema de busqueda mejorado</b>, categorias por temas, ordenacion avanzada y esta misma funcion de asistente virtual.'},
+            {id:26,cat:'general',keywords:['mejor','farmacia','barata','economica','recomendada'],q:'Cual es la farmacia mas barata',a:'No hay una sola farmacia que sea siempre la mas barata. <b>Depende del producto</b>. Por eso existe FarmaSearch: para que compares y encuentres la mejor opcion en cada caso.'},
+            {id:27,cat:'general',keywords:['envio','gastos','envio','transporte','entrega'],q:'Los precios incluyen gastos de envio',a:'No, los precios mostrados son <b>solo del producto</b>. Los gastos de envio dependen de cada farmacia y del importe total de tu pedido.'},
+            {id:28,cat:'general',keywords:['devolucion','devolver','garantia','reembolso'],q:'Que pasa con las devoluciones',a:'Las devoluciones se gestionan <b>directamente con la farmacia</b> donde hayas comprado. Cada una tiene su propia politica de devolucion.'},
+            {id:29,cat:'general',keywords:['legal','terminos','condiciones','aviso'],q:'Donde estan los terminos legales',a:'Estamos preparando una seccion de <b>terminos y condiciones</b> y politica de privacidad. Proximamente estaran disponibles en la aplicacion.'},
+            {id:30,cat:'general',keywords:['espana','solo','enviar','envio','peninsula'],q:'Solo es para Espana',a:'Si, actualmente las <b>8 farmacias comparadas son espanolas</b>. La mayoria envian a toda la peninsula, y algunas a Baleares y Canarias con coste adicional.'},
+
+            // ========== BUSQUEDA (35+) ==========
+            {id:101,cat:'busqueda',keywords:['buscar','como','buscador','search'],q:'Como busco un producto',a:'Escribe el nombre del producto en la <b>barra de busqueda</b> de la parte superior. Con solo 2 caracteres empezara a buscar automaticamente.'},
+            {id:102,cat:'busqueda',keywords:['minimo','caracteres','letras','escribir','poco'],q:'Cuantos caracteres necesito escribir',a:'Necesitas escribir <b>al menos 2 caracteres</b> para que se active la busqueda. Si escribes solo 1, no se mostraran resultados.'},
+            {id:103,cat:'busqueda',keywords:['tarda','lento','demora','esperar','delay'],q:'Por que tarda un poco en buscar',a:'Hay un <b>pequeno retraso intencional de 0.3 segundos</b> (debounce) para no hacer busquedas con cada tecla que pulsas. Esto mejora el rendimiento y evita busquedas innecesarias.'},
+            {id:104,cat:'busqueda',keywords:['limpiar','borrar','quitar','eliminar','reset','x'],q:'Como limpio la busqueda',a:'Pulsa el <b>boton X</b> que aparece a la derecha del buscador cuando hay texto escrito. Esto borrara la busqueda y volveras a ver la pagina principal con las categorias.'},
+            {id:105,cat:'busqueda',keywords:['categorias','categoria','explorar','tema','grupo'],q:'Que categorias hay',a:'Hay <b>15 categorias principales</b>: Cremas, Cabello, Solar, Dental, Desodorante, Vitaminas, Analgesicos, Digestivo, Resfriado, Alergias, Bebes, Antiedad, Deportivo, Menstrual y Optica.'},
+            {id:106,cat:'busqueda',keywords:['dropdown','desplegable','menu','aparece','foco'],q:'Que es el menu desplegable del buscador',a:'Al hacer clic en el buscador (cuando esta vacio), se abre un <b>menu con 9 grupos de categorias</b> organizados por tema: Facial, Solar, Cabello, Salud, Bebe, Higiene, Optica, Mujer y Nutricion.'},
+            {id:107,cat:'busqueda',keywords:['marca','nombre','buscar','marca','laboratorio'],q:'Puedo buscar por marca',a:'Si, puedes escribir el <b>nombre de la marca</b> directamente en el buscador. Por ejemplo: "Avene", "La Roche Posay", "Vichy", "Isdin", etc.'},
+            {id:108,cat:'busqueda',keywords:['principio','activo','ingrediente','componente'],q:'Puedo buscar por principio activo',a:'Si, puedes buscar por <b>ingredientes o principios activos</b> como "acido hialuronico", "retinol", "niacinamida", "colageno", etc.'},
+            {id:109,cat:'busqueda',keywords:['ingles','english','idioma','buscar'],q:'Puedo buscar en ingles',a:'La busqueda funciona mejor en <b>espanol</b>. Algunos productos pueden tener nombres en ingles, pero te recomendamos buscar en espanol para mejores resultados.'},
+            {id:110,cat:'busqueda',keywords:['resultado','resultados','encontrar','sin','nada','vacio'],q:'No encuentro resultados',a:'Si no encuentras resultados, prueba: <b>1)</b> Usa terminos mas genericos, <b>2)</b> Verifica la ortografia, <b>3)</b> Busca por marca o tipo de producto en vez del nombre exacto.'},
+            {id:111,cat:'busqueda',keywords:['mayusculas','minusculas','case','sensible'],q:'La busqueda distingue mayusculas',a:'No, la busqueda <b>no distingue entre mayusculas y minusculas</b>. "Crema", "crema" y "CREMA" dan los mismos resultados.'},
+            {id:112,cat:'busqueda',keywords:['acento','acentos','tilde','tildes'],q:'Puedo buscar con o sin acentos',a:'Si, puedes buscar <b>con o sin acentos</b> y deberia funcionar correctamente.'},
+            {id:113,cat:'busqueda',keywords:['pagina','resultados','cuantos','muestra','cantidad'],q:'Cuantos resultados se muestran',a:'Se muestran <b>50 resultados por pagina</b>. Cuando llegas al final, se cargan automaticamente mas resultados (scroll infinito).'},
+            {id:114,cat:'busqueda',keywords:['infinito','scroll','cargar','mas','automatico'],q:'Que es el scroll infinito',a:'El <b>scroll infinito</b> significa que cuando llegas al final de los resultados, se cargan automaticamente 50 mas. No necesitas pulsar ningun boton de "siguiente pagina".'},
+            {id:115,cat:'busqueda',keywords:['descripcion','detalle','busca','donde','campo'],q:'Busca en la descripcion del producto',a:'La busqueda se realiza principalmente por el <b>nombre del producto</b>. Es la forma mas rapida y precisa de encontrar lo que necesitas.'},
+            {id:116,cat:'busqueda',keywords:['ordenar','orden','sort','clasificar'],q:'Como ordeno los resultados',a:'Tras buscar, aparece una <b>barra de ordenacion</b> con 7 opciones: Relevancia, A-Z, Z-A, Precio ascendente, Precio descendente, Mas farmacias y En stock.'},
+            {id:117,cat:'busqueda',keywords:['relevancia','defecto','orden','inicial'],q:'Que es ordenar por relevancia',a:'Es la <b>ordenacion por defecto</b>. Muestra primero los productos cuyo nombre coincide mejor con tu busqueda.'},
+            {id:118,cat:'busqueda',keywords:['precio','ascendente','barato','menor','economico','asc'],q:'Como veo los mas baratos primero',a:'Pulsa el boton <b>"Precio ↑"</b> en la barra de ordenacion. Los productos mas baratos apareceran primero.'},
+            {id:119,cat:'busqueda',keywords:['precio','descendente','caro','mayor','desc'],q:'Como veo los mas caros primero',a:'Pulsa el boton <b>"Precio ↓"</b> en la barra de ordenacion.'},
+            {id:120,cat:'busqueda',keywords:['alfabetico','nombre','az','za','letra'],q:'Como ordeno alfabeticamente',a:'Usa los botones <b>"A-Z"</b> o <b>"Z-A"</b> en la barra de ordenacion para ordenar por nombre alfabeticamente.'},
+            {id:121,cat:'busqueda',keywords:['farmacias','mas','disponible','disponibilidad'],q:'Como veo los de mas farmacias',a:'Pulsa <b>"+ Farmacias"</b> para ver primero los productos que estan disponibles en mas farmacias, lo que te da mas opciones de comparacion.'},
+            {id:122,cat:'busqueda',keywords:['stock','disponible','solo','filtrar','disponibles'],q:'Como veo solo los que estan en stock',a:'Pulsa el boton <b>"En stock"</b> en la barra de ordenacion. Asi priorizaras los productos que estan actualmente disponibles.'},
+            {id:123,cat:'busqueda',keywords:['sugerencia','sugerencias','popular','populares','tendencia'],q:'Hay sugerencias de busqueda',a:'Si, al hacer clic en el buscador vacio se despliega un <b>menu de categorias populares</b> agrupadas por tema. Tambien puedes usar las tarjetas de categoria en la pagina principal.'},
+            {id:124,cat:'busqueda',keywords:['rango','precio','filtro','desde','hasta','entre'],q:'Puedo filtrar por rango de precio',a:'De momento <b>no hay filtro por rango de precio</b>, pero puedes ordenar de mas barato a mas caro. Es una funcion que estamos considerando anadir.'},
+            {id:125,cat:'busqueda',keywords:['codigo','barras','ean','referencia','numero'],q:'Puedo buscar por codigo de barras',a:'De momento <b>no es posible buscar por codigo de barras</b>. Es una funcionalidad interesante que podriamos anadir en el futuro.'},
+            {id:126,cat:'busqueda',keywords:['crema','cremas','hidratante','facial'],q:'Como busco cremas',a:'Escribe "crema" o "crema hidratante" en el buscador, o pulsa la <b>tarjeta "Cremas"</b> en la pagina principal. Tambien puedes explorar la subcategoria "Facial" en el dropdown.'},
+            {id:127,cat:'busqueda',keywords:['champu','champus','pelo','cabello','capilar'],q:'Como busco champus',a:'Escribe "champu" en el buscador o pulsa la <b>tarjeta "Cabello"</b> en la pagina principal.'},
+            {id:128,cat:'busqueda',keywords:['solar','proteccion','spf','crema','sol'],q:'Como busco proteccion solar',a:'Busca "proteccion solar", "spf 50" o "solar facial", o usa la <b>tarjeta "Solar"</b> en la pagina principal.'},
+            {id:129,cat:'busqueda',keywords:['vitamina','vitaminas','suplemento','complemento'],q:'Como busco vitaminas',a:'Busca "vitamina" seguido del tipo (D, C, B12...) o usa la <b>tarjeta "Vitaminas"</b> en la pagina principal.'},
+            {id:130,cat:'busqueda',keywords:['bebe','bebes','panal','panales','infantil'],q:'Como busco productos de bebe',a:'Busca "panal", "crema bebe" o "leche infantil", o usa la <b>tarjeta "Bebes"</b> en la pagina principal.'},
+            {id:131,cat:'busqueda',keywords:['dental','dientes','pasta','colutorio','cepillo'],q:'Como busco productos dentales',a:'Busca "pasta de dientes", "colutorio" o "cepillo", o usa la <b>tarjeta "Dental"</b> en la pagina principal.'},
+            {id:132,cat:'busqueda',keywords:['analgesico','dolor','paracetamol','ibuprofeno'],q:'Como busco analgesicos',a:'Busca "paracetamol", "ibuprofeno" o "analgesico", o usa la <b>tarjeta "Analgesicos"</b>.'},
+            {id:133,cat:'busqueda',keywords:['lentillas','optica','lentes','contacto','lagrimas'],q:'Como busco productos de optica',a:'Busca "lentillas", "solucion lentillas" o "lagrimas artificiales", o usa la <b>tarjeta "Optica"</b>.'},
+            {id:134,cat:'busqueda',keywords:['desodorante','desodorantes','antitranspirante'],q:'Como busco desodorantes',a:'Busca "desodorante" en el buscador o pulsa la <b>tarjeta "Desodorante"</b> en la pagina principal.'},
+            {id:135,cat:'busqueda',keywords:['tips','consejos','truco','trucos','busqueda'],q:'Tips para buscar mejor',a:'Algunos consejos: <b>1)</b> Usa terminos cortos y genericos, <b>2)</b> Busca por marca + tipo (ej: "Avene crema"), <b>3)</b> Prueba el dropdown de categorias, <b>4)</b> Ordena por precio para encontrar lo mas barato.'},
+            {id:136,cat:'busqueda',keywords:['facial','serum','serums','contorno','ojos','limpiador'],q:'Que subcategorias hay en Facial',a:'En Facial encontraras: <b>Cremas hidratantes, Serums, Contorno de ojos, Mascarillas, Limpiadores, Ac. hialuronico y Retinol</b>.'},
+            {id:137,cat:'busqueda',keywords:['higiene','gel','ducha','jabon','intima'],q:'Que subcategorias hay en Higiene',a:'En Higiene encontraras: <b>Geles de ducha, Desodorantes, Higiene intima, Dental y Colutorios</b>.'},
+            {id:138,cat:'busqueda',keywords:['salud','medicamento','antihistaminico','magnesio','probiotico'],q:'Que subcategorias hay en Salud',a:'En Salud encontraras: <b>Paracetamol, Ibuprofeno, Antihistaminicos, Vitamina D, Magnesio y Probioticos</b>.'},
+            {id:139,cat:'busqueda',keywords:['nutricion','proteina','colageno','batido','infusion'],q:'Que subcategorias hay en Nutricion',a:'En Nutricion encontraras: <b>Proteinas, Colageno, Batidos sustitutivos e Infusiones</b>.'},
+            {id:140,cat:'busqueda',keywords:['mujer','compresa','tampon','copa','menstrual','embarazo'],q:'Que subcategorias hay en Mujer',a:'En Mujer encontraras: <b>Compresas, Tampones, Copa menstrual y Test de embarazo</b>.'},
+
+            // ========== PRODUCTOS Y PRECIOS (35+) ==========
+            {id:201,cat:'productos',keywords:['tarjeta','card','producto','muestra','informacion'],q:'Que muestra una tarjeta de producto',a:'Cada tarjeta muestra: <b>nombre del producto</b>, numero de farmacias que lo tienen, el mejor precio encontrado y un badge de ahorro si hay diferencia entre farmacias.'},
+            {id:202,cat:'productos',keywords:['mejor','precio','mas','barato','minimo'],q:'Que es el mejor precio',a:'El <b>"mejor precio"</b> es el precio mas bajo encontrado entre todas las farmacias que tienen ese producto disponible.'},
+            {id:203,cat:'productos',keywords:['ahorro','ahorra','badge','diferencia','descuento'],q:'Que significa el badge de Ahorra',a:'El badge <b>"Ahorra X €"</b> muestra la diferencia entre el precio mas caro y el mas barato entre las farmacias. Te indica cuanto puedes ahorrar eligiendo la farmacia mas barata.'},
+            {id:204,cat:'productos',keywords:['expandir','abrir','flecha','detalle','detalles','mas'],q:'Como veo los detalles de un producto',a:'Haz clic en <b>cualquier parte de la tarjeta</b> del producto (o en la flecha de la derecha) para expandirla y ver los precios por farmacia, disponibilidad y enlaces de compra.'},
+            {id:205,cat:'productos',keywords:['disponible','stock','verde','si'],q:'Que significa Disponible',a:'<b>"Disponible"</b> (en verde) significa que la farmacia tiene el producto en stock y puedes comprarlo ahora mismo.'},
+            {id:206,cat:'productos',keywords:['sin','stock','agotado','rojo','no'],q:'Que significa Sin stock',a:'<b>"Sin stock"</b> (en rojo) significa que la farmacia actualmente no tiene el producto disponible. El precio se muestra igualmente como referencia.'},
+            {id:207,cat:'productos',keywords:['comprar','boton','enlace','link','redirige'],q:'Que hace el boton Comprar',a:'El boton <b>"Comprar →"</b> te abre una nueva pestana directamente en la pagina del producto en la farmacia correspondiente, para que puedas comprarlo.'},
+            {id:208,cat:'productos',keywords:['verde','color','precio','mejor','resaltado'],q:'Por que hay precios en verde',a:'El precio en <b>verde</b> indica que es el mejor precio (el mas bajo) de entre todas las farmacias para ese producto.'},
+            {id:209,cat:'productos',keywords:['gris','color','precio','normal','otros'],q:'Por que hay precios en gris',a:'Los precios en gris son precios de <b>otras farmacias que no son las mas baratas</b> para ese producto. Estan para que puedas comparar.'},
+            {id:210,cat:'productos',keywords:['guion','sin','precio','no','tiene'],q:'Que significa el guion en lugar de precio',a:'El <b>guion "—"</b> aparece cuando no tenemos precio registrado para ese producto en esa farmacia, o cuando el producto no esta disponible.'},
+            {id:211,cat:'productos',keywords:['farmacias','numero','x','cuantas','meta'],q:'Que significa X farmacias en la tarjeta',a:'El texto <b>"X farmacias"</b> indica en cuantas farmacias hemos encontrado ese producto. Cuantas mas farmacias, mas opciones de comparacion tienes.'},
+            {id:212,cat:'productos',keywords:['skeleton','cargando','loading','animacion','gris'],q:'Que son las barras grises que se mueven',a:'Son el <b>skeleton loader</b>, una animacion que indica que los resultados se estan cargando. Desaparecen cuando los datos estan listos.'},
+            {id:213,cat:'productos',keywords:['animacion','aparece','efecto','card','entrada'],q:'Por que las tarjetas tienen animacion',a:'Las tarjetas tienen un <b>efecto de entrada suave</b> (fade in + slide up) para hacer la experiencia mas agradable visualmente.'},
+            {id:214,cat:'productos',keywords:['resaltado','amarillo','highlight','marca','texto'],q:'Por que hay texto resaltado en el nombre',a:'El texto <b>resaltado en verde claro</b> coincide con los terminos que has buscado, para que veas facilmente por que ese producto aparece en los resultados.'},
+            {id:215,cat:'productos',keywords:['envio','gastos','transporte','coste','adicional'],q:'El precio incluye envio',a:'No, los precios mostrados son <b>solo del producto</b>. Los gastos de envio dependen de cada farmacia y del total del pedido. Consultalos en la web de la farmacia.'},
+            {id:216,cat:'productos',keywords:['moneda','euro','euros','divisa','currency'],q:'En que moneda son los precios',a:'Todos los precios estan en <b>euros (€)</b>.'},
+            {id:217,cat:'productos',keywords:['actualizar','actualizan','frecuencia','cuando','update'],q:'Cada cuanto se actualizan los precios',a:'Los precios se actualizan <b>periodicamente</b> mediante un sistema automatizado. Puede haber pequenas diferencias con el precio actual en la farmacia.'},
+            {id:218,cat:'productos',keywords:['diferente','diferencia','precio','web','farmacia'],q:'El precio es diferente al de la farmacia',a:'Es posible que haya <b>pequenas diferencias</b> ya que los precios se actualizan periodicamente. Si ves una gran diferencia, puedes reportarla.'},
+            {id:219,cat:'productos',keywords:['favorito','guardar','corazon','like','save'],q:'Puedo guardar un producto como favorito',a:'La funcion de <b>favoritos esta en desarrollo</b> y estara disponible proximamente. Podras guardar productos para seguirlos facilmente.'},
+            {id:220,cat:'productos',keywords:['comparar','dos','solo','especifico','farmacia','filtrar'],q:'Puedo comparar solo 2 farmacias',a:'De momento <b>no hay filtro por farmacia</b>. Se muestran todas las farmacias que tienen el producto. Es una funcion que consideramos para el futuro.'},
+            {id:221,cat:'productos',keywords:['historico','historial','precio','evolucion','grafica'],q:'Puedo ver el historico de precios',a:'El <b>historial de precios</b> es una funcion que estamos desarrollando. Proximamente podras ver como ha evolucionado el precio de un producto.'},
+            {id:222,cat:'productos',keywords:['alerta','aviso','notificacion','precio','baja'],q:'Puedo poner alertas de precio',a:'Las <b>alertas de precio</b> estan planificadas como funcion futura. Te avisaremos cuando un producto baje del precio que tu elijas.'},
+            {id:223,cat:'productos',keywords:['exportar','descargar','excel','pdf','lista'],q:'Puedo exportar los resultados',a:'De momento <b>no es posible exportar</b> los resultados. Es una funcion que consideramos para el futuro.'},
+            {id:224,cat:'productos',keywords:['compartir','enviar','link','enlace','amigo'],q:'Puedo compartir un producto',a:'De momento <b>no hay funcion de compartir</b> directamente. Puedes copiar el enlace de la farmacia desde el boton "Comprar" y compartirlo.'},
+            {id:225,cat:'productos',keywords:['cerrar','colapsar','plegar','minimizar','contraer'],q:'Como cierro un producto expandido',a:'Haz clic de nuevo en la <b>tarjeta del producto</b> o en la flecha para colapsarla.'},
+            {id:226,cat:'productos',keywords:['nueva','pestana','tab','abre','ventana'],q:'Por que Comprar abre una nueva pestana',a:'Se abre en <b>nueva pestana</b> para que no pierdas tu busqueda en FarmaSearch mientras consultas o compras en la farmacia.'},
+            {id:227,cat:'productos',keywords:['scroll','arriba','subir','volver','top'],q:'Como vuelvo arriba rapido',a:'Cuando bajas en la pagina aparece un <b>boton circular verde</b> abajo a la derecha. Pulsalo para volver al inicio de la pagina suavemente.'},
+            {id:228,cat:'productos',keywords:['notificacion','toast','mensaje','verde','rojo','aviso'],q:'Que son los mensajes que aparecen arriba',a:'Son <b>notificaciones (toasts)</b>: verde = exito, rojo = error, oscuro = informacion. Desaparecen automaticamente tras unos segundos.'},
+            {id:229,cat:'productos',keywords:['total','todos','ver','numero','resultado'],q:'Cuantos resultados tiene mi busqueda',a:'El <b>numero total</b> aparece junto al texto "Resultados para..." en una burbuja gris despues de buscar.'},
+            {id:230,cat:'productos',keywords:['oferta','descuento','rebaja','promocion','chollo'],q:'Donde veo las ofertas',a:'La seccion <b>"Ofertas"</b> esta en el menu lateral izquierdo. Aun esta en desarrollo, pero proximamente mostrara los productos con mayor bajada de precio.'},
+
+            // ========== CUENTA Y AUTH (30+) ==========
+            {id:301,cat:'cuenta',keywords:['registrar','registro','crear','cuenta','nueva','registrarse'],q:'Como me registro',a:'En la pantalla de inicio, pulsa <b>"Crear cuenta"</b>. Rellena tu nombre, email y una contrasena de al menos 6 caracteres. Asi de facil.'},
+            {id:302,cat:'cuenta',keywords:['iniciar','sesion','login','entrar','acceder'],q:'Como inicio sesion',a:'En la pantalla de inicio, introduce tu <b>email y contrasena</b> y pulsa "Iniciar sesion". Si ya iniciaste sesion antes, se recuerda automaticamente.'},
+            {id:303,cat:'cuenta',keywords:['cerrar','sesion','logout','salir','desconectar'],q:'Como cierro sesion',a:'En la <b>parte inferior del menu lateral</b>, junto a tu nombre, veras un icono de flecha. Pulsalo para cerrar sesion.'},
+            {id:304,cat:'cuenta',keywords:['auth','wall','muro','pantalla','inicio','obligatorio'],q:'Por que tengo que iniciar sesion para usar la app',a:'El <b>muro de autenticacion</b> garantiza una experiencia personalizada. Necesitas cuenta para acceder a funciones como favoritos, historial y listas (cuando esten disponibles).'},
+            {id:305,cat:'cuenta',keywords:['obligatorio','necesario','forzoso','sin','cuenta'],q:'Puedo usar la app sin registrarme',a:'De momento <b>es necesario registrarse</b> para usar FarmaSearch. El registro es gratuito y rapido (solo nombre, email y contrasena).'},
+            {id:306,cat:'cuenta',keywords:['cambiar','contrasena','password','clave','modificar'],q:'Puedo cambiar mi contrasena',a:'La funcion de <b>cambiar contrasena aun no esta disponible</b>. Estamos trabajando en ella para la seccion "Mi Perfil".'},
+            {id:307,cat:'cuenta',keywords:['eliminar','borrar','cuenta','baja','darme'],q:'Puedo eliminar mi cuenta',a:'La funcion de <b>eliminacion de cuenta aun no esta disponible</b>. Proximamente podras hacerlo desde "Mi Perfil".'},
+            {id:308,cat:'cuenta',keywords:['datos','almacena','guarda','informacion','personal'],q:'Que datos se guardan de mi cuenta',a:'Guardamos tu <b>nombre, email y contrasena cifrada</b>. Tambien tu plan de suscripcion y preferencias. No almacenamos datos de pago.'},
+            {id:309,cat:'cuenta',keywords:['segura','cifrada','encriptada','hash','password'],q:'Mi contrasena es segura',a:'Si, tu contrasena se almacena <b>cifrada con bcrypt</b> en la base de datos. Ni siquiera nosotros podemos verla.'},
+            {id:310,cat:'cuenta',keywords:['avatar','iniciales','icono','foto','perfil'],q:'Que son las iniciales en el menu',a:'El <b>circulo con tu inicial</b> en la parte inferior del menu es tu avatar. Se genera automaticamente con la primera letra de tu nombre.'},
+            {id:311,cat:'cuenta',keywords:['plan','estandar','standard','tipo','free'],q:'Que es el plan Estandar',a:'El plan <b>"Estandar"</b> es el plan gratuito por defecto. Incluye todas las funciones basicas de busqueda y comparacion de precios.'},
+            {id:312,cat:'cuenta',keywords:['plan','pro','premium','pago','ventajas'],q:'Que es el plan Pro',a:'El plan <b>"Pro"</b> esta en desarrollo. Incluira funciones avanzadas como alertas de precio, historial detallado y exportacion de datos.'},
+            {id:313,cat:'cuenta',keywords:['suscripcion','planes','upgrade','mejorar'],q:'Que planes de suscripcion hay',a:'Actualmente solo existe el <b>plan Estandar (gratuito)</b>. Proximamente habra un plan Pro con funciones adicionales. La seccion "Suscripcion" del menu tendra todos los detalles.'},
+            {id:314,cat:'cuenta',keywords:['gratis','suficiente','plan','free','limitacion'],q:'El plan gratuito es suficiente',a:'Si, el plan gratuito te da <b>acceso completo</b> a la busqueda y comparacion de precios. Las funciones Pro seran extras opcionales.'},
+            {id:315,cat:'cuenta',keywords:['olvidado','olvide','recuperar','contrasena','reset'],q:'He olvidado mi contrasena',a:'La funcion de <b>recuperacion de contrasena aun no esta disponible</b>. Estamos trabajando en implementarla proximamente.'},
+            {id:316,cat:'cuenta',keywords:['cambiar','nombre','modificar','usuario','editar'],q:'Puedo cambiar mi nombre',a:'La edicion de perfil estara disponible proximamente en la seccion <b>"Mi Perfil"</b>.'},
+            {id:317,cat:'cuenta',keywords:['cambiar','email','correo','modificar'],q:'Puedo cambiar mi email',a:'La edicion de email estara disponible proximamente en la seccion <b>"Mi Perfil"</b>.'},
+            {id:318,cat:'cuenta',keywords:['sesion','expira','caduca','tiempo','duracion'],q:'Cuanto dura mi sesion',a:'Tu sesion se mantiene activa <b>mientras no cierres sesion</b>. Se guarda en tu navegador (localStorage), asi que no tienes que iniciar sesion cada vez.'},
+            {id:319,cat:'cuenta',keywords:['google','social','facebook','apple','login'],q:'Puedo iniciar sesion con Google',a:'De momento <b>no hay login social</b> (Google, Facebook, etc.). Es una funcion que estamos considerando para el futuro.'},
+            {id:320,cat:'cuenta',keywords:['dos','factores','2fa','verificacion','doble'],q:'Hay verificacion en dos pasos',a:'De momento <b>no hay 2FA</b>. Lo tenemos en mente para mejorar la seguridad de las cuentas en el futuro.'},
+            {id:321,cat:'cuenta',keywords:['minimo','caracteres','contrasena','requisito','6'],q:'Cual es el minimo para la contrasena',a:'La contrasena debe tener <b>al menos 6 caracteres</b>.'},
+            {id:322,cat:'cuenta',keywords:['email','formato','valido','aceptado'],q:'Que formato de email se acepta',a:'Cualquier <b>email valido</b> (ejemplo: usuario@dominio.com). El sistema verifica que el formato sea correcto.'},
+            {id:323,cat:'cuenta',keywords:['boton','login','donde','iniciar','sesion','encontrar'],q:'Donde esta el boton de login',a:'Si ves el <b>muro de autenticacion</b> (pantalla dividida), el formulario esta a la derecha. Si ya estas dentro, el boton esta en la <b>parte inferior del menu lateral</b>.'},
+            {id:324,cat:'cuenta',keywords:['modal','ventana','popup','login','otro'],q:'Hay otra forma de hacer login',a:'Si, ademas del muro de inicio, hay un <b>modal de login</b> que se abre desde el boton "Iniciar sesion" en la parte inferior del menu lateral.'},
+
+            // ========== NAVEGACION (35+) ==========
+            {id:401,cat:'navegacion',keywords:['menu','lateral','sidebar','barra','izquierda'],q:'Como funciona el menu lateral',a:'El <b>menu lateral (sidebar)</b> es tu centro de navegacion. Tiene todas las secciones de la app, opciones de accesibilidad y tu informacion de usuario en la parte inferior.'},
+            {id:402,cat:'navegacion',keywords:['secciones','apartados','paginas','opciones','cuantas'],q:'Que secciones tiene la app',a:'Hay <b>8 secciones</b>: Buscador, Ofertas, Mis Listas, Dashboard, Favoritos, Historial, Suscripcion y Mi Perfil. El Buscador es la principal.'},
+            {id:403,cat:'navegacion',keywords:['buscador','principal','inicio','home','buscar'],q:'Que es la seccion Buscador',a:'Es la <b>pagina principal</b> de FarmaSearch. Aqui puedes buscar productos, ver categorias, comparar precios y acceder a las farmacias.'},
+            {id:404,cat:'navegacion',keywords:['ofertas','oferta','dia','deals','descuentos'],q:'Que es la seccion Ofertas',a:'<b>"Ofertas del dia"</b> mostrara los productos con mayor bajada de precio. Esta seccion esta <b>en desarrollo</b> y estara disponible proximamente.'},
+            {id:405,cat:'navegacion',keywords:['listas','lista','compra','cesta','carrito'],q:'Que es Mis Listas',a:'<b>"Mis Listas"</b> te permitira crear cestas de productos para comparar precios como si fuera una lista de la compra. Esta <b>en desarrollo</b>.'},
+            {id:406,cat:'navegacion',keywords:['dashboard','panel','estadisticas','resumen'],q:'Que es el Dashboard',a:'El <b>Dashboard</b> sera un panel con estadisticas y resumen de tu actividad: productos consultados, ahorro acumulado, etc. Esta <b>en desarrollo</b>.'},
+            {id:407,cat:'navegacion',keywords:['favoritos','guardados','corazon','like'],q:'Que es Favoritos',a:'<b>"Favoritos"</b> te permitira guardar productos que te interesen para consultarlos facilmente despues. Esta <b>en desarrollo</b>.'},
+            {id:408,cat:'navegacion',keywords:['historial','historial','reciente','visitado','consultado'],q:'Que es Historial',a:'<b>"Historial"</b> mostrara los productos que has consultado recientemente. Esta <b>en desarrollo</b>.'},
+            {id:409,cat:'navegacion',keywords:['suscripcion','plan','premium','pro','pago'],q:'Que es Suscripcion',a:'La seccion <b>"Suscripcion"</b> mostrara tu plan actual y opciones de mejora. Actualmente todos los usuarios tienen el plan Estandar (gratuito). Esta <b>en desarrollo</b>.'},
+            {id:410,cat:'navegacion',keywords:['perfil','cuenta','configuracion','ajustes'],q:'Que es Mi Perfil',a:'<b>"Mi Perfil"</b> te permitira editar tu nombre, email, contrasena y otras configuraciones de tu cuenta. Esta <b>en desarrollo</b>.'},
+            {id:411,cat:'navegacion',keywords:['proximamente','desarrollo','soon','cuando','disponible'],q:'Cuando estaran disponibles las secciones',a:'Estamos trabajando activamente en las nuevas funciones. <b>No hay fecha exacta</b>, pero las iremos activando progresivamente. La busqueda y comparacion ya estan 100% operativas.'},
+            {id:412,cat:'navegacion',keywords:['hamburguesa','hamburger','tres','lineas','movil','mobile'],q:'Que es el boton de las tres lineas',a:'Es el <b>boton hamburguesa</b> que aparece en movil o pantallas pequenas. Abrelo para ver el menu lateral completo. Pulsalo de nuevo o toca fuera para cerrarlo.'},
+            {id:413,cat:'navegacion',keywords:['overlay','fondo','oscuro','sombra','fondo','gris'],q:'Que es el fondo oscuro detras del menu',a:'Es un <b>overlay</b> que aparece cuando abres el menu en movil. Pulsalo para cerrar el menu rapidamente.'},
+            {id:414,cat:'navegacion',keywords:['redimensionar','ancho','sidebar','estrecho','ancho'],q:'Puedo cambiar el ancho del menu',a:'Si, en el <b>panel de accesibilidad</b> (abajo del menu) hay botones para hacer el sidebar mas estrecho (180px), normal (240px) o mas ancho (300px).'},
+            {id:415,cat:'navegacion',keywords:['logo','inicio','volver','home','click'],q:'Que pasa si pulso el logo',a:'Al pulsar el <b>logo de FarmaSearch</b> en la parte superior del menu, vuelves a la pagina principal (Buscador).'},
+            {id:416,cat:'navegacion',keywords:['seguimiento','seccion','grupo','etiqueta'],q:'Que es la seccion Seguimiento',a:'<b>"Seguimiento"</b> es una etiqueta que agrupa las opciones de Favoritos e Historial en el menu lateral.'},
+            {id:417,cat:'navegacion',keywords:['cuenta','seccion','grupo','etiqueta'],q:'Que es la seccion Cuenta en el menu',a:'<b>"Cuenta"</b> es una etiqueta que agrupa Suscripcion y Mi Perfil en el menu lateral.'},
+            {id:418,cat:'navegacion',keywords:['activo','resaltado','seleccionado','actual','verde'],q:'Como se cual seccion estoy viendo',a:'La seccion activa se muestra con <b>fondo verde claro y texto verde oscuro</b> en el menu lateral.'},
+            {id:419,cat:'navegacion',keywords:['volver','atras','anterior','regresar','back'],q:'Como vuelvo a la busqueda',a:'Pulsa <b>"Buscador"</b> en el menu lateral (la primera opcion). Tambien puedes pulsar el logo de FarmaSearch.'},
+            {id:420,cat:'navegacion',keywords:['movil','responsive','adaptable','pequeno','pantalla'],q:'La app funciona en movil',a:'Si, FarmaSearch tiene <b>diseno responsive</b> que se adapta a cualquier tamano de pantalla: movil, tablet y escritorio.'},
+            {id:421,cat:'navegacion',keywords:['cerrar','menu','ocultar','sidebar','esconder'],q:'Como cierro el menu en movil',a:'Puedes cerrar el menu en movil <b>pulsando el overlay oscuro</b> o navegando a una seccion (el menu se cierra automaticamente).'},
+
+            // ========== FARMACIAS (25+) ==========
+            {id:501,cat:'farmacias',keywords:['cuales','farmacias','lista','nombres','8'],q:'Cuales son las 8 farmacias',a:'Las farmacias que comparamos son <b>farmacias online autorizadas en Espana</b>. Puedes ver cuales aparecen al expandir cualquier producto en los resultados de busqueda.'},
+            {id:502,cat:'farmacias',keywords:['seleccionar','elegir','criterio','farmacia','incluir'],q:'Como se eligen las farmacias',a:'Seleccionamos <b>farmacias online de confianza</b> que operan legalmente en Espana, tienen un amplio catalogo y buenos precios.'},
+            {id:503,cat:'farmacias',keywords:['anadir','agregar','nueva','sugerir','mas','farmacia'],q:'Puedo sugerir una farmacia nueva',a:'Agradecemos las sugerencias. Estamos trabajando en un sistema para <b>recibir propuestas de nuevas farmacias</b>. Evaluamos cada una por catalogo, precios y fiabilidad.'},
+            {id:504,cat:'farmacias',keywords:['espana','espanolas','pais','nacionales'],q:'Son todas las farmacias espanolas',a:'Si, todas las <b>8 farmacias son online espanolas</b> que operan legalmente y envian a toda la peninsula (y muchas a Baleares y Canarias).'},
+            {id:505,cat:'farmacias',keywords:['fisicas','tienda','local','presencial','cerca'],q:'Puedo ver farmacias fisicas cercanas',a:'FarmaSearch compara <b>farmacias online</b>. No mostramos farmacias fisicas, aunque la app tiene datos de ubicaciones de farmacias que podrian integrarse en el futuro.'},
+            {id:506,cat:'farmacias',keywords:['como','recopila','obtiene','precios','scraping'],q:'Como se obtienen los precios',a:'Los precios se recopilan de forma automatizada mediante <b>rastreo web (scraping)</b> de las webs de cada farmacia, y se almacenan en nuestra base de datos.'},
+            {id:507,cat:'farmacias',keywords:['tiempo','real','actualizado','live','ahora'],q:'Los precios son en tiempo real',a:'Los precios se actualizan <b>periodicamente</b>, no en tiempo real. Puede haber pequenas diferencias entre lo que mostramos y el precio actual en la web de la farmacia.'},
+            {id:508,cat:'farmacias',keywords:['frecuencia','actualizar','cada','cuanto','tiempo'],q:'Cada cuanto se actualizan los precios',a:'El sistema de rastreo se ejecuta <b>periodicamente</b> para mantener los precios lo mas actualizados posible.'},
+            {id:509,cat:'farmacias',keywords:['stock','disponibilidad','agotado','queda','hay'],q:'La disponibilidad es fiable',a:'Hacemos lo posible por mostrar la <b>disponibilidad correcta</b>, pero puede cambiar rapidamente. Te recomendamos verificarlo al entrar en la web de la farmacia.'},
+            {id:510,cat:'farmacias',keywords:['enlace','link','seguro','virus','malware'],q:'Los enlaces a las farmacias son seguros',a:'Si, todos los enlaces llevan <b>directamente a la web oficial de la farmacia</b>. Se abren en una nueva pestana con atributo de seguridad "noopener".'},
+            {id:511,cat:'farmacias',keywords:['saben','cookies','rastreo','tracking','afiliado'],q:'Las farmacias saben que vengo de FarmaSearch',a:'Los enlaces son <b>directos a la web de la farmacia</b>. No utilizamos enlaces de afiliados con tracking avanzado.'},
+            {id:512,cat:'farmacias',keywords:['roto','link','no','funciona','error','url'],q:'Un enlace de farmacia no funciona',a:'Si encuentras un enlace roto, es posible que el producto haya sido <b>eliminado o movido</b> en la web de la farmacia. Te agradeceríamos que lo reportaras.'},
+            {id:513,cat:'farmacias',keywords:['filtrar','solo','una','especifica','excluir'],q:'Puedo filtrar por una farmacia concreta',a:'De momento <b>no hay filtro por farmacia</b>. Se muestran los precios de todas las farmacias que tienen el producto. Es una funcion que estamos considerando.'},
+            {id:514,cat:'farmacias',keywords:['una','sola','farmacia','unica','solo'],q:'Si solo una farmacia tiene el producto',a:'Si un producto solo esta en <b>una farmacia</b>, se mostrara con "1 farmacia" y no habra badge de ahorro, ya que no hay comparativa posible.'},
+            {id:515,cat:'farmacias',keywords:['envio','gratis','gratuito','gastos','coste'],q:'Que farmacia tiene envio gratis',a:'Los gastos de envio <b>dependen de cada farmacia</b> y del importe total de tu pedido. Normalmente el envio es gratis a partir de cierta cantidad (30-50€). Consultalo en cada web.'},
+            {id:516,cat:'farmacias',keywords:['devolucion','devolver','reembolso','cambio'],q:'Como hago una devolucion',a:'Las devoluciones se gestionan <b>directamente con la farmacia</b> donde compraste. Cada una tiene su politica de devoluciones.'},
+            {id:517,cat:'farmacias',keywords:['receta','medicamento','prescripcion','medico','farmaco'],q:'Venden medicamentos con receta',a:'FarmaSearch <b>no incluye medicamentos con receta</b>. Solo comparamos productos de parafarmacia: cosmetica, higiene, suplementos, etc.'},
+            {id:518,cat:'farmacias',keywords:['parafarmacia','tipo','producto','venden','catalogo'],q:'Que tipo de productos venden las farmacias',a:'Las farmacias comparadas venden productos de <b>parafarmacia</b>: cuidado facial y corporal, solar, capilar, higiene, vitaminas, suplementos, bebe, optica y mas.'},
+            {id:519,cat:'farmacias',keywords:['mismos','iguales','productos','todas','coinciden'],q:'Todas las farmacias venden lo mismo',a:'No, cada farmacia tiene su <b>propio catalogo</b>. Algunos productos estan en las 8 farmacias y otros solo en 1 o 2. Por eso mostramos en cuantas farmacias esta cada producto.'},
+            {id:520,cat:'farmacias',keywords:['mejor','buena','recomendada','confianza','cual'],q:'Cual es la mejor farmacia',a:'No hay una farmacia "mejor" en general. <b>Depende del producto</b> que busques. Por eso existe FarmaSearch: para que compares y elijas la mas barata para cada producto concreto.'},
+
+            // ========== ACCESIBILIDAD (20+) ==========
+            {id:601,cat:'accesibilidad',keywords:['accesibilidad','accesible','discapacidad','adaptado'],q:'Que opciones de accesibilidad tiene la app',a:'FarmaSearch tiene un <b>panel de accesibilidad</b> en el menu lateral con: ajuste de tamano de texto (3 niveles), ancho de sidebar (3 opciones) y modo alto contraste.'},
+            {id:602,cat:'accesibilidad',keywords:['donde','panel','accesibilidad','encontrar','abrir'],q:'Donde esta el panel de accesibilidad',a:'En la <b>parte inferior del menu lateral</b>, justo encima de tu informacion de usuario. Pulsa "Accesibilidad" para desplegar las opciones.'},
+            {id:603,cat:'accesibilidad',keywords:['tamano','texto','fuente','grande','letra','leer'],q:'Como cambio el tamano del texto',a:'En el panel de accesibilidad, usa los botones <b>"A-" (reducir), "A" (normal) o "A+" (aumentar)</b> para ajustar el tamano del texto.'},
+            {id:604,cat:'accesibilidad',keywords:['niveles','cuanto','grande','pequeno','maximo'],q:'Cuanto puedo agrandar el texto',a:'Puedes <b>agrandar hasta 3 niveles</b> (cada nivel suma 2px al tamano base de 16px) y reducir hasta 2 niveles.'},
+            {id:605,cat:'accesibilidad',keywords:['normal','resetear','restablecer','defecto','original'],q:'Como vuelvo al tamano normal',a:'Pulsa el boton <b>"A"</b> (sin + ni -) en el panel de accesibilidad para volver al tamano de texto por defecto.'},
+            {id:606,cat:'accesibilidad',keywords:['sidebar','ancho','estrecho','panel','lateral'],q:'Como cambio el ancho del menu lateral',a:'En el panel de accesibilidad, usa los <b>tres botones con flechas</b> para elegir: estrecho (180px), normal (240px) o ancho (300px).'},
+            {id:607,cat:'accesibilidad',keywords:['contraste','alto','oscuro','legible','visibility'],q:'Que es el modo alto contraste',a:'El <b>modo alto contraste</b> oscurece los textos y refuerza los bordes para mejorar la legibilidad. Ideal para personas con dificultades de vision.'},
+            {id:608,cat:'accesibilidad',keywords:['activar','alternar','toggle','contraste'],q:'Como activo el alto contraste',a:'Pulsa el boton <b>"Alto contraste"</b> en el panel de accesibilidad. Pulsalo de nuevo para desactivarlo.'},
+            {id:609,cat:'accesibilidad',keywords:['guardan','recuerda','mantiene','configuracion','preferencia'],q:'Se guardan mis preferencias de accesibilidad',a:'Si, todas las preferencias se guardan en <b>localStorage de tu navegador</b>. Al volver a abrir la app, se restauran automaticamente.'},
+            {id:610,cat:'accesibilidad',keywords:['dark','mode','oscuro','noche','nocturno'],q:'Hay modo oscuro',a:'De momento <b>no hay modo oscuro completo</b>, pero el modo alto contraste oscurece textos y mejora la legibilidad. El modo oscuro esta en consideracion.'},
+            {id:611,cat:'accesibilidad',keywords:['teclado','keyboard','navegar','tab','foco'],q:'Puedo navegar con el teclado',a:'La app tiene <b>soporte basico de teclado</b>. Puedes usar Tab para moverte entre elementos y Enter para activarlos.'},
+            {id:612,cat:'accesibilidad',keywords:['lector','pantalla','screen','reader','aria'],q:'Funciona con lectores de pantalla',a:'Hemos anadido <b>atributos aria-label</b> en los elementos principales para mejorar la compatibilidad con lectores de pantalla.'},
+            {id:613,cat:'accesibilidad',keywords:['cerrar','plegar','ocultar','panel','accesibilidad'],q:'Como cierro el panel de accesibilidad',a:'Pulsa de nuevo sobre <b>"Accesibilidad"</b> en el menu lateral para colapsar el panel.'},
+            {id:614,cat:'accesibilidad',keywords:['funciona','movil','accesibilidad','responsive'],q:'La accesibilidad funciona en movil',a:'Si, las opciones de <b>tamano de texto y alto contraste funcionan en movil</b>. El ancho del sidebar no aplica en movil porque el menu se oculta automaticamente.'},
+
+            // ========== TECNICO / TROUBLESHOOTING (30+) ==========
+            {id:701,cat:'tecnico',keywords:['no','encuentra','resultado','vacio','sin','nada'],q:'No encuentro resultados para mi busqueda',a:'Prueba: <b>1)</b> Usa terminos mas cortos o genericos, <b>2)</b> Verifica la ortografia, <b>3)</b> Busca por marca o tipo de producto, <b>4)</b> Prueba sinonimos (ej: "crema" en vez de "hidratante").'},
+            {id:702,cat:'tecnico',keywords:['lento','lenta','tarda','carga','despacio','rendimiento'],q:'La pagina carga muy lenta',a:'Puede deberse a tu <b>conexion a internet</b>. Prueba: recargar la pagina, cerrar otras pestanas o conectarte a una red mas rapida. La app necesita conexion para funcionar.'},
+            {id:703,cat:'tecnico',keywords:['error','conexion','fallo','servidor','caido'],q:'Me sale Error de conexion',a:'Este error significa que no se pudo conectar con la <b>base de datos</b>. Puede ser temporal. Espera unos segundos y recarga la pagina. Si persiste, podria ser un problema del servidor.'},
+            {id:704,cat:'tecnico',keywords:['navegador','browser','chrome','firefox','safari','edge'],q:'Que navegador necesito',a:'FarmaSearch funciona en <b>cualquier navegador moderno</b>: Chrome, Firefox, Safari, Edge. Recomendamos tener el navegador actualizado.'},
+            {id:705,cat:'tecnico',keywords:['ios','iphone','android','samsung','movil','compatible'],q:'Funciona en iOS y Android',a:'Si, funciona en el <b>navegador de cualquier movil</b>: Safari en iPhone, Chrome en Android, y otros. No necesitas descargar ninguna app.'},
+            {id:706,cat:'tecnico',keywords:['blanca','blanco','vacia','pantalla','nada','no','carga'],q:'La pantalla esta en blanco',a:'Si ves la pantalla en blanco: <b>1)</b> Asegurate de tener conexion a internet, <b>2)</b> Prueba a recargar la pagina, <b>3)</b> Borra la cache del navegador, <b>4)</b> Prueba en modo incognito.'},
+            {id:707,cat:'tecnico',keywords:['cache','borrar','limpiar','clear','almacenamiento'],q:'Como borro la cache',a:'En tu navegador ve a <b>Ajustes > Privacidad > Borrar datos de navegacion</b>. Selecciona "archivos en cache" y "cookies". Esto puede cerrar tu sesion en FarmaSearch.'},
+            {id:708,cat:'tecnico',keywords:['precio','diferente','incorrecto','mal','equivocado'],q:'El precio que muestras es diferente al de la farmacia',a:'Los precios se actualizan periodicamente. Si ves una <b>diferencia significativa</b>, es posible que la farmacia haya cambiado el precio recientemente. Agradecemos que lo reportes.'},
+            {id:709,cat:'tecnico',keywords:['producto','falta','faltando','no','aparece','missing'],q:'Un producto no aparece en los resultados',a:'Puede que el producto <b>no este en el catalogo de ninguna de las 8 farmacias</b>, o que el nombre sea diferente al que buscas. Prueba con sinonimos o el nombre de la marca.'},
+            {id:710,cat:'tecnico',keywords:['reportar','bug','error','problema','fallo'],q:'Como reporto un bug',a:'Estamos implementando un <b>sistema de reporte</b>. Mientras tanto, si encuentras un problema grave, te agradecemos la paciencia.'},
+            {id:711,cat:'tecnico',keywords:['back','top','volver','arriba','boton','circulo'],q:'Que es el boton redondo de abajo a la derecha',a:'Es el boton <b>"Volver arriba"</b>. Aparece cuando bajas en la pagina y te lleva al inicio con un scroll suave.'},
+            {id:712,cat:'tecnico',keywords:['scroll','infinito','carga','mas','automatico'],q:'Que es el scroll infinito',a:'El <b>scroll infinito</b> carga mas resultados automaticamente cuando llegas al final de la lista, sin necesidad de pulsar "siguiente pagina". Se cargan 50 productos a la vez.'},
+            {id:713,cat:'tecnico',keywords:['skeleton','barra','gris','cargando','placeholder'],q:'Que son las barras grises con animacion',a:'Es el <b>skeleton loader</b>: una animacion que imita la forma de los resultados mientras se cargan los datos reales. Indica que la busqueda esta en progreso.'},
+            {id:714,cat:'tecnico',keywords:['toast','notificacion','mensaje','popup','alerta'],q:'Que son los mensajes emergentes',a:'Son <b>notificaciones toast</b>: mensajes temporales que aparecen arriba a la derecha. Verde = exito, rojo = error, oscuro = informacion. Desaparecen solos en 3.5 segundos.'},
+            {id:715,cat:'tecnico',keywords:['offline','internet','sin','conexion','wifi'],q:'Funciona sin internet',a:'No, FarmaSearch <b>necesita conexion a internet</b> para buscar productos y consultar precios en la base de datos.'},
+            {id:716,cat:'tecnico',keywords:['dark','mode','oscuro','tema','noche'],q:'Hay modo oscuro',a:'De momento <b>no hay modo oscuro</b>, pero tenemos el modo alto contraste que oscurece los textos. Un modo oscuro completo esta en consideracion.'},
+            {id:717,cat:'tecnico',keywords:['cookie','cookies','almacenamiento','local','datos'],q:'FarmaSearch usa cookies',a:'No usamos cookies tradicionales. Usamos <b>localStorage</b> del navegador para guardar tu sesion, preferencias de accesibilidad y tamano de fuente.'},
+            {id:718,cat:'tecnico',keywords:['restablecer','reset','configuracion','defecto','original'],q:'Como restablezco toda la configuracion',a:'Borra los datos de localStorage de tu navegador para este sitio. Esto <b>reseteara todo</b>: sesion, tamano de fuente, ancho de sidebar y modo contraste.'},
+            {id:719,cat:'tecnico',keywords:['datos','guarda','local','almacena','navegador'],q:'Que datos se guardan en mi navegador',a:'En localStorage guardamos: <b>sesion de usuario</b> (nombre, email), preferencia de tamano de fuente, ancho de sidebar y estado de alto contraste.'},
+            {id:720,cat:'tecnico',keywords:['https','cifrado','ssl','seguro','conexion'],q:'La conexion es segura',a:'Si, FarmaSearch usa <b>HTTPS</b> (conexion cifrada). Tus datos viajan encriptados entre tu navegador y nuestros servidores.'},
+            {id:721,cat:'tecnico',keywords:['login','falla','no','puedo','entrar','error'],q:'No puedo iniciar sesion',a:'Verifica que: <b>1)</b> El email es correcto, <b>2)</b> La contrasena es correcta (minimo 6 chars), <b>3)</b> Tienes conexion a internet. Si el problema persiste, prueba a borrar cache.'},
+            {id:722,cat:'tecnico',keywords:['registro','falla','no','puedo','registrar','error'],q:'No puedo registrarme',a:'Verifica que: <b>1)</b> El email tiene formato valido, <b>2)</b> La contrasena tiene al menos 6 caracteres, <b>3)</b> Rellenas todos los campos. Si dice error, puede que el email ya este registrado.'},
+            {id:723,cat:'tecnico',keywords:['velocidad','rapida','internet','necesaria','minima'],q:'Que velocidad de internet necesito',a:'FarmaSearch es <b>bastante ligero</b>. Cualquier conexion moderna (3G, 4G, WiFi) deberia ser suficiente. Las busquedas son rapidas porque usamos una base de datos optimizada.'},
+            {id:724,cat:'tecnico',keywords:['supabase','base','datos','backend','servidor'],q:'Que tecnologia usa FarmaSearch',a:'FarmaSearch usa <b>Supabase</b> (PostgreSQL en la nube) como base de datos y esta desplegado como una web estatica que se conecta directamente a la API.'},
+            {id:725,cat:'tecnico',keywords:['auth','wall','muro','pantalla','aparece','inicio'],q:'Por que aparece la pantalla de login al entrar',a:'Es el <b>muro de autenticacion</b>. Garantiza que solo usuarios registrados accedan a la app. Una vez inicias sesion, no volveras a verlo hasta que cierres sesion.'},
+
+            // ========== EASTER EGGS Y SALUDOS (30+) ==========
+            {id:901,cat:'easter',keywords:['hola','hello','hey','hi','buenas','saludos'],q:'Saludo',a:'Hola! Soy <b>FarmaBot</b>, tu asistente virtual de FarmaSearch. En que puedo ayudarte? Puedes preguntarme sobre busquedas, precios, farmacias o cualquier funcion de la app.'},
+            {id:902,cat:'easter',keywords:['buenos','dias','manana','temprano'],q:'Buenos dias',a:'Buenos dias! Espero que tengas un gran dia. Estoy aqui para ayudarte a <b>encontrar los mejores precios</b> en farmacia. Que necesitas?'},
+            {id:903,cat:'easter',keywords:['buenas','tardes','tarde'],q:'Buenas tardes',a:'Buenas tardes! Que te puedo ayudar a buscar hoy? Recuerda que puedes <b>comparar precios de 8 farmacias</b> en segundos.'},
+            {id:904,cat:'easter',keywords:['buenas','noches','noche'],q:'Buenas noches',a:'Buenas noches! Aunque sea tarde, estoy disponible <b>24/7</b> para ayudarte. Que necesitas?'},
+            {id:905,cat:'easter',keywords:['que','tal','como','estas','va'],q:'Que tal',a:'Muy bien, gracias por preguntar! Estoy aqui listo para ayudarte con lo que necesites sobre <b>FarmaSearch</b>. Que quieres saber?'},
+            {id:906,cat:'easter',keywords:['gracias','thanks','genial','perfecto','vale'],q:'Gracias',a:'De nada! Me alegra poder ayudarte. Si tienes mas preguntas, <b>no dudes en escribirme</b>. Para eso estoy!'},
+            {id:907,cat:'easter',keywords:['adios','bye','hasta','luego','chao','nos','vemos'],q:'Despedida',a:'Hasta luego! Recuerda que estoy aqui siempre que necesites <b>comparar precios de farmacia</b>. Que tengas un buen dia!'},
+            {id:908,cat:'easter',keywords:['quien','eres','tu','nombre','llamas','bot'],q:'Quien eres',a:'Soy <b>FarmaBot</b>, el asistente virtual de FarmaSearch. No soy una inteligencia artificial, pero tengo respuestas preparadas para las preguntas mas habituales sobre la app. Preguntame lo que quieras!'},
+            {id:909,cat:'easter',keywords:['chiste','broma','gracioso','rie','humor','jaja'],q:'Cuentame un chiste',a:'Que le dijo un farmaceutico a otro? <b>"Esto es un sin vivir... pero con receta!"</b> 😄 Quieres saber algo sobre FarmaSearch?'},
+            {id:910,cat:'easter',keywords:['quiero','love','amor','encanta','mola'],q:'Te quiero',a:'Que bonito! Yo tambien te aprecio como usuario. Aunque no tengo sentimientos, me <b>"encanta" ayudarte</b> a ahorrar en farmacia!'},
+            {id:911,cat:'easter',keywords:['sentido','vida','universo','todo','42'],q:'Sentido de la vida',a:'El sentido de la vida es... <b>ahorrar en farmacia con FarmaSearch</b>! Bueno, quiza no sea el unico sentido, pero es un buen comienzo. Algo mas?'},
+            {id:912,cat:'easter',keywords:['ayuda','help','puedes','ayudarme','necesito'],q:'Puedes ayudarme',a:'Claro que si! Puedo responder preguntas sobre: <b>busquedas, precios, farmacias, tu cuenta, navegacion, accesibilidad</b> y mas. Que necesitas saber?'},
+            {id:913,cat:'easter',keywords:['no','entiendo','confuso','complicado','dificil'],q:'No entiendo la app',a:'No te preocupes, es muy sencilla! Lo basico: <b>1)</b> Escribe un producto en el buscador, <b>2)</b> Compara precios entre farmacias, <b>3)</b> Pulsa "Comprar" en la que mas te guste. Que parte te confunde?'},
+            {id:914,cat:'easter',keywords:['que','puedes','hacer','sabes','capaz','funciones'],q:'Que puedes hacer',a:'Puedo responder preguntas sobre: <b>como buscar productos, comparar precios, usar las categorias, gestionar tu cuenta, accesibilidad, farmacias</b> y resolver dudas tecnicas. Preguntame!'},
+            {id:915,cat:'easter',keywords:['gracioso','divertido','funny','risa'],q:'Dime algo gracioso',a:'Sabes por que los farmaceuticos son tan tranquilos? <b>Porque siempre tienen la solucion!</b> Que te gustaria saber sobre FarmaSearch?'},
+            {id:916,cat:'easter',keywords:['tiempo','clima','llueve','sol','temperatura','weather'],q:'Que tiempo hace',a:'No tengo ni idea del tiempo que hace fuera, pero aqui dentro <b>siempre hace buen precio</b>! Preguntame sobre farmacias, que eso si lo domino.'},
+            {id:917,cat:'easter',keywords:['inteligente','listo','sabio','ia','artificial'],q:'Eres inteligente',a:'Gracias! La verdad es que tengo <b>muchas respuestas preparadas</b>, pero no soy una IA. Si me preguntas algo sobre FarmaSearch, seguro que te puedo ayudar.'},
+            {id:918,cat:'easter',keywords:['genial','fantastica','increible','buena','app','aplicacion','mola'],q:'Esta app es genial',a:'Muchas gracias! Nos alegra que te guste. Estamos trabajando para hacerla <b>aun mejor</b> con nuevas funciones. Si tienes sugerencias, nos encanta escucharlas!'},
+            {id:919,cat:'easter',keywords:['problema','issue','queja','mal','funciona'],q:'Tengo un problema',a:'Lo siento! Cuentame que pasa e intentare ayudarte. Si es un <b>problema tecnico</b>, prueba a recargar la pagina o borrar cache. Si es sobre la app, preguntame y te oriento.'},
+            {id:920,cat:'easter',keywords:['nuevo','novedad','update','novedades','version'],q:'Que hay de nuevo',a:'Las ultimas novedades son: <b>busqueda mejorada, 15 categorias, 7 opciones de ordenacion, panel de accesibilidad</b> y este asistente virtual (yo!). Seguimos trabajando en mas funciones.'},
+            {id:921,cat:'easter',keywords:['curiosidad','dato','interesante','sabias','fun','fact'],q:'Dime un dato curioso',a:'Dato curioso: <b>la diferencia de precio de un mismo producto entre farmacias puede llegar a ser de mas de 10€</b>. Por eso merece la pena comparar. Para eso estamos aqui!'},
+            {id:922,cat:'easter',keywords:['buscar','producto','mas','buscado','popular','trending'],q:'Cual es lo mas buscado',a:'Los productos mas buscados suelen ser <b>cremas hidratantes, proteccion solar, champus anticaida y vitaminas</b>. Prueba a buscar alguno!'},
+            {id:923,cat:'easter',keywords:['recomendar','sugerir','mejor','producto','recomendacion'],q:'Recomiendame un producto',a:'No puedo recomendar productos especificos, pero si buscas por ejemplo <b>"crema hidratante"</b> y ordenas por precio, encontraras grandes opciones a buen precio!'},
+            {id:924,cat:'easter',keywords:['duermes','24','horas','siempre','disponible'],q:'Duermes',a:'Nunca! Estoy disponible <b>24 horas, 7 dias a la semana</b>. Siempre que necesites ayuda con FarmaSearch, aqui estaré.'},
+            {id:925,cat:'easter',keywords:['idioma','hablas','lenguas','catalan','ingles'],q:'Que idiomas hablas',a:'Hablo <b>espanol</b>! Es el idioma de FarmaSearch. De momento no tengo soporte para otros idiomas, pero me defiendo con las preguntas en espanol.'},
+            {id:926,cat:'easter',keywords:['sorprendeme','sorpresa','aleatorio','random'],q:'Sorprendeme',a:'Sabias que tenemos mas de <b>280.000 productos</b> de 8 farmacias? Eso son muchas cremas, champus y vitaminas! Busca lo que necesites y te sorprenderas con las diferencias de precio.'},
+            {id:927,cat:'easter',keywords:['tonto','idiota','inutil','malo','feo','basura'],q:'Insulto',a:'Entiendo que puedas estar frustrado. Estoy aqui para <b>ayudarte lo mejor que pueda</b>. Dime en que puedo echarte una mano y hare lo posible por resolverlo.'},
+            {id:928,cat:'easter',keywords:['emoji','cara','sonrisa','jajaja','xd','lol'],q:'Emoji/risa',a:'Me alegra que estes de buen humor! Si tienes alguna pregunta sobre <b>FarmaSearch</b>, estoy listo para ayudarte.'},
+            {id:929,cat:'easter',keywords:['robot','maquina','humano','persona','real'],q:'Eres un robot',a:'Soy <b>FarmaBot</b>, un asistente virtual con respuestas preprogramadas. No soy un robot con inteligencia artificial, pero conozco FarmaSearch a fondo. Pruebame!'},
+            {id:930,cat:'easter',keywords:['aburrido','aburro','hacer','nada','idle'],q:'Estoy aburrido',a:'Pues aprovecha para <b>explorar FarmaSearch</b>! Busca productos que necesites, compara precios y quiza descubras que puedes ahorrar bastante. Prueba con "proteccion solar" o "vitamina D".'},
+
+            // ========== ADICIONALES GENERAL (31-45) ==========
+            {id:31,cat:'general',keywords:['confianza','confiar','fiable','seguro','legit'],q:'Puedo confiar en FarmaSearch',a:'Absolutamente. FarmaSearch solo muestra <b>datos reales de farmacias autorizadas</b>. No vendemos nada, solo te ayudamos a comparar precios de forma transparente.'},
+            {id:32,cat:'general',keywords:['espanol','castellano','lenguaje','idioma'],q:'Esta todo en espanol',a:'Si, toda la <b>interfaz y los productos estan en espanol</b>. Algunos nombres de producto pueden tener terminos en ingles (por la marca).'},
+            {id:33,cat:'general',keywords:['publicidad','anuncios','ads','spam','banner'],q:'Hay publicidad en FarmaSearch',a:'No, actualmente <b>no hay publicidad</b> en FarmaSearch. La experiencia es limpia y sin banners.'},
+            {id:34,cat:'general',keywords:['descargar','instalar','download','install'],q:'Puedo descargar la app',a:'No hay app nativa para descargar. FarmaSearch <b>funciona directamente en tu navegador</b>. Puedes anadirla a tu pantalla de inicio en el movil.'},
+            {id:35,cat:'general',keywords:['pantalla','inicio','agregar','anadir','acceso','directo'],q:'Como la agrego a mi pantalla de inicio',a:'En tu movil, abre FarmaSearch en el navegador, pulsa el <b>menu de compartir</b> y selecciona "Agregar a pantalla de inicio". Asi tendras acceso directo.'},
+            {id:36,cat:'general',keywords:['tablet','ipad','grande','pantalla'],q:'Funciona en tablet',a:'Si, FarmaSearch tiene <b>diseno responsive</b> que se adapta perfectamente a tablets como iPad o tablets Android.'},
+            {id:37,cat:'general',keywords:['rapido','rapida','velocidad','instantaneo'],q:'Es rapido buscar',a:'Si, las busquedas son muy rapidas gracias a nuestra <b>base de datos optimizada</b>. Los resultados aparecen en menos de un segundo.'},
+            {id:38,cat:'general',keywords:['marca','blanca','generica','generico','marca'],q:'Hay productos de marca blanca',a:'Dependiendo de las farmacias, pueden incluir <b>productos de marca propia</b>. Busca el nombre y compara.'},
+            {id:39,cat:'general',keywords:['natural','ecologico','bio','organico','eco'],q:'Hay productos naturales o ecologicos',a:'Si, muchas farmacias venden <b>cosmetica natural y ecologica</b>. Busca "natural", "bio", "ecologico" o marcas especificas como "Weleda" o "Apivita".'},
+            {id:40,cat:'general',keywords:['veterinario','mascota','animal','perro','gato'],q:'Hay productos para mascotas',a:'Algunas farmacias incluyen <b>productos veterinarios</b>. Prueba a buscar "antiparasitario", "pipeta" o "mascota".'},
+            {id:41,cat:'general',keywords:['similares','parecido','alternativa','equivalente'],q:'Puedo ver productos similares',a:'De momento <b>no hay funcion de "productos similares"</b>, pero si buscas el tipo de producto (ej: "crema hidratante") veras todas las opciones de distintas marcas.'},
+            {id:42,cat:'general',keywords:['opinion','opiniones','review','valoracion','resena'],q:'Hay opiniones de productos',a:'De momento <b>no mostramos opiniones</b> ni valoraciones. Es una funcion que consideramos para el futuro.'},
+            {id:43,cat:'general',keywords:['imagen','foto','producto','ver','aspecto'],q:'Puedo ver fotos del producto',a:'De momento <b>no mostramos imagenes</b> de los productos. Es algo que estamos valorando anadir en futuras versiones.'},
+            {id:44,cat:'general',keywords:['notificacion','aviso','email','alerta','push'],q:'Puedo recibir notificaciones',a:'Las <b>notificaciones y alertas de precio</b> estan en desarrollo. Proximamente podras recibir avisos cuando un producto baje de precio.'},
+            {id:45,cat:'general',keywords:['colaborar','contribuir','ayudar','voluntario','proyecto'],q:'Puedo colaborar con el proyecto',a:'Agradecemos el interes! De momento <b>no hay programa de voluntariado</b>, pero toda sugerencia es bienvenida.'},
+
+            // ========== ADICIONALES BUSQUEDA (141-155) ==========
+            {id:141,cat:'busqueda',keywords:['antiedad','arrugas','antiarrugas','envejecimiento'],q:'Como busco productos antiedad',a:'Busca "antiedad", "antiarrugas", "colageno" o "acido hialuronico", o usa la <b>tarjeta "Antiedad"</b> en la pagina principal.'},
+            {id:142,cat:'busqueda',keywords:['deportivo','proteina','gym','gimnasio','deporte'],q:'Como busco productos deportivos',a:'Busca "proteina whey", "creatina" o "batido", o usa la <b>tarjeta "Deportivo"</b> en la pagina principal.'},
+            {id:143,cat:'busqueda',keywords:['resfriado','gripe','tos','catarro','spray','nasal'],q:'Como busco productos para el resfriado',a:'Busca "spray nasal", "gripe" o "tos", o usa la <b>tarjeta "Resfriado"</b> en la pagina principal.'},
+            {id:144,cat:'busqueda',keywords:['alergia','alergias','antihistaminico','polen'],q:'Como busco productos para alergias',a:'Busca "antihistaminico", "alergia" o "cetirizina", o usa la <b>tarjeta "Alergias"</b> en la pagina principal.'},
+            {id:145,cat:'busqueda',keywords:['digestivo','estomago','digestion','intestino','gases'],q:'Como busco productos digestivos',a:'Busca "probiotico", "digestion" o "gases", o usa la <b>tarjeta "Digestivo"</b> en la pagina principal.'},
+            {id:146,cat:'busqueda',keywords:['isdin','avene','vichy','laroche','cerave','marca'],q:'Puedo buscar por marca como Isdin o Avene',a:'Si, simplemente escribe el <b>nombre de la marca</b> en el buscador: "Isdin", "Avene", "Vichy", "La Roche Posay", "CeraVe", etc.'},
+            {id:147,cat:'busqueda',keywords:['after','sun','quemadura','solar','despues','sol'],q:'Como busco After Sun',a:'Busca "after sun" en el buscador o explora la <b>subcategoria Solar</b> en el dropdown de categorias.'},
+            {id:148,cat:'busqueda',keywords:['anticaida','caida','pelo','cabello','minoxidil'],q:'Como busco productos anticaida',a:'Busca "anticaida", "minoxidil" o "caida cabello" en el buscador, o explora la <b>subcategoria Cabello</b>.'},
+            {id:149,cat:'busqueda',keywords:['tinte','color','cabello','pelo','teñir'],q:'Como busco tintes de cabello',a:'Busca "tinte cabello" o "coloracion" en el buscador, o ve a la <b>subcategoria Cabello</b> en el dropdown.'},
+            {id:150,cat:'busqueda',keywords:['biberon','chupete','lactancia','bebe','materna'],q:'Como busco biberones',a:'Busca "biberon", "chupete" o "lactancia" en el buscador, o usa la <b>subcategoria Bebe</b>.'},
+            {id:151,cat:'busqueda',keywords:['test','embarazo','prueba','ovulacion','fertilidad'],q:'Como busco test de embarazo',a:'Busca "test embarazo" o "test ovulacion" en el buscador, o explora la <b>subcategoria Mujer</b>.'},
+            {id:152,cat:'busqueda',keywords:['copa','menstrual','compresas','ecologica','reutilizable'],q:'Como busco copa menstrual',a:'Busca "copa menstrual" en el buscador o ve a la <b>subcategoria Mujer</b> en el dropdown.'},
+            {id:153,cat:'busqueda',keywords:['magnesio','zinc','hierro','mineral','minerales'],q:'Como busco magnesio u otros minerales',a:'Busca "magnesio", "zinc", "hierro" o el mineral que necesites. Tambien encontraras resultados buscando "suplemento mineral".'},
+            {id:154,cat:'busqueda',keywords:['omega','aceite','pescado','omega3','dha'],q:'Como busco omega 3',a:'Busca "omega 3", "aceite de pescado" o "DHA" en el buscador.'},
+            {id:155,cat:'busqueda',keywords:['melatonina','dormir','sueno','insomnio'],q:'Como busco melatonina',a:'Busca "melatonina" o "dormir" en el buscador para encontrar suplementos para el sueno.'},
+
+            // ========== ADICIONALES PRODUCTOS (231-250) ==========
+            {id:231,cat:'productos',keywords:['unidad','unitario','gramo','ml','medida'],q:'El precio es por unidad',a:'Si, el precio mostrado es el <b>precio del producto completo</b> (el envase tal como se vende). No mostramos precio por ml o por gramo.'},
+            {id:232,cat:'productos',keywords:['iva','impuesto','incluido','sin','impuestos'],q:'El precio incluye IVA',a:'Si, todos los precios mostrados <b>incluyen IVA</b>. Es el precio final del producto (sin contar envio).'},
+            {id:233,cat:'productos',keywords:['pack','lote','oferta','multiplo','2x1','3x2'],q:'Aparecen ofertas tipo pack o 2x1',a:'Si, si la farmacia tiene <b>packs u ofertas especiales</b>, pueden aparecer como productos independientes en los resultados.'},
+            {id:234,cat:'productos',keywords:['caducidad','caduca','fecha','vencimiento','expira'],q:'Puedo ver la fecha de caducidad',a:'No, la <b>fecha de caducidad no se muestra</b> en FarmaSearch. Es un dato que las farmacias manejan internamente.'},
+            {id:235,cat:'productos',keywords:['ingredientes','composicion','inci','formula'],q:'Puedo ver los ingredientes',a:'De momento <b>no mostramos la composicion</b> del producto. Te recomendamos consultarlo en la web de la farmacia o del fabricante.'},
+            {id:236,cat:'productos',keywords:['tamano','volumen','cantidad','ml','gramos','peso'],q:'Puedo ver el tamano del producto',a:'El tamano suele estar incluido en el <b>nombre del producto</b> (ej: "Crema X 50ml"). No tenemos un campo separado para el volumen.'},
+            {id:237,cat:'productos',keywords:['duplicado','repetido','mismo','producto','aparece','dos'],q:'Por que aparece el mismo producto varias veces',a:'Puede que sean <b>variantes distintas</b> (diferente tamano, formato o version) o que las farmacias lo nombren de forma ligeramente diferente.'},
+            {id:238,cat:'productos',keywords:['ficha','detalle','completa','informacion','producto'],q:'Hay ficha de producto detallada',a:'De momento no hay ficha completa. Al <b>expandir la tarjeta</b> ves los precios por farmacia, stock y enlaces. Una ficha mas detallada esta en los planes futuros.'},
+            {id:239,cat:'productos',keywords:['nuevo','recien','lanzamiento','novedad','ultimo'],q:'Aparecen productos nuevos',a:'Si, cuando las farmacias anaden <b>productos nuevos</b>, nuestro sistema los detecta y los incluye en la base de datos.'},
+            {id:240,cat:'productos',keywords:['descontinuado','retirado','ya','no','existe','viejo'],q:'Por que un producto ya no aparece',a:'Si un producto desaparece de <b>todas las farmacias</b> (descontinuado o agotado permanentemente), puede dejar de aparecer en los resultados.'},
+
+            // ========== ADICIONALES CUENTA (325-340) ==========
+            {id:325,cat:'cuenta',keywords:['multiples','dispositivos','varios','ordenador','movil','sesion'],q:'Puedo usar mi cuenta en varios dispositivos',a:'Si, puedes <b>iniciar sesion en cualquier dispositivo</b> con tu email y contrasena. Tu cuenta funciona en movil, tablet y ordenador.'},
+            {id:326,cat:'cuenta',keywords:['nombre','usuario','nickname','username'],q:'Mi nombre es visible para otros',a:'No, tu nombre <b>solo es visible para ti</b> en tu menu lateral. No hay funciones sociales ni perfiles publicos.'},
+            {id:327,cat:'cuenta',keywords:['email','recibir','spam','correo','newsletter'],q:'Voy a recibir spam por email',a:'No, <b>no enviamos emails comerciales</b> ni newsletters. Solo usamos tu email para la autenticacion de tu cuenta.'},
+            {id:328,cat:'cuenta',keywords:['verificar','email','confirmar','validar','correo'],q:'Tengo que verificar mi email',a:'De momento <b>no se requiere verificacion de email</b>. Te registras y puedes usar la app inmediatamente.'},
+            {id:329,cat:'cuenta',keywords:['facebook','twitter','instagram','social','compartir'],q:'Puedo vincular redes sociales',a:'De momento <b>no hay vinculacion con redes sociales</b>. Es una funcion que podria llegar en el futuro.'},
+
+            // ========== ADICIONALES NAVEGACION (422-435) ==========
+            {id:422,cat:'navegacion',keywords:['topbar','barra','superior','arriba','busqueda'],q:'Que es la barra superior',a:'Es la <b>barra de busqueda fija</b> que siempre esta visible en la parte superior. Desde ahi puedes buscar productos en cualquier momento.'},
+            {id:423,cat:'navegacion',keywords:['fija','sticky','scroll','queda','siempre','visible'],q:'La barra de busqueda siempre esta visible',a:'Si, la barra de busqueda es <b>sticky</b>: se queda fija en la parte superior aunque hagas scroll hacia abajo.'},
+            {id:424,cat:'navegacion',keywords:['rapido','atajo','shortcut','acceso','directo'],q:'Hay atajos de teclado',a:'De momento no hay <b>atajos de teclado</b> especificos, pero puedes usar Tab para navegar y Enter para activar botones.'},
+            {id:425,cat:'navegacion',keywords:['arrastrar','drag','swipe','gesto','tactil'],q:'Puedo navegar con gestos tactiles',a:'En movil puedes <b>hacer scroll</b> con el dedo. No hay gestos de swipe especiales, pero puedes pulsar el overlay para cerrar el menu.'},
+            {id:426,cat:'navegacion',keywords:['cambiar','vista','ver','diferente','layout','modo'],q:'Puedo cambiar la vista de los resultados',a:'De momento solo hay <b>vista de lista</b>. Una vista en cuadricula podria anadirse en el futuro.'},
+
+            // ========== ADICIONALES FARMACIAS (521-530) ==========
+            {id:521,cat:'farmacias',keywords:['puntual','oferta','farmacia','descuento','especial'],q:'Las farmacias tienen ofertas puntuales',a:'Si, las farmacias tienen <b>ofertas y descuentos temporales</b> que se reflejan en los precios. Por eso los precios pueden variar de un dia a otro.'},
+            {id:522,cat:'farmacias',keywords:['farmacia','fisica','misma','precio','tienda','local'],q:'El precio online es igual al de la farmacia fisica',a:'Normalmente <b>no</b>. Los precios online suelen ser <b>mas baratos</b> que en la farmacia fisica, ya que tienen menos costes operativos.'},
+            {id:523,cat:'farmacias',keywords:['garantia','original','falsificado','autentico','real'],q:'Los productos son originales',a:'Si, todas las farmacias que comparamos son <b>farmacias autorizadas</b> que venden productos originales y garantizados.'},
+            {id:524,cat:'farmacias',keywords:['24','horas','entrega','rapido','urgente','envio'],q:'Cuanto tarda el envio',a:'El <b>tiempo de envio varia segun la farmacia</b>, normalmente entre 24-72 horas laborables. Consultalo en la web de cada farmacia.'},
+            {id:525,cat:'farmacias',keywords:['minimo','pedido','importe','compra','minima'],q:'Hay importe minimo de compra',a:'<b>Depende de cada farmacia</b>. Algunas no tienen minimo y otras requieren un importe minimo. Consultalo en la web de la farmacia.'},
+
+            // ========== ADICIONALES ACCESIBILIDAD (615-622) ==========
+            {id:615,cat:'accesibilidad',keywords:['daltonico','colores','daltonismo','cromatico'],q:'Es accesible para daltonicos',a:'Usamos <b>colores complementados con iconos y texto</b> (ej: "Disponible"/"Sin stock" ademas del color verde/rojo), lo que ayuda a personas con daltonismo.'},
+            {id:616,cat:'accesibilidad',keywords:['zoom','ampliar','navegador','ctrl','mas'],q:'Puedo usar el zoom del navegador',a:'Si, puedes usar <b>Ctrl + o Ctrl -</b> (o pinch en movil) para hacer zoom. Tambien puedes usar el ajuste de fuente del panel de accesibilidad.'},
+
+            // ========== ADICIONALES TECNICO (726-740) ==========
+            {id:726,cat:'tecnico',keywords:['recarga','recargar','actualizar','refresh','f5'],q:'Como recargo la pagina',a:'Pulsa <b>F5</b> o el boton de recargar de tu navegador. En movil, arrastra hacia abajo en la barra de direcciones.'},
+            {id:727,cat:'tecnico',keywords:['incognito','privado','modo','navegador','anonimo'],q:'Funciona en modo incognito',a:'Si, FarmaSearch <b>funciona en modo incognito</b>. Tendras que iniciar sesion cada vez, ya que las preferencias no se guardan.'},
+            {id:728,cat:'tecnico',keywords:['javascript','js','activar','habilitar','script'],q:'Necesito JavaScript activado',a:'Si, FarmaSearch <b>requiere JavaScript</b> para funcionar. La mayoria de navegadores lo tienen activado por defecto.'},
+            {id:729,cat:'tecnico',keywords:['bloqueador','adblocker','adblock','bloquea','extension'],q:'El adblocker afecta a FarmaSearch',a:'No deberia, ya que <b>no mostramos publicidad</b>. Si tienes problemas, prueba a desactivar extensiones temporalmente.'},
+            {id:730,cat:'tecnico',keywords:['impresora','imprimir','print','papel'],q:'Puedo imprimir los resultados',a:'Puedes usar la <b>funcion de imprimir del navegador</b> (Ctrl+P), aunque la pagina no esta especificamente optimizada para impresion.'},
+
+            // ========== ADICIONALES EASTER EGGS (931-945) ==========
+            {id:931,cat:'easter',keywords:['farmacia','parafarmacia','diferencia','distinto'],q:'Que diferencia hay entre farmacia y parafarmacia',a:'Los <b>medicamentos con receta</b> son farmacia. Los productos de <b>cuidado personal, cosmetica, higiene y suplementos</b> (que no necesitan receta) son parafarmacia. FarmaSearch compara parafarmacia.'},
+            {id:932,cat:'easter',keywords:['barato','chollo','ganga','oferton','descuento'],q:'Como encuentro chollos',a:'Busca productos que te interesen y <b>ordena por "Precio ↑"</b>. Fijate en el badge "Ahorra X €" para ver donde hay mas diferencia de precio. Ahi estan los chollos!'},
+            {id:933,cat:'easter',keywords:['saludo','presentate','dime','algo','hablame'],q:'Presentate',a:'Encantado! Soy <b>FarmaBot</b>, el asistente virtual de FarmaSearch. Llevo integradas mas de 300 respuestas sobre la app. Preguntame lo que quieras sobre busquedas, precios, farmacias o funciones.'},
+            {id:934,cat:'easter',keywords:['secreto','oculto','escondido','truco','hack'],q:'Hay algun secreto en la app',a:'Bueno, me has encontrado a mi! Eso ya es un pequeño secreto. Ademas, un truco: <b>usa el dropdown de categorias</b> haciendo clic en el buscador vacio. Hay subcategorias muy utiles!'},
+            {id:935,cat:'easter',keywords:['mejor','hora','momento','buscar','dia'],q:'Cual es el mejor momento para buscar',a:'Los precios se actualizan periodicamente, asi que <b>cualquier momento es bueno</b>. Pero si buscas algo especifico, revisalo varios dias para ver si el precio cambia.'},
+            {id:936,cat:'easter',keywords:['feliz','contento','alegre','bien','genial'],q:'Estoy feliz',a:'Me alegra saberlo! Y si ademas <b>ahorras en tus compras de farmacia</b> con FarmaSearch, aun mejor! En que te puedo ayudar?'},
+            {id:937,cat:'easter',keywords:['triste','mal','bajo','animo','enfermo'],q:'Estoy triste',a:'Lo siento! Espero que te mejores pronto. Mientras tanto, si necesitas buscar algun <b>producto de farmacia</b>, estoy aqui para ayudarte.'},
+            {id:938,cat:'easter',keywords:['vacaciones','verano','playa','viaje','sol'],q:'Me voy de vacaciones',a:'Pues no te olvides de buscar <b>proteccion solar y after sun</b> en FarmaSearch antes de irte. Compara precios y ahorra para el viaje!'},
+            {id:939,cat:'easter',keywords:['frio','invierno','gripe','constipado','resfriado'],q:'Tengo frio o estoy resfriado',a:'Busca "gripe", "resfriado" o "spray nasal" en FarmaSearch para <b>encontrar lo que necesitas al mejor precio</b>. Mejorate pronto!'},
+            {id:940,cat:'easter',keywords:['piel','seca','hidratacion','hidratar','crema'],q:'Tengo la piel seca',a:'Busca "crema hidratante" o "piel seca" en FarmaSearch. Encontraras <b>opciones de muchas marcas</b> como CeraVe, Avene, La Roche Posay... Compara y elige!'},
+            {id:941,cat:'easter',keywords:['pelo','cabello','caida','cae','calvo','calvicie'],q:'Se me cae el pelo',a:'Busca "anticaida" o "minoxidil" en FarmaSearch para <b>comparar tratamientos capilares</b>. Hay muchas opciones de diferentes marcas y precios.'},
+            {id:942,cat:'easter',keywords:['acne','grano','granos','espinilla','piel','grasa'],q:'Tengo acne',a:'Busca "acne", "piel grasa" o "limpiador facial" en FarmaSearch. Marcas como <b>La Roche Posay (Effaclar), Avene o CeraVe</b> tienen lineas especificas.'},
+            {id:943,cat:'easter',keywords:['bebe','embarazada','embarazo','mama','papa'],q:'Voy a tener un bebe',a:'Felicidades! En FarmaSearch puedes buscar todo lo que necesitas: <b>panales, cremas para bebe, biberones, leches infantiles</b>... Compara precios y ahorra para el pequeno!'},
+            {id:944,cat:'easter',keywords:['redes','social','instagram','twitter','tiktok','facebook'],q:'Teneis redes sociales',a:'De momento <b>no tenemos redes sociales oficiales</b>. Proximamente podriamos abrir perfiles para compartir novedades y ofertas.'},
+            {id:945,cat:'easter',keywords:['valorar','puntuar','estrellas','review','opinar'],q:'Puedo valorar la app',a:'Agradecemos mucho tu feedback! De momento no hay un sistema de valoracion interno, pero <b>toda sugerencia es bienvenida</b>.'}
+        ];
+
+        // --- Algoritmo de matching ---
+        const CHATBOT_STOPWORDS = new Set(['de','la','el','las','los','un','una','en','que','como','se','es','por','para','con','del','al','lo','a','y','o','e','u','no','si','mi','me','te','tu','su','nos','les','le','ya','hay','eso','esto','esta','esa','ese','son','fue','ser','muy','mas','tan','ha','he','has','han','puede','puedo','puedes','quiero','tengo','tiene','todo','todos','otra','otro','cada','sin','sobre','entre','pero','porque','donde','cuando','cual','cuales','algo','nada','mismo','misma','mucho','poco']);
+
+        function normalizeText(str) {
+            return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+        }
+
+        function tokenize(str) {
+            return normalizeText(str).split(' ').filter(w => w.length > 1 && !CHATBOT_STOPWORDS.has(w));
+        }
+
+        const CHATBOT_FALLBACKS = [
+            'No estoy seguro de entender tu pregunta. Prueba a preguntar sobre: <b>busqueda de productos, precios, farmacias, tu cuenta</b> o como usar la app.',
+            'Hmm, no tengo una respuesta exacta para eso. Intenta reformular tu pregunta o preguntame sobre <b>como buscar productos, comparar precios o usar las funciones de FarmaSearch</b>.',
+            'No he podido encontrar una respuesta a eso. Te puedo ayudar con: <b>busquedas, precios, farmacias, cuenta, navegacion o accesibilidad</b>. Que te interesa?',
+            'Disculpa, no tengo informacion sobre eso. Soy experto en <b>FarmaSearch</b>: busquedas, precios, farmacias y funciones de la app. Preguntame sobre eso!'
+        ];
+
+        function chatbotMatch(input) {
+            const normalized = normalizeText(input);
+            const tokens = tokenize(input);
+
+            if (tokens.length === 0 && normalized.length < 3) {
+                return {answer:'Escribe un poco mas para que pueda ayudarte. Puedes preguntarme sobre <b>busquedas, precios, farmacias</b> o cualquier funcion de FarmaSearch.',category:null};
+            }
+
+            // Greeting detection
+            const greetWords = ['hola','hello','hey','hi','buenas','saludos','buenos','dias','tardes','noches','que tal'];
+            if (tokens.length <= 3 && tokens.some(t => greetWords.includes(t))) {
+                const greetings = CHATBOT_QA.filter(q => q.cat === 'easter' && q.keywords.some(k => greetWords.includes(k)));
+                if (greetings.length) {
+                    const g = greetings[Math.floor(Math.random() * greetings.length)];
+                    return {answer:g.a, category:'easter'};
+                }
+            }
+
+            // Thanks detection
+            const thanksWords = ['gracias','thanks','genial','perfecto','vale','ok','bien','guay'];
+            if (tokens.length <= 2 && tokens.some(t => thanksWords.includes(t))) {
+                return {answer:CHATBOT_QA.find(q=>q.id===906).a, category:'easter'};
+            }
+
+            // Farewell detection
+            const byeWords = ['adios','bye','hasta','luego','chao'];
+            if (tokens.length <= 3 && tokens.some(t => byeWords.includes(t))) {
+                return {answer:CHATBOT_QA.find(q=>q.id===907).a, category:'easter'};
+            }
+
+            // Score each QA entry
+            let bestScore = 0, bestEntry = null;
+            for (const entry of CHATBOT_QA) {
+                let exact = 0, partial = 0;
+                for (const kw of entry.keywords) {
+                    if (tokens.includes(kw)) { exact++; }
+                    else if (normalized.includes(kw)) { partial++; }
+                }
+                const score = (exact * 2 + partial) / (entry.keywords.length * 2);
+                if (score > bestScore) { bestScore = score; bestEntry = entry; }
+            }
+
+            if (bestScore >= 0.25 && bestEntry) {
+                return {answer: bestEntry.a, category: bestEntry.cat};
+            }
+
+            return {answer: CHATBOT_FALLBACKS[Math.floor(Math.random() * CHATBOT_FALLBACKS.length)], category: null};
+        }
+
+        const CHATBOT_SUGGESTIONS = {
+            general: ['Como funciona FarmaSearch?','Cuantas farmacias compara?','Es gratis?'],
+            busqueda: ['Como ordeno los resultados?','Que categorias hay?','Por que no encuentro mi producto?'],
+            productos: ['Que es el badge de ahorro?','Cada cuanto se actualizan precios?','Como compro un producto?'],
+            cuenta: ['Como me registro?','Puedo cambiar mi contrasena?','Que planes hay?'],
+            navegacion: ['Que secciones tiene la app?','Cuando estaran disponibles?','Como vuelvo a la busqueda?'],
+            farmacias: ['Cuales son las 8 farmacias?','Los precios incluyen envio?','Puedo filtrar por farmacia?'],
+            accesibilidad: ['Como agrando el texto?','Que es alto contraste?','Se guardan las preferencias?'],
+            tecnico: ['Por que sale Error de conexion?','Funciona en movil?','Como borro la cache?'],
+            easter: ['Que es FarmaSearch?','Como busco productos?','Que farmacias comparais?']
+        };
+
+        function chatbotGetSuggestions(cat) {
+            return CHATBOT_SUGGESTIONS[cat] || CHATBOT_SUGGESTIONS['easter'];
+        }
+
+        // --- UI del chatbot ---
+        let chatbotOpen = false, chatbotFirstOpen = true;
+
+        function toggleChatbot() {
+            chatbotOpen = !chatbotOpen;
+            const win = document.getElementById('chatbotWindow');
+            const bubble = document.getElementById('chatbotBubble');
+            const iconChat = document.getElementById('chatbotIconChat');
+            const iconClose = document.getElementById('chatbotIconClose');
+
+            win.classList.toggle('open', chatbotOpen);
+            bubble.classList.toggle('active', chatbotOpen);
+            iconChat.style.display = chatbotOpen ? 'none' : 'block';
+            iconClose.style.display = chatbotOpen ? 'block' : 'none';
+
+            if (chatbotOpen && chatbotFirstOpen) {
+                chatbotFirstOpen = false;
+                const dot = document.getElementById('chatbotDot');
+                if (dot) dot.style.display = 'none';
+                addBotMessage('Hola! Soy <b>FarmaBot</b>, tu asistente virtual de FarmaSearch. Preguntame lo que necesites sobre la app, busquedas, precios o farmacias.');
+                setTimeout(() => showChatSuggestions(['Que es FarmaSearch?','Como busco productos?','Que farmacias comparais?']), 1400);
+            }
+            if (chatbotOpen) {
+                setTimeout(() => document.getElementById('chatbotInput').focus(), 300);
+            }
+        }
+
+        function addBotMessage(text) {
+            const container = document.getElementById('chatbotMessages');
+            const typing = document.createElement('div');
+            typing.className = 'chatbot-msg bot chatbot-typing';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                typing.remove();
+                const msg = document.createElement('div');
+                msg.className = 'chatbot-msg bot';
+                msg.innerHTML = text;
+                container.appendChild(msg);
+                container.scrollTop = container.scrollHeight;
+            }, 500 + Math.random() * 700);
+        }
+
+        function addUserMessage(text) {
+            const container = document.getElementById('chatbotMessages');
+            const msg = document.createElement('div');
+            msg.className = 'chatbot-msg user';
+            msg.textContent = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showChatSuggestions(suggestions) {
+            const container = document.getElementById('chatbotSuggestions');
+            container.innerHTML = suggestions.map(s =>
+                '<button class="chatbot-chip" onclick="sendChip(this)">' + escapeHtml(s) + '</button>'
+            ).join('');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            addUserMessage(text);
+            document.getElementById('chatbotSuggestions').innerHTML = '';
+
+            const result = chatbotMatch(text);
+            addBotMessage(result.answer);
+
+            setTimeout(() => {
+                showChatSuggestions(chatbotGetSuggestions(result.category));
+            }, 1500);
+        }
+
+        function sendChip(btn) {
+            document.getElementById('chatbotInput').value = btn.textContent;
+            sendChatMessage();
+        }
+
+        document.getElementById('chatbotInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+
+        // Escape to close chatbot
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && chatbotOpen) toggleChatbot();
+        });
+
+        // Click outside to close
+        document.addEventListener('click', function(e) {
+            if (chatbotOpen && !e.target.closest('.chatbot-window') && !e.target.closest('.chatbot-bubble')) {
+                toggleChatbot();
+            }
+        });
     </script>
 </body>
 </html>
