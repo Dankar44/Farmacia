@@ -14,7 +14,9 @@
             --primary: #00a99d;
             --primary-dark: #008f85;
             --primary-light: #e0f7f5;
+            --primary-lighter: #f0faf9;
             --accent-orange: #f57c00;
+            --accent-orange-light: #fff3e0;
             --bg-body: #f4f6f8;
             --bg-white: #ffffff;
             --text-dark: #1a1a2e;
@@ -23,8 +25,17 @@
             --border: #e0e0e0;
             --border-light: #eee;
             --radius: 12px;
+            --radius-lg: 16px;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --danger-border: #fecaca;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -40,45 +51,54 @@
             min-height: 100vh;
         }
 
-        /* Top bar */
+        /* ---- Top bar ---- */
         .panel-topbar {
-            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 100%);
-            padding: 14px 24px;
+            background: linear-gradient(135deg, #00a99d 0%, #00c9bc 50%, #00a99d 100%);
+            background-size: 200% 200%;
+            padding: 0 28px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,169,157,0.2);
         }
 
         .panel-topbar-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .panel-topbar-left svg {
-            width: 24px;
-            height: 24px;
+        .panel-topbar-logo {
+            width: 34px;
+            height: 34px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .panel-topbar-logo svg {
+            width: 20px;
+            height: 20px;
         }
 
         .panel-topbar-title {
             font-size: 1.05rem;
             font-weight: 700;
-        }
-
-        .panel-topbar-user {
-            font-size: 0.82rem;
-            opacity: 0.9;
-            margin-left: 10px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
+            letter-spacing: -0.01em;
         }
 
         .panel-topbar-links {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
         }
 
         .panel-topbar-links a {
@@ -86,9 +106,9 @@
             text-decoration: none;
             font-size: 0.82rem;
             font-weight: 500;
-            padding: 6px 14px;
-            border-radius: 6px;
-            transition: background 0.2s;
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: background var(--transition);
         }
 
         .panel-topbar-links a:hover {
@@ -96,300 +116,1093 @@
         }
 
         .panel-topbar-links .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.18);
+            margin-left: 6px;
         }
 
-        /* Main layout */
-        .panel-main {
-            max-width: 1000px;
+        .panel-topbar-links .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        /* ---- Dashboard header ---- */
+        .dashboard-header {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 28px 20px;
+            padding: 32px 28px 0;
+        }
+
+        .dashboard-welcome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-welcome-text h1 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        .dashboard-welcome-text h1 span {
+            color: var(--primary);
+        }
+
+        .dashboard-welcome-text p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .dashboard-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .dashboard-badge .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        /* ---- Stats row ---- */
+        .stats-row {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 28px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.locations {
+            background: var(--primary-light);
+        }
+
+        .stat-icon.locations svg {
+            color: var(--primary);
+        }
+
+        .stat-icon.status {
+            background: var(--success-light);
+        }
+
+        .stat-icon.status svg {
+            color: var(--success);
+        }
+
+        .stat-icon.info {
+            background: var(--accent-orange-light);
+        }
+
+        .stat-icon.info svg {
+            color: var(--accent-orange);
+        }
+
+        .stat-content {
+            min-width: 0;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ---- Main layout ---- */
+        .panel-main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 28px 40px;
         }
 
         .panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
-        @media (max-width: 768px) {
-            .panel-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Cards */
+        /* ---- Cards ---- */
         .panel-card {
             background: var(--bg-white);
             border: 1px solid var(--border-light);
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: box-shadow var(--transition);
+        }
+
+        .panel-card:hover {
+            box-shadow: var(--shadow-md);
         }
 
         .panel-card-header {
-            padding: 16px 20px;
+            padding: 18px 24px;
             border-bottom: 1px solid var(--border-light);
-            font-size: 0.92rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 700;
             color: var(--text-dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            background: linear-gradient(180deg, #fafbfc 0%, var(--bg-white) 100%);
+        }
+
+        .panel-card-header .header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-card-header .header-icon.add-icon {
+            background: var(--primary-light);
+        }
+
+        .panel-card-header .header-icon.list-icon {
+            background: var(--accent-orange-light);
+        }
+
+        .panel-card-header .header-count {
+            margin-left: auto;
+            background: var(--bg-body);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
         .panel-card-body {
-            padding: 20px;
+            padding: 24px;
         }
 
-        /* Form */
+        /* ---- Map ---- */
+        #miniMap {
+            height: 220px;
+            border-radius: 10px;
+            border: 2px solid var(--border-light);
+            margin-bottom: 8px;
+            transition: border-color var(--transition);
+        }
+
+        #miniMap:hover {
+            border-color: var(--primary);
+        }
+
+        .map-hint {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .map-hint svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+        }
+
+        /* ---- Form ---- */
         .form-row {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .form-row label {
             display: block;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .form-row input {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.85rem;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.88rem;
             font-family: inherit;
+            color: var(--text-dark);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            background: var(--bg-body);
+        }
+
+        .form-row input::placeholder {
+            color: #bbb;
+        }
+
+        .form-row input:hover {
+            border-color: #ccc;
+            background: #fff;
         }
 
         .form-row input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.12);
+            background: #fff;
         }
 
         .form-row-pair {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .form-section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+            margin-top: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-light);
         }
 
         .btn-add {
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: #fff;
             border: none;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 4px;
+            transition: all var(--transition);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,169,157,0.25);
         }
 
         .btn-add:hover {
-            background: var(--primary-dark);
+            box-shadow: 0 4px 16px rgba(0,169,157,0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
         }
 
         .btn-add:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Mini map */
-        #miniMap {
-            height: 160px;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-            margin-bottom: 14px;
+        .btn-add svg {
+            width: 18px;
+            height: 18px;
         }
 
-        .map-hint {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 10px;
+        /* ---- Locations summary ---- */
+        .locations-summary {
+            padding: 16px 24px;
+            background: var(--primary-lighter);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--primary-dark);
+            font-weight: 500;
         }
 
-        /* Location list */
+        .locations-summary svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ---- Location list ---- */
         .locations-list {
-            max-height: 500px;
+            max-height: 580px;
             overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .locations-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .locations-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .locations-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
         }
 
         .location-item {
-            padding: 14px 16px;
+            padding: 18px 24px;
             border-bottom: 1px solid var(--border-light);
             display: flex;
-            justify-content: space-between;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
+            transition: background var(--transition);
+        }
+
+        .location-item:hover {
+            background: #fafbfc;
         }
 
         .location-item:last-child {
             border-bottom: none;
         }
 
-        .location-info h4 {
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 2px;
+        .location-marker {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
-        .location-info p {
-            font-size: 0.78rem;
+        .location-marker svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .location-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .location-info h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .location-info .location-address {
+            font-size: 0.8rem;
             color: var(--text-muted);
             line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .location-info .location-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .location-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.74rem;
+            color: #777;
+        }
+
+        .location-meta-item svg {
+            width: 13px;
+            height: 13px;
+            opacity: 0.6;
         }
 
         .btn-delete {
-            padding: 6px 12px;
-            background: #fef2f2;
-            color: #c62828;
-            border: 1px solid #fecaca;
-            border-radius: 6px;
-            font-size: 0.72rem;
+            padding: 7px 14px;
+            background: var(--bg-body);
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 0.74rem;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
             white-space: nowrap;
-            transition: background 0.2s;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .btn-delete svg {
+            width: 14px;
+            height: 14px;
         }
 
         .btn-delete:hover {
-            background: #fee2e2;
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger-border);
         }
 
+        /* ---- Empty state ---- */
         .empty-locations {
-            padding: 40px 20px;
+            padding: 60px 32px;
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
         }
 
-        /* Success/error toast */
-        .toast {
+        .empty-locations .empty-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .empty-locations .empty-icon svg {
+            width: 28px;
+            height: 28px;
+            opacity: 0.35;
+        }
+
+        .empty-locations h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .empty-locations p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 260px;
+            margin: 0 auto;
+        }
+
+        .empty-locations .empty-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .empty-locations .empty-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ---- Toast notification ---- */
+        .toast-container {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: var(--text-dark);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 8px;
+            top: 76px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            padding: 14px 20px;
+            border-radius: 12px;
             font-size: 0.85rem;
             font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            transform: translateX(120%);
             opacity: 0;
-            transition: all 0.3s;
-            z-index: 999;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 280px;
+            max-width: 400px;
         }
 
         .toast.show {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(0);
         }
 
-        .toast.error {
-            background: #c62828;
+        .toast .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast .toast-icon.success {
+            background: var(--success-light);
+        }
+
+        .toast .toast-icon.success svg {
+            color: var(--success);
+        }
+
+        .toast .toast-icon.error {
+            background: var(--danger-light);
+        }
+
+        .toast .toast-icon.error svg {
+            color: var(--danger);
+        }
+
+        .toast .toast-message {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background var(--transition);
+            flex-shrink: 0;
+        }
+
+        .toast .toast-close:hover {
+            background: var(--bg-body);
+        }
+
+        .toast .toast-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .toast .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            border-radius: 0 0 12px 12px;
+            transition: width linear;
+        }
+
+        .toast .toast-progress.success {
+            background: var(--primary);
+        }
+
+        .toast .toast-progress.error {
+            background: var(--danger);
+        }
+
+        /* ---- Delete confirmation modal ---- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--danger-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .modal-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--danger);
+        }
+
+        .modal-box h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .modal-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .modal-btn-cancel {
+            background: var(--bg-body);
+            color: var(--text-body);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--border-light);
+        }
+
+        .modal-btn-delete {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+        }
+
+        .modal-btn-delete:hover {
+            background: #b91c1c;
+            box-shadow: 0 4px 16px rgba(220,38,38,0.35);
+        }
+
+        /* ---- Loading skeleton ---- */
+        .skeleton-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .skeleton-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--bg-body) 25%, var(--border-light) 50%, var(--bg-body) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-lines {
+            flex: 1;
+        }
+
+        .skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--bg-body) 25%, var(--border-light) 50%, var(--bg-body) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-line:nth-child(1) { width: 60%; }
+        .skeleton-line:nth-child(2) { width: 85%; }
+        .skeleton-line:nth-child(3) { width: 40%; }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 900px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .panel-topbar {
+                padding: 0 16px;
+                height: 54px;
+            }
+
+            .panel-topbar-title {
+                font-size: 0.95rem;
+            }
+
+            .panel-topbar-links a:not(.logout-btn) {
+                display: none;
+            }
+
+            .dashboard-header {
+                padding: 24px 16px 0;
+            }
+
+            .dashboard-welcome-text h1 {
+                font-size: 1.25rem;
+            }
+
+            .stats-row {
+                padding: 16px 16px 0;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 16px 18px;
+            }
+
+            .panel-main {
+                padding: 16px 16px 32px;
+            }
+
+            .panel-card-body {
+                padding: 18px;
+            }
+
+            .location-item {
+                padding: 14px 18px;
+            }
+
+            .form-row-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-box {
+                padding: 24px;
+                width: 92%;
+            }
+
+            .toast {
+                min-width: 240px;
+                max-width: calc(100vw - 48px);
+            }
+
+            .toast-container {
+                right: 12px;
+                top: 66px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Top bar -->
     <div class="panel-topbar">
         <div class="panel-topbar-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
-                <path d="m8.5 8.5 7 7" stroke="#fff" />
-                <path d="M14 6 6 14" stroke="#ffe0b2" />
-            </svg>
-            <span class="panel-topbar-title">FarmaSearch Panel</span>
-            <span class="panel-topbar-user">{{ farmacia_nombre }}</span>
+            <div class="panel-topbar-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
+                    <path d="m8.5 8.5 7 7" stroke="#fff" />
+                    <path d="M14 6 6 14" stroke="#ffe0b2" />
+                </svg>
+            </div>
+            <span class="panel-topbar-title">FarmaSearch</span>
         </div>
         <div class="panel-topbar-links">
             <a href="/">Buscador</a>
             <a href="/mapa">Mapa</a>
-            <a href="/logout" class="logout-btn">Cerrar sesión</a>
+            <a href="/logout" class="logout-btn">Cerrar sesion</a>
         </div>
     </div>
 
+    <!-- Dashboard header -->
+    <div class="dashboard-header">
+        <div class="dashboard-welcome">
+            <div class="dashboard-welcome-text">
+                <h1>Bienvenido, <span>{{ farmacia_nombre }}</span></h1>
+                <p>Gestiona las ubicaciones de tu farmacia desde este panel</p>
+            </div>
+            <div class="dashboard-badge">
+                <span class="dot"></span>
+                Panel activo
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon locations">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="statTotal">--</div>
+                <div class="stat-label">Ubicaciones registradas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" style="font-size:1rem; color:var(--success)">Activo</div>
+                <div class="stat-label">Estado del servicio</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" style="font-size:1rem; color:var(--accent-orange)" id="statLastUpdate">--</div>
+                <div class="stat-label">Ultima actualizacion</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
     <div class="panel-main">
         <div class="panel-grid">
             <!-- Add location form -->
             <div class="panel-card">
                 <div class="panel-card-header">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        style="width:18px;height:18px">
-                        <path d="M12 5v14" stroke="var(--primary)" />
-                        <path d="M5 12h14" stroke="var(--primary)" />
-                    </svg>
-                    Añadir ubicación
+                    <div class="header-icon add-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                            <path d="M12 5v14" stroke="var(--primary)" />
+                            <path d="M5 12h14" stroke="var(--primary)" />
+                        </svg>
+                    </div>
+                    Nueva ubicacion
                 </div>
                 <div class="panel-card-body">
                     <div id="miniMap"></div>
-                    <p class="map-hint">Haz clic en el mapa para seleccionar la ubicación</p>
+                    <p class="map-hint">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4"/>
+                            <path d="M12 8h.01"/>
+                        </svg>
+                        Haz clic en el mapa para seleccionar la ubicacion
+                    </p>
+
+                    <div class="form-section-label">Informacion basica</div>
 
                     <div class="form-row">
-                        <label>Nombre de la tienda</label>
+                        <label for="inp_nombre">Nombre de la tienda</label>
                         <input type="text" id="inp_nombre" placeholder="ej: Farmacia Central Sol">
                     </div>
                     <div class="form-row">
-                        <label>Dirección</label>
-                        <input type="text" id="inp_direccion" placeholder="ej: Calle Gran Vía 12, Madrid">
+                        <label for="inp_direccion">Direccion</label>
+                        <input type="text" id="inp_direccion" placeholder="ej: Calle Gran Via 12, Madrid">
                     </div>
                     <div class="form-row form-row-pair">
                         <div>
-                            <label>Latitud</label>
+                            <label for="inp_lat">Latitud</label>
                             <input type="number" step="any" id="inp_lat" placeholder="40.4168">
                         </div>
                         <div>
-                            <label>Longitud</label>
+                            <label for="inp_lng">Longitud</label>
                             <input type="number" step="any" id="inp_lng" placeholder="-3.7038">
                         </div>
                     </div>
+
+                    <div class="form-section-label">Contacto y horario</div>
+
                     <div class="form-row form-row-pair">
                         <div>
-                            <label>Teléfono</label>
+                            <label for="inp_tel">Telefono</label>
                             <input type="text" id="inp_tel" placeholder="ej: 91 123 4567">
                         </div>
                         <div>
-                            <label>Horario</label>
+                            <label for="inp_horario">Horario</label>
                             <input type="text" id="inp_horario" placeholder="ej: L-V 9:00-21:00">
                         </div>
                     </div>
-                    <button class="btn-add" id="btnAdd" onclick="addLocation()">Añadir ubicación</button>
+                    <button class="btn-add" id="btnAdd" onclick="addLocation()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14"/>
+                            <path d="M5 12h14"/>
+                        </svg>
+                        Guardar ubicacion
+                    </button>
                 </div>
             </div>
 
             <!-- Locations list -->
             <div class="panel-card">
                 <div class="panel-card-header">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        style="width:18px;height:18px">
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" stroke="var(--primary)" />
-                        <circle cx="12" cy="10" r="3" stroke="var(--accent-orange)" />
-                    </svg>
+                    <div class="header-icon list-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" stroke="var(--accent-orange)" />
+                            <circle cx="12" cy="10" r="3" stroke="var(--accent-orange)" />
+                        </svg>
+                    </div>
                     Mis ubicaciones
+                    <span class="header-count" id="headerCount">--</span>
+                </div>
+                <div class="locations-summary" id="locationsSummary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    <span id="summaryText">Cargando ubicaciones...</span>
                 </div>
                 <div class="locations-list" id="locationsList">
-                    <div class="empty-locations">Cargando...</div>
+                    <!-- Loading skeletons -->
+                    <div class="skeleton-item">
+                        <div class="skeleton-circle"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-circle"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-circle"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Delete confirmation modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" y1="11" x2="10" y2="17"/>
+                    <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+            </div>
+            <h3>Eliminar ubicacion</h3>
+            <p id="deleteModalText">Esta accion no se puede deshacer. La ubicacion se eliminara permanentemente del sistema.</p>
+            <div class="modal-actions">
+                <button class="modal-btn-cancel" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="modal-btn-delete" id="btnConfirmDelete" onclick="confirmDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Mini map for picking coordinates
+        // ---- Mini map for picking coordinates ----
         const miniMap = L.map('miniMap').setView([40.4168, -3.7038], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '&copy; OpenStreetMap'
         }).addTo(miniMap);
 
         let pickMarker = null;
@@ -402,37 +1215,116 @@
             pickMarker = L.marker(e.latlng).addTo(miniMap);
         });
 
-        // Load existing locations
+        // ---- State ----
+        let pendingDeleteId = null;
+        let locationCount = 0;
+
+        // ---- Load existing locations ----
         async function loadLocations() {
             try {
                 const resp = await fetch('/api/farmacias/mis-ubicaciones');
                 const data = await resp.json();
 
                 const list = document.getElementById('locationsList');
+                locationCount = data.length;
+
+                // Update stats
+                document.getElementById('statTotal').textContent = locationCount;
+                document.getElementById('headerCount').textContent = locationCount + (locationCount === 1 ? ' ubicacion' : ' ubicaciones');
+                document.getElementById('statLastUpdate').textContent = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                // Update summary
+                const summaryText = document.getElementById('summaryText');
+                if (locationCount === 0) {
+                    summaryText.textContent = 'No hay ubicaciones registradas. Anade tu primera tienda.';
+                } else if (locationCount === 1) {
+                    summaryText.textContent = 'Tienes 1 ubicacion activa visible en FarmaSearch.';
+                } else {
+                    summaryText.textContent = `Tienes ${locationCount} ubicaciones activas visibles en FarmaSearch.`;
+                }
 
                 if (data.length === 0) {
-                    list.innerHTML = '<div class="empty-locations">No tienes ubicaciones registradas.<br>Usa el formulario para añadir tu primera tienda.</div>';
+                    list.innerHTML = `
+                        <div class="empty-locations">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                            </div>
+                            <h3>Sin ubicaciones</h3>
+                            <p>No tienes ubicaciones registradas. Usa el formulario de la izquierda para anadir tu primera tienda.</p>
+                            <span class="empty-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 12H5"/>
+                                    <polyline points="12 19 5 12 12 5"/>
+                                </svg>
+                                Completar formulario
+                            </span>
+                        </div>`;
                     return;
                 }
 
                 let html = '';
                 data.forEach(loc => {
+                    const phone = loc.telefono ? escapeHtml(loc.telefono) : '';
+                    const schedule = loc.horario ? escapeHtml(loc.horario) : '';
+
                     html += `
                         <div class="location-item">
+                            <div class="location-marker">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                    <circle cx="12" cy="10" r="3" stroke="var(--accent-orange)"/>
+                                </svg>
+                            </div>
                             <div class="location-info">
                                 <h4>${escapeHtml(loc.nombre_tienda)}</h4>
-                                <p>${escapeHtml(loc.direccion)}</p>
-                                <p>${loc.telefono ? escapeHtml(loc.telefono) : ''} ${loc.horario ? '· ' + escapeHtml(loc.horario) : ''}</p>
+                                <p class="location-address">${escapeHtml(loc.direccion)}</p>
+                                <div class="location-meta">
+                                    ${phone ? `<span class="location-meta-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                        </svg>
+                                        ${phone}
+                                    </span>` : ''}
+                                    ${schedule ? `<span class="location-meta-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        ${schedule}
+                                    </span>` : ''}
+                                </div>
                             </div>
-                            <button class="btn-delete" onclick="deleteLocation(${loc.id})">Eliminar</button>
+                            <button class="btn-delete" onclick="deleteLocation(${loc.id}, '${escapeHtml(loc.nombre_tienda).replace(/'/g, "\\'")}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 6h18"/>
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                </svg>
+                                Eliminar
+                            </button>
                         </div>`;
                 });
                 list.innerHTML = html;
             } catch (err) {
-                document.getElementById('locationsList').innerHTML = '<div class="empty-locations">Error al cargar ubicaciones</div>';
+                document.getElementById('locationsList').innerHTML = `
+                    <div class="empty-locations">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3>Error al cargar</h3>
+                        <p>No se pudieron cargar las ubicaciones. Intenta recargar la pagina.</p>
+                    </div>`;
             }
         }
 
+        // ---- Add location ----
         async function addLocation() {
             const nombre = document.getElementById('inp_nombre').value.trim();
             const direccion = document.getElementById('inp_direccion').value.trim();
@@ -442,13 +1334,17 @@
             const horario = document.getElementById('inp_horario').value.trim();
 
             if (!nombre || !direccion || isNaN(lat) || isNaN(lng)) {
-                showToast('Rellena nombre, dirección y coordenadas', true);
+                showToast('Rellena nombre, direccion y coordenadas', true);
                 return;
             }
 
             const btn = document.getElementById('btnAdd');
             btn.disabled = true;
-            btn.textContent = 'Añadiendo...';
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:18px;height:18px;animation:spin 0.8s linear infinite">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                Guardando...`;
 
             try {
                 const resp = await fetch('/api/farmacias/ubicaciones', {
@@ -465,8 +1361,7 @@
                 });
 
                 if (resp.ok) {
-                    showToast('Ubicación añadida correctamente');
-                    // Clear form
+                    showToast('Ubicacion anadida correctamente');
                     document.getElementById('inp_nombre').value = '';
                     document.getElementById('inp_direccion').value = '';
                     document.getElementById('inp_lat').value = '';
@@ -477,46 +1372,130 @@
                     loadLocations();
                 } else {
                     const err = await resp.json();
-                    showToast(err.error || 'Error al añadir', true);
+                    showToast(err.error || 'Error al anadir', true);
                 }
             } catch (err) {
-                showToast('Error de conexión', true);
+                showToast('Error de conexion', true);
             }
 
             btn.disabled = false;
-            btn.textContent = 'Añadir ubicación';
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                    <path d="M12 5v14"/>
+                    <path d="M5 12h14"/>
+                </svg>
+                Guardar ubicacion`;
         }
 
-        async function deleteLocation(id) {
-            if (!confirm('¿Eliminar esta ubicación?')) return;
+        // ---- Delete location (with modal) ----
+        function deleteLocation(id, name) {
+            pendingDeleteId = id;
+            document.getElementById('deleteModalText').textContent =
+                `Se eliminara "${name}" permanentemente. Esta accion no se puede deshacer.`;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            pendingDeleteId = null;
+        }
+
+        async function confirmDelete() {
+            if (!pendingDeleteId) return;
+
+            const btn = document.getElementById('btnConfirmDelete');
+            btn.textContent = 'Eliminando...';
+            btn.disabled = true;
 
             try {
-                const resp = await fetch(`/api/farmacias/ubicaciones/${id}`, { method: 'DELETE' });
+                const resp = await fetch(`/api/farmacias/ubicaciones/${pendingDeleteId}`, { method: 'DELETE' });
                 if (resp.ok) {
-                    showToast('Ubicación eliminada');
+                    showToast('Ubicacion eliminada');
                     loadLocations();
                 } else {
                     showToast('Error al eliminar', true);
                 }
             } catch (err) {
-                showToast('Error de conexión', true);
+                showToast('Error de conexion', true);
             }
+
+            btn.textContent = 'Eliminar';
+            btn.disabled = false;
+            closeDeleteModal();
         }
+
+        // Close modal on overlay click
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+
+        // ---- Toast notification ----
+        let toastCounter = 0;
 
         function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast show' + (isError ? ' error' : '');
-            setTimeout(() => { toast.className = 'toast'; }, 3000);
+            const container = document.getElementById('toastContainer');
+            const id = ++toastCounter;
+            const type = isError ? 'error' : 'success';
+            const iconSvg = isError
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                       <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                   </svg>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+                       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                   </svg>`;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('data-id', id);
+            toast.innerHTML = `
+                <div class="toast-icon ${type}">${iconSvg}</div>
+                <span class="toast-message">${escapeHtml(msg)}</span>
+                <button class="toast-close" onclick="dismissToast(${id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+                <div class="toast-progress ${type}" style="width:100%"></div>`;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+                const bar = toast.querySelector('.toast-progress');
+                bar.style.transitionDuration = '4s';
+                bar.style.width = '0%';
+            });
+
+            // Auto dismiss
+            setTimeout(() => dismissToast(id), 4000);
         }
 
+        function dismissToast(id) {
+            const toast = document.querySelector(`.toast[data-id="${id}"]`);
+            if (!toast) return;
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 350);
+        }
+
+        // ---- Utilities ----
         function escapeHtml(str) {
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
         }
 
-        // Init
+        // ---- Spinner keyframes ----
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+        document.head.appendChild(styleSheet);
+
+        // ---- Init ----
         loadLocations();
     </script>
 </body>

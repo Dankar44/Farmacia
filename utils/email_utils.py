@@ -5,35 +5,33 @@ from email.mime.multipart import MIMEMultipart
 import logging
 from dotenv import load_dotenv
 
-# Asegurar que las variables de entorno están cargadas
 load_dotenv()
 
-EMAIL_SENDER = os.getenv("SMTP_USER", "danisuperk@gmail.com") 
-EMAIL_PASSWORD = os.getenv("SMTP_PASS", "urxvfyzsjkrfnlmw")
-EMAIL_RECEIVER = "daniel.karimi@alumnos.upm.es"
+EMAIL_SENDER = os.getenv("SMTP_USER", "")
+EMAIL_PASSWORD = os.getenv("SMTP_PASS", "")
+EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER", "")
 
-def send_email(subject, body, receiver=EMAIL_RECEIVER):
-    if EMAIL_SENDER == "your-email@gmail.com" or not EMAIL_PASSWORD:
-        logging.warning("Email credentials not configured. Skipping email sent.")
-        print("⚠️ Configura SMTP_USER y SMTP_PASS para enviar correos.")
+
+def send_email(subject, body, receiver=None, to_email=None):
+    to = to_email or receiver or EMAIL_RECEIVER
+    if not EMAIL_SENDER or not EMAIL_PASSWORD or not to:
+        logging.warning("Email credentials not configured. Skipping.")
         return False
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_SENDER
-    msg['To'] = receiver
+    msg['To'] = to
     msg['Subject'] = subject
-
     msg.attach(MIMEText(body, 'html'))
 
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        text = msg.as_string()
-        server.sendmail(EMAIL_SENDER, receiver, text)
+        server.sendmail(EMAIL_SENDER, to, msg.as_string())
         server.quit()
-        logging.info("Email sent successfully to " + receiver)
+        logging.info(f"Email sent to {to}")
         return True
     except Exception as e:
-        logging.error(f"Failed to send email to {receiver}: {e}")
+        logging.error(f"Failed to send email: {e}")
         return False

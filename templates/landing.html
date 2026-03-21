@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmaSearch - Comparador de Precios de Farmacia</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root {
+            --primary: #00a99d;
+            --primary-dark: #008f85;
+            --primary-light: #e0f7f5;
+            --primary-glow: rgba(0,169,157,0.12);
+            --accent: #f57c00;
+            --text-dark: #1a1a2e;
+            --text-body: #374151;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --bg-body: #f5f6f8;
+            --bg-white: #ffffff;
+            --green: #059669;
+            --red: #dc2626;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== LEFT PANEL (Brand) ===== */
+        .brand-panel {
+            width: 50%;
+            background: linear-gradient(160deg, #00a99d 0%, #00c9bc 40%, #00d4aa 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+        }
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -15%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .brand-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -10%;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .brand-content { position: relative; z-index: 1; max-width: 480px; }
+
+        /* Logo */
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+        .brand-logo-icon {
+            width: 56px; height: 56px;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+        }
+        .brand-logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+        .brand-sub {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        /* Stats */
+        .brand-stats {
+            display: flex;
+            gap: 32px;
+        }
+        .brand-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .brand-stat-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Features */
+        .brand-features {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .brand-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+        .brand-feature-icon {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== RIGHT PANEL (Auth) ===== */
+        .auth-panel {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: var(--bg-body);
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px 36px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Tabs */
+        .auth-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 28px;
+            background: var(--border-light);
+            border-radius: 10px;
+            padding: 3px;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+        .auth-tab.active {
+            background: var(--bg-white);
+            color: var(--text-dark);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Form */
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .form-input-wrap {
+            position: relative;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: all var(--transition);
+            background: var(--bg-body);
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            background: var(--bg-white);
+        }
+        .form-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            display: flex;
+        }
+        .form-input:focus ~ .form-icon { color: var(--primary); }
+
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+        }
+        .pw-toggle:hover { color: var(--text-secondary); }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .auth-btn:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,169,157,0.3); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .auth-btn .spinner {
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+        .auth-btn.loading .spinner { display: block; }
+        .auth-btn.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: -10px;
+            margin-bottom: 18px;
+            cursor: pointer;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        /* Message */
+        .auth-message {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .auth-message.error {
+            display: block;
+            background: #fef2f2;
+            color: var(--red);
+            border: 1px solid #fecaca;
+        }
+        .auth-message.success {
+            display: block;
+            background: #ecfdf5;
+            color: var(--green);
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Divider */
+        .auth-divider {
+            text-align: center;
+            padding: 20px 0 16px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .auth-footer-text {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+        .auth-footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Recovery form */
+        .recovery-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .recovery-overlay.active { opacity: 1; pointer-events: auto; }
+        .recovery-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        .recovery-overlay.active .recovery-card { transform: translateY(0); }
+        .recovery-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .recovery-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .recovery-actions { display: flex; gap: 10px; margin-top: 16px; }
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            transition: all var(--transition);
+        }
+        .btn-secondary:hover { background: var(--border-light); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .brand-panel {
+                width: 100%;
+                padding: 40px 28px 36px;
+            }
+            .brand-title { font-size: 1.8rem; }
+            .brand-features { display: none; }
+            .auth-panel {
+                width: 100%;
+                padding: 28px 20px 40px;
+            }
+        }
+        @media (max-width: 480px) {
+            .brand-panel { padding: 28px 20px; }
+            .brand-title { font-size: 1.5rem; }
+            .brand-stats { gap: 20px; }
+            .brand-stat-value { font-size: 1.5rem; }
+            .auth-card { padding: 28px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT: Brand panel -->
+    <div class="brand-panel">
+        <div class="brand-content">
+            <div class="brand-logo">
+                <svg class="brand-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="url(#cg)"/>
+                    <circle cx="12" cy="12" r="5.5" fill="#fff" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+                    <path d="M14 8.5C14 8.5 15 9.5 15.5 10.5C16 11.5 14 13.5 11 14.5C11 14.5 9 10.5 14 8.5Z" fill="rgba(0,169,157,0.7)"/>
+                    <path d="M11 14.5C11 14.5 12 12 14 10" stroke="#fff" stroke-width="1" stroke-linecap="round"/>
+                    <path d="M16 16L20.5 20.5" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M17.5 17.5L20.5 20.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="cg" x1="3" y1="3" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="rgba(255,255,255,0.4)"/>
+                            <stop offset="1" stop-color="rgba(255,255,255,0.15)"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="brand-logo-text">FarmaSearch</span>
+            </div>
+
+            <h1 class="brand-title">Compara precios en<br>farmacias de toda Espana</h1>
+            <p class="brand-sub">Busca cualquier producto de parafarmacia y encuentra el mejor precio entre 8 farmacias online. Gratis, sin registro obligatorio para siempre.</p>
+
+            <div class="brand-stats">
+                <div>
+                    <div class="brand-stat-value">8</div>
+                    <div class="brand-stat-label">Farmacias</div>
+                </div>
+                <div>
+                    <div class="brand-stat-value">280K+</div>
+                    <div class="brand-stat-label">Productos</div>
+                </div>
+                <div>
+                    <div class="brand-stat-value">100%</div>
+                    <div class="brand-stat-label">Gratuito</div>
+                </div>
+            </div>
+
+            <div class="brand-features">
+                <div class="brand-feature">
+                    <div class="brand-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    Busqueda instantanea en tiempo real
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg>
+                    </div>
+                    Mejor precio destacado y ahorro visible
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    Mapa de farmacias cerca de ti
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Auth panel -->
+    <div class="auth-panel">
+        <div class="auth-container">
+            <div class="auth-card">
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">Iniciar sesion</button>
+                    <button class="auth-tab" onclick="switchTab('registro')">Crear cuenta</button>
+                </div>
+
+                <div id="authMessage" class="auth-message"></div>
+
+                <!-- LOGIN FORM -->
+                <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="form-input-wrap">
+                            <input type="email" class="form-input" id="loginEmail" placeholder="tu@email.com" required>
+                            <span class="form-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contrasena</label>
+                        <div class="form-input-wrap">
+                            <input type="password" class="form-input" id="loginPassword" placeholder="Tu contrasena" required minlength="6">
+                            <span class="form-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                            <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <a class="forgot-link" onclick="openRecovery()">Olvidaste tu contrasena?</a>
+                    <button type="submit" class="auth-btn" id="loginBtn">
+                        <div class="spinner"></div>
+                        <span class="btn-text">Iniciar sesion</span>
+                    </button>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form class="auth-form" id="registroForm" onsubmit="handleRegistro(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nombre</label>
+                        <div class="form-input-wrap">
+                            <input type="text" class="form-input" id="regNombre" placeholder="Tu nombre" required minlength="2">
+                            <span class="form-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="form-input-wrap">
+                            <input type="email" class="form-input" id="regEmail" placeholder="tu@email.com" required>
+                            <span class="form-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contrasena</label>
+                        <div class="form-input-wrap">
+                            <input type="password" class="form-input" id="regPassword" placeholder="Minimo 6 caracteres" required minlength="6">
+                            <span class="form-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                            <button type="button" class="pw-toggle" onclick="togglePw('regPassword', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-btn" id="regBtn">
+                        <div class="spinner"></div>
+                        <span class="btn-text">Crear cuenta</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer-text" id="footerToggle">
+                    Ya tienes cuenta? <a onclick="switchTab('login')" style="cursor:pointer">Inicia sesion</a>
+                </div>
+            </div>
+
+            <div class="auth-divider">
+                <a href="/mapa" style="color:var(--primary);text-decoration:none;font-weight:600">Ver mapa de farmacias</a>
+                &nbsp;&middot;&nbsp;
+                <a href="/acceso-farmacias" style="color:var(--text-muted);text-decoration:none">Acceso farmacias</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recovery modal -->
+    <div class="recovery-overlay" id="recoveryModal" onclick="if(event.target===this)closeRecovery()">
+        <div class="recovery-card">
+            <h3 class="recovery-title">Recuperar contrasena</h3>
+            <p class="recovery-sub">Introduce tu email y te enviaremos una contrasena temporal para acceder a tu cuenta.</p>
+            <div id="recoveryMessage" class="auth-message" style="display:none"></div>
+            <div class="form-group">
+                <div class="form-input-wrap">
+                    <input type="email" class="form-input" id="recoveryEmail" placeholder="tu@email.com" required style="padding-left:14px">
+                </div>
+            </div>
+            <div class="recovery-actions">
+                <button class="btn-secondary" onclick="closeRecovery()">Cancelar</button>
+                <button class="auth-btn" id="recoveryBtn" onclick="handleRecovery()" style="flex:1">
+                    <div class="spinner"></div>
+                    <span class="btn-text">Enviar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach((t, i) => {
+                t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'registro' && i === 1));
+            });
+            document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+            document.getElementById('registroForm').classList.toggle('active', tab === 'registro');
+            document.getElementById('footerToggle').innerHTML = tab === 'login'
+                ? 'No tienes cuenta? <a onclick="switchTab(\'registro\')" style="cursor:pointer;color:var(--primary);text-decoration:none;font-weight:600">Crear cuenta</a>'
+                : 'Ya tienes cuenta? <a onclick="switchTab(\'login\')" style="cursor:pointer;color:var(--primary);text-decoration:none;font-weight:600">Inicia sesion</a>';
+            hideMessage();
+        }
+
+        // Password toggle
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // Messages
+        function showMessage(msg, type) {
+            const el = document.getElementById('authMessage');
+            el.textContent = msg;
+            el.className = `auth-message ${type}`;
+        }
+        function hideMessage() {
+            document.getElementById('authMessage').className = 'auth-message';
+        }
+
+        function setLoading(btn, loading) {
+            btn.classList.toggle('loading', loading);
+            btn.disabled = loading;
+        }
+
+        // Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            setLoading(btn, true);
+            hideMessage();
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value.trim(),
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = data.redirect || '/';
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch(err) {
+                showMessage('Error de conexion', 'error');
+            }
+            setLoading(btn, false);
+        }
+
+        // Register
+        async function handleRegistro(e) {
+            e.preventDefault();
+            const btn = document.getElementById('regBtn');
+            setLoading(btn, true);
+            hideMessage();
+
+            try {
+                const res = await fetch('/api/auth/registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre: document.getElementById('regNombre').value.trim(),
+                        email: document.getElementById('regEmail').value.trim(),
+                        password: document.getElementById('regPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = data.redirect || '/';
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch(err) {
+                showMessage('Error de conexion', 'error');
+            }
+            setLoading(btn, false);
+        }
+
+        // Recovery
+        function openRecovery() { document.getElementById('recoveryModal').classList.add('active'); }
+        function closeRecovery() { document.getElementById('recoveryModal').classList.remove('active'); }
+
+        async function handleRecovery() {
+            const btn = document.getElementById('recoveryBtn');
+            const email = document.getElementById('recoveryEmail').value.trim();
+            if (!email) return;
+            setLoading(btn, true);
+
+            const msgEl = document.getElementById('recoveryMessage');
+
+            try {
+                const res = await fetch('/api/auth/recuperar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                msgEl.textContent = data.message || 'Revisa tu email';
+                msgEl.className = 'auth-message success';
+                msgEl.style.display = 'block';
+                setTimeout(closeRecovery, 3000);
+            } catch(err) {
+                msgEl.textContent = 'Error de conexion';
+                msgEl.className = 'auth-message error';
+                msgEl.style.display = 'block';
+            }
+            setLoading(btn, false);
+        }
+    </script>
+</body>
+</html>

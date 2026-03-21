@@ -1,0 +1,10 @@
+# FarmaSearch - Web dependencies only (for Railway deploy)
+flask>=3.0
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+bcrypt>=4.0
+python-dotenv>=1.0
+requests>=2.31
+pandas>=2.0
+openpyxl>=3.1
+gunicorn>=21.0

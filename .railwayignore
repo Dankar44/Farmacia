@@ -1,0 +1,15 @@
+# Files NOT needed for the web deploy (scrapers stay on local PC)
+scrapers/
+scripts/
+tests/
+backups/
+exports/
+logs/
+migration/
+docs/
+scraper_app.py
+run_all.py
+main.py
+*.sql
+*.gz
+__pycache__/

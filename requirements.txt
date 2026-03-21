@@ -1,4 +1,26 @@
-playwright==1.42.0
-sqlalchemy==2.0.28
-psycopg2-binary==2.9.9
-python-dotenv==1.0.1
+# FarmaSearch - Dependencies
+
+# Web framework
+flask>=3.0
+
+# Database
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+
+# Scraping
+playwright>=1.42
+requests>=2.31
+beautifulsoup4>=4.12
+aiohttp>=3.9
+lxml>=5.0
+
+# Excel exports
+openpyxl>=3.1
+xlsxwriter>=3.1
+
+# Auth & Security
+bcrypt>=4.0
+python-dotenv>=1.0
+
+# Data processing
+pandas>=2.0

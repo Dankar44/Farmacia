@@ -81,7 +81,7 @@ def get_engine():
     
     import urllib.parse
     encoded_password = urllib.parse.quote_plus(password)
-    connection_string = f"postgresql://{user}:{encoded_password}@{host}:{port}/{db_name}?host=127.0.0.1"
+    connection_string = f"postgresql://{user}:{encoded_password}@{host}:{port}/{db_name}"
     return create_engine(connection_string)
 
 def init_db():

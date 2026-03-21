@@ -1,27 +1,33 @@
 """
-Scraper de FarmaciaBarata - Usa Playwright + Sitemap + Batch Fetch.
+Scraper de PromoFarma - Usa Playwright + Sitemap + Batch Fetch.
 
-FarmaciaBarata tiene un catálogo público accesible vía sitemap y sin
-protección anti-bot estricta.
+PromoFarma protege TODAS sus páginas con un "Client Challenge" anti-bot.
+Las peticiones HTTP directas (requests) son bloqueadas por TLS fingerprinting.
 
-Estrategia:
+Estrategia (descubierta por ingeniería inversa):
   1. Abrir un navegador real con Playwright UNA SOLA VEZ
-  2. Descargar el sitemap (`sitemap-1.xml`) y extraer sitemaps de productos
-  3. Desde el navegador, hacer fetch() al sitemap XML → obtener todas las URLs
+  2. Navegar a la web para resolver el challenge automáticamente
+  3. Desde el navegador, hacer fetch() al sitemap XML → obtener 124k+ URLs
   4. Batch-fetch de páginas de producto con Promise.all() (20 a la vez)
-  5. Parsear precios del HTML con expresiones regulares (sin renderizar DOM)
+  5. Parsear precios del HTML con regex (sin renderizar DOM)
   6. Guardar en PostgreSQL y exportar a Excel
 
+Rendimiento estimado:
+  - ~0.1s por producto (fetch paralelo dentro del navegador)
+  - ~124,000 productos en ~2-3 horas
+  - Se puede dejar corriendo de fondo sin supervisión
+
 Uso (desde la raíz del proyecto vía main.py):
-    python main.py farmaciabarata                  # Scraping completo
-    python main.py farmaciabarata --limit 1000     # Solo 1000 productos (test)
-    python main.py farmaciabarata --export         # Solo exportar a Excel
+    python main.py promofarma                  # Scraping completo (~2-3h)
+    python main.py promofarma --limit 1000     # Solo 1000 productos (test)
+    python main.py promofarma --export         # Solo exportar a Excel
 """
 
 import os
 import sys
 import re
 import time
+import json
 import logging
 import argparse
 from datetime import datetime, timezone
@@ -29,7 +35,7 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.orm import sessionmaker
 
 # Directorio raíz del proyecto
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, PROJECT_ROOT)
 from db_models import get_engine, Producto, Precio, Base
 
@@ -43,26 +49,33 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, 'scraper_farmaciabarata.log'), encoding='utf-8'),
+        logging.FileHandler(os.path.join(LOG_DIR, 'scraper_promofarma.log'), encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
 
-
 # ============================================================
 # CONFIGURACIÓN
 # ============================================================
-FARMACIA_NOMBRE = "FarmaciaBarata"
-BASE_URL = "https://farmaciabarata.es"
-SITEMAP_INDEX = "https://www.farmaciabarata.es/module/lgsitemaps/sitemap?name=sitemap_1"
+FARMACIA_NOMBRE = "PromoFarma"
+BASE_URL = "https://www.promofarma.com"
+SITEMAP_INDEX = "https://www.promofarma.com/es/sitemaps/index.xml"
 BATCH_SIZE_FETCH = 20   # Productos por batch de fetch (Promise.all)
 BATCH_SIZE_DB = 200     # Productos por commit a la DB
 DELAY_BETWEEN_BATCHES = 0.3  # Segundos entre batches (para no saturar)
 
-# JavaScript para extraer datos rapidísimo (ejecutado en entorno browser)
+# JavaScript para extraer datos de un producto a partir de su HTML
+# PromoFarma incluye atributos data-* muy fiables en la página del producto:
+#   data-product-name="Letibalm Repair..."
+#   data-pvp="5.49"       (precio de venta)
+#   data-pvpr="6.75"      (precio recomendado / PVP original)
+#   data-discount="1.26"
+#   data-product-id="12895"
+# También incluye JSON-LD schema.org con offers.price y availability.
 EXTRACT_FROM_HTML_JS = r"""
 (urls) => {
+    // Helper: decodificar entidades HTML
     function decodeEntities(s) {
         if (!s) return s;
         return s.replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
@@ -77,35 +90,40 @@ EXTRACT_FROM_HTML_JS = r"""
             .then(html => {
                 const data = {url: url, ok: true};
 
-                const titleMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
-                if (titleMatch) data.nombre = decodeEntities(titleMatch[1].trim());
-
-                let precio = null;
-                const priceMatch = html.match(/"price"\s*:\s*"?([\d.]+)"?/i);
-                if (priceMatch) {
-                    precio = parseFloat(priceMatch[1]);
+                // 1. Nombre: data-product-name (más fiable) o <title>
+                const nameAttr = html.match(/data-product-name="([^"]+)"/);
+                if (nameAttr) {
+                    data.nombre = decodeEntities(nameAttr[1]);
                 } else {
-                    const priceFallback = html.match(/<span[^>]*itemprop="price"[^>]*content="([\d.]+)"/i);
-                    if (priceFallback) precio = parseFloat(priceFallback[1]);
+                    const titleMatch = html.match(/<title>([^<]+)</);
+                    if (titleMatch) data.nombre = decodeEntities(titleMatch[1].split('|')[0].trim());
                 }
-                data.precio = precio;
 
-                let sku = "";
-                const eanMatch = html.match(/"ean13"\s*:\s*"(\d+)"/i);
-                if (eanMatch) {
-                    sku = eanMatch[1];
+                // 2. Precio de venta: data-pvp (formato decimal con punto)
+                const pvp = html.match(/data-pvp="([\d.]+)"/);
+                if (pvp) {
+                    data.precio = parseFloat(pvp[1]);
                 } else {
-                    const refMatch = html.match(/Referencia.*?(\d{5,13})/i);
-                    if (refMatch) {
-                        sku = refMatch[1].trim();
-                    } else {
-                        const skuMatch = html.match(/itemprop="sku"[^>]*>([^<]+)</i);
-                        if (skuMatch) sku = skuMatch[1].trim();
+                    // Fallback: JSON-LD offers.price
+                    const jsonPrice = html.match(/"price":\s*([\d.]+)/);
+                    if (jsonPrice) data.precio = parseFloat(jsonPrice[1]);
+                }
+
+                // 3. Precio original: data-pvpr 
+                const pvpr = html.match(/data-pvpr="([\d.]+)"/);
+                if (pvpr) {
+                    const orig = parseFloat(pvpr[1]);
+                    if (data.precio && orig > data.precio) {
+                        data.precioOriginal = orig;
                     }
                 }
-                data.sku = sku;
 
-                data.enStock = !html.includes('id="out-of-stock"') && !html.includes('Agotado') && !html.includes('out-of-stock');
+                // 4. ID del producto
+                const prodId = html.match(/data-product-id="(\d+)"/);
+                data.sku = prodId ? prodId[1] : (url.match(/\/p-(\d+)/) || ['',''])[1];
+
+                // 5. Disponibilidad: JSON-LD (slashes escapados como \/)
+                data.enStock = html.includes('InStock');
 
                 return data;
             })
@@ -119,48 +137,45 @@ EXTRACT_FROM_HTML_JS = r"""
 # FASE 1: DESCUBRIR PRODUCTOS VÍA SITEMAP
 # ============================================================
 def descubrir_productos_sitemap(page):
-    import requests
-    """Descarga el sitemap index y obtiene las URLs de todos los productos."""
+    """
+    Descarga el sitemap index y todos los sub-sitemaps para extraer
+    las URLs de todos los productos de PromoFarma (~124k).
+    """
     logger.info("Descargando sitemap index...")
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    
-    try:
-        r = requests.get(SITEMAP_INDEX, headers=headers)
-        sitemap_xml = r.text
-    except Exception as e:
-        logger.error(f"Error descargando sitemap: {e}")
+    sitemap_xml = page.evaluate("""(url) => {
+        return fetch(url).then(r => r.text()).catch(e => "Error: " + e.toString());
+    }""", SITEMAP_INDEX)
+
+    if sitemap_xml.startswith("Error"):
+        logger.error(f"Error descargando sitemap: {sitemap_xml}")
         return {}
 
+    # Extraer sub-sitemaps de productos
     sub_urls = re.findall(r'<loc>(https://[^<]+)</loc>', sitemap_xml)
-    product_subs = [u for u in sub_urls if 'product_' in u]
+    product_subs = [u for u in sub_urls if 'product' in u]
     logger.info(f"Encontrados {len(product_subs)} sub-sitemaps de productos")
 
+    # Descargar cada sub-sitemap
     productos_por_categoria = {}
     total = 0
 
     for i, sub_url in enumerate(product_subs):
-        sub_url = sub_url.replace('&amp;', '&')
-        logger.info(f"  Procesando sub-sitemap {sub_url}...")
-        try:
-            r = requests.get(sub_url, headers=headers)
-            sub_xml = r.text
-        except Exception as e:
-            logger.warning(f"  Error en sub-sitemap {sub_url}: {e}")
+        cat_name = sub_url.split('cp-sitemap_product-')[-1].replace('.xml', '')
+        cat_name_display = cat_name.replace('_', ' ').replace('-', ' > ').title()
+
+        sub_xml = page.evaluate("""(url) => {
+            return fetch(url).then(r => r.text()).catch(e => "Error: " + e.toString());
+        }""", sub_url)
+
+        if sub_xml.startswith("Error"):
+            logger.warning(f"  Error en sub-sitemap {cat_name}: {sub_xml}")
             continue
 
-        urls = re.findall(r'<loc>(https://[^<]+)</loc>', sub_xml)
-        
-        valid_urls = []
-        for u in urls:
-            if not u.endswith('.jpg') and not u.endswith('.png'):
-                valid_urls.append(u)
-        
-        if valid_urls:
-            # FarmaciaBarata agrupa por número en sitemap, ponemos "General" de cat.
-            cat_name = f"Productos {i+1}"
-            productos_por_categoria[cat_name] = valid_urls
-            total += len(valid_urls)
-            logger.info(f"  [{i+1}/{len(product_subs)}] -> {len(valid_urls)} productos (acumulado: {total})")
+        urls = re.findall(r'<loc>(https://[^<]+/p-\d+)</loc>', sub_xml)
+        if urls:
+            productos_por_categoria[cat_name_display] = urls
+            total += len(urls)
+            logger.info(f"  [{i+1}/{len(product_subs)}] {cat_name_display}: {len(urls)} productos (acumulado: {total})")
 
     logger.info(f"Total URLs descubiertas: {total}")
     return productos_por_categoria
@@ -170,6 +185,10 @@ def descubrir_productos_sitemap(page):
 # FASE 2: EXTRAER PRECIOS EN LOTES
 # ============================================================
 def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
+    """
+    Extrae precios de productos haciendo fetch en lotes desde el navegador.
+    Cada lote usa Promise.all para hacer 20 fetches en paralelo.
+    """
     exitos = 0
     errores = 0
     sin_precio = 0
@@ -180,20 +199,19 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
     urls_existentes = {p[0] for p in productos_existentes}
     logger.info(f"Productos ya en DB: {len(urls_existentes)}")
 
-    # Construir lista de URLs
+    # Construir lista de URLs pendientes
     urls_pendientes = []
-    urls_vistas = set()
     for cat_nombre, urls in productos_por_categoria.items():
         for url in urls:
-            if url not in urls_existentes and url not in urls_vistas:
+            if url not in urls_existentes:
                 urls_pendientes.append((url, cat_nombre))
-                urls_vistas.add(url)
 
     total_pendientes = len(urls_pendientes)
     if limit > 0:
         urls_pendientes = urls_pendientes[:limit]
     logger.info(f"URLs pendientes de procesar: {len(urls_pendientes)} (de {total_pendientes} nuevas)")
 
+    # Procesar en lotes
     total_batches = -(-len(urls_pendientes) // BATCH_SIZE_FETCH)
     start_time = time.time()
 
@@ -221,6 +239,7 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
 
             nombre = prod_data.get('nombre', '')
             precio_val = prod_data.get('precio')
+            precio_orig = prod_data.get('precioOriginal')
 
             if precio_val is None:
                 sin_precio += 1
@@ -228,6 +247,7 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
 
             try:
                 precio = Decimal(str(precio_val))
+                precio_original = Decimal(str(precio_orig)) if precio_orig else None
             except (InvalidOperation, ValueError):
                 sin_precio += 1
                 continue
@@ -249,16 +269,18 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
             precio_record = Precio(
                 producto_id=producto_db.id,
                 precio=precio,
-                precio_original=None,  # FarmaciaBarata scrape price is direct
+                precio_original=precio_original,
                 en_stock=en_stock,
                 fecha_captura=hoy,
             )
             db.add(precio_record)
             exitos += 1
 
+        # Commit periódico
         if exitos > 0 and exitos % BATCH_SIZE_DB == 0:
             db.commit()
 
+        # Log de progreso
         if (batch_idx + 1) % 50 == 0 or batch_idx == total_batches - 1:
             elapsed = time.time() - start_time
             rate = exitos / elapsed if elapsed > 0 else 0
@@ -269,9 +291,11 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
                 f"Velocidad: {rate:.1f} prod/s | ETA: {eta:.0f} min"
             )
 
+        # Pequeña pausa para no saturar
         if DELAY_BETWEEN_BATCHES > 0:
             time.sleep(DELAY_BETWEEN_BATCHES)
 
+    # Commit final
     db.commit()
     return exitos, errores, sin_precio
 
@@ -280,6 +304,7 @@ def extraer_precios_batch(page, db, productos_por_categoria, limit=0):
 # EJECUTAR SCRAPING COMPLETO
 # ============================================================
 def ejecutar_scraping(db, limit=0):
+    """Scraping completo: sitemap + batch fetch."""
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as p:
@@ -290,15 +315,18 @@ def ejecutar_scraping(db, limit=0):
         )
         page = context.new_page()
 
-        logger.info("Abriendo página principal de FarmaciaBarata para iniciar contexto...")
+        # Paso 1: Resolver Client Challenge
+        logger.info("Abriendo PromoFarma para resolver el Client Challenge...")
         try:
-            page.goto(BASE_URL, wait_until="domcontentloaded", timeout=30000)
-            time.sleep(2)
+            page.goto(f"{BASE_URL}/es/", wait_until="domcontentloaded", timeout=30000)
+            time.sleep(5)
+            logger.info("Challenge resuelto.")
         except Exception as e:
-            logger.error(f"Error cargando FarmaciaBarata: {e}")
+            logger.error(f"Error cargando PromoFarma: {e}")
             browser.close()
             return
 
+        # Paso 2: Descubrir productos vía sitemap
         logger.info("\n" + "=" * 60)
         logger.info("FASE 1: DESCUBRIMIENTO VÍA SITEMAP")
         logger.info("=" * 60)
@@ -310,6 +338,7 @@ def ejecutar_scraping(db, limit=0):
             browser.close()
             return
 
+        # Paso 3: Extraer precios en lotes
         logger.info("\n" + "=" * 60)
         logger.info("FASE 2: EXTRACCIÓN DE PRECIOS (BATCH FETCH)")
         logger.info("=" * 60)
@@ -317,6 +346,7 @@ def ejecutar_scraping(db, limit=0):
 
         browser.close()
 
+    # Resumen
     logger.info("\n" + "=" * 60)
     logger.info("RESUMEN FINAL")
     logger.info("=" * 60)
@@ -333,7 +363,7 @@ def exportar_a_excel(db, filename=None):
     if filename is None:
         export_dir = os.path.join(PROJECT_ROOT, 'exports')
         os.makedirs(export_dir, exist_ok=True)
-        filename = os.path.join(export_dir, 'precios_farmaciabarata.xlsx')
+        filename = os.path.join(export_dir, 'precios_promofarma.xlsx')
 
     from sqlalchemy import text
     from openpyxl import Workbook
@@ -352,7 +382,7 @@ def exportar_a_excel(db, filename=None):
             ORDER BY pr2.fecha_captura DESC
             LIMIT 1
         )
-        ORDER BY p.nombre
+        ORDER BY p.categoria, p.nombre
     """)
 
     result = db.execute(query, {"farmacia": FARMACIA_NOMBRE})
@@ -360,12 +390,13 @@ def exportar_a_excel(db, filename=None):
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Precios FarmaciaBarata"
+    ws.title = "Precios PromoFarma"
 
+    # Estilo morado para PromoFarma
     header_font = Font(name='Calibri', bold=True, color='FFFFFF', size=11)
-    header_fill = PatternFill(start_color='00bcd4', end_color='00bcd4', fill_type='solid') # Cyan farmaciabarata
+    header_fill = PatternFill(start_color='6A1B9A', end_color='6A1B9A', fill_type='solid')
     header_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    fill_par = PatternFill(start_color='e0f7fa', end_color='e0f7fa', fill_type='solid')
+    fill_par = PatternFill(start_color='F3E5F5', end_color='F3E5F5', fill_type='solid')
     fill_impar = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid')
     font_stock_si = Font(name='Calibri', color='2E7D32')
     font_stock_no = Font(name='Calibri', color='C62828')
@@ -416,7 +447,7 @@ def exportar_a_excel(db, filename=None):
         ws.cell(row=row_idx, column=5).alignment = align_right
         if precio_original:
             ws.cell(row=row_idx, column=6).number_format = '#,##0.00 €'
-            ws.cell(row=row_idx, column=6).alignment = align_right
+        ws.cell(row=row_idx, column=6).alignment = align_right
         ws.cell(row=row_idx, column=7).alignment = align_center
         ws.cell(row=row_idx, column=7).font = Font(name='Calibri', color='C62828', bold=True)
 
@@ -441,7 +472,7 @@ def exportar_a_excel(db, filename=None):
 # MAIN
 # ============================================================
 def main():
-    parser = argparse.ArgumentParser(description="Scraper de precios FarmaciaBarata (Playwright + Sitemap)")
+    parser = argparse.ArgumentParser(description="Scraper de precios PromoFarma (Playwright + Sitemap)")
     parser.add_argument("--limit", type=int, default=0, help="Limitar a N productos (0=todos)")
     parser.add_argument("--export", action="store_true", help="Solo exportar datos existentes a Excel")
     parser.add_argument("--output", type=str, default=None, help="Ruta del archivo de salida")
@@ -458,7 +489,7 @@ def main():
             exportar_a_excel(db, filename=args.output)
         else:
             logger.info("=" * 60)
-            logger.info("SCRAPING DE FARMACIABARATA")
+            logger.info("SCRAPING DE PROMOFARMA (SITEMAP + BATCH FETCH)")
             logger.info("=" * 60)
             ejecutar_scraping(db, limit=args.limit)
 

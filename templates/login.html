@@ -18,6 +18,10 @@
             --text-muted: #999;
             --border: #e0e0e0;
             --radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 12px 48px rgba(0, 0, 0, 0.08);
+            --shadow-focus: 0 0 0 3px rgba(0, 169, 157, 0.15);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -27,54 +31,116 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-body);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 24px;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(0, 169, 157, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 169, 157, 0.03) 0%, transparent 50%);
         }
 
+        /* ---------- entrance animation ---------- */
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---------- card ---------- */
         .login-card {
             background: #fff;
-            border-radius: var(--radius);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-            padding: 48px 40px 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            overflow: hidden;
+            animation: cardEntrance 0.5s ease-out both;
         }
 
+        .card-accent {
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, #00c9bb 40%, var(--accent-orange) 100%);
+        }
+
+        .card-body {
+            padding: 44px 40px 36px;
+        }
+
+        /* ---------- logo ---------- */
         .login-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 6px;
         }
 
         .login-logo-icon {
-            width: 44px;
-            height: 44px;
-            background: var(--primary);
-            border-radius: 12px;
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--primary) 0%, #00c9bb 100%);
+            border-radius: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 169, 157, 0.25);
         }
 
         .login-logo-text {
-            font-size: 1.4rem;
+            font-size: 1.45rem;
             font-weight: 700;
             color: var(--text-dark);
+            letter-spacing: -0.3px;
         }
 
         .login-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
-            margin-bottom: 32px;
+            margin-bottom: 36px;
+            line-height: 1.5;
         }
 
+        /* ---------- error ---------- */
+        .error-msg {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 13px 16px;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            border-left: 3px solid #ef4444;
+            line-height: 1.45;
+        }
+
+        .error-msg svg {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ---------- form ---------- */
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .form-label {
@@ -82,123 +148,338 @@
             font-size: 0.82rem;
             font-weight: 600;
             color: var(--text-dark);
-            margin-bottom: 6px;
+            margin-bottom: 7px;
+            letter-spacing: 0.01em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            pointer-events: none;
+            color: #b0b0b0;
+            display: flex;
+            align-items: center;
+            transition: color var(--transition);
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
+            padding: 13px 14px 13px 42px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.92rem;
             font-family: inherit;
-            transition: border-color 0.2s;
+            color: var(--text-dark);
+            background: #fafbfc;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
             outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #c0c0c0;
+        }
+
+        .form-input:hover {
+            border-color: #ccc;
         }
 
         .form-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.1);
+            box-shadow: var(--shadow-focus);
+            background: #fff;
         }
 
+        .form-input:focus ~ .input-icon,
+        .form-input:focus + .toggle-password .input-icon-inline {
+            color: var(--primary);
+        }
+
+        /* password toggle */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #b0b0b0;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: color var(--transition), background var(--transition);
+        }
+
+        .toggle-password:hover {
+            color: var(--text-dark);
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .toggle-password .icon-hide { display: none; }
+        .toggle-password.active .icon-show { display: none; }
+        .toggle-password.active .icon-hide { display: block; }
+
+        /* ---------- submit button ---------- */
         .login-btn {
             width: 100%;
-            padding: 14px;
-            background: var(--primary);
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, #00c9bb 100%);
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.95rem;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 6px;
+            transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+            margin-top: 8px;
+            position: relative;
+            letter-spacing: 0.01em;
+            box-shadow: 0 4px 14px rgba(0, 169, 157, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .login-btn:hover {
-            background: var(--primary-dark);
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 169, 157, 0.35);
         }
 
-        .error-msg {
-            background: #fef2f2;
-            color: #c62828;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            margin-bottom: 16px;
-            border: 1px solid #fecaca;
+        .login-btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 169, 157, 0.2);
         }
 
+        .login-btn:disabled {
+            opacity: 0.85;
+            cursor: not-allowed;
+        }
+
+        .btn-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        .login-btn.loading .btn-text { display: none; }
+        .login-btn.loading .btn-spinner { display: block; }
+        .login-btn.loading .btn-loading-text { display: inline; }
+
+        .btn-loading-text { display: none; }
+
+        /* ---------- divider ---------- */
+        .card-divider {
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            margin: 28px 0 20px;
+        }
+
+        /* ---------- links ---------- */
         .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.84rem;
             color: var(--primary);
             text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition);
         }
 
         .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .login-hint {
-            margin-top: 24px;
-            padding: 14px;
-            background: var(--primary-light);
-            border-radius: 8px;
-            font-size: 0.75rem;
             color: var(--primary-dark);
         }
 
-        .login-hint strong {
-            display: block;
-            margin-bottom: 4px;
+        .back-link svg {
+            transition: transform var(--transition);
+        }
+
+        .back-link:hover svg {
+            transform: translateX(-2px);
+        }
+
+        /* ---------- footer ---------- */
+        .card-footer {
+            background: #fafbfc;
+            border-top: 1px solid #f0f0f0;
+            padding: 18px 40px;
+            text-align: center;
+        }
+
+        .card-footer p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .card-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition);
+        }
+
+        .card-footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* ---------- responsive ---------- */
+        @media (max-width: 480px) {
+            .card-body {
+                padding: 36px 28px 28px;
+            }
+            .card-footer {
+                padding: 16px 28px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="login-card">
-        <div class="login-logo">
-            <div class="login-logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    style="width:22px;height:22px">
-                    <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" stroke="#fff" />
-                    <path d="m8.5 8.5 7 7" stroke="#fff" />
-                    <path d="M14 6 6 14" stroke="#ffe0b2" />
+        <!-- gradient accent bar -->
+        <div class="card-accent"></div>
+
+        <div class="card-body">
+            <!-- logo -->
+            <div class="login-logo">
+                <div class="login-logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="10" y="4" width="4" height="16" rx="1.2" fill="#fff"/>
+                        <rect x="4" y="10" width="16" height="4" rx="1.2" fill="#fff"/>
+                    </svg>
+                </div>
+                <span class="login-logo-text">FarmaSearch</span>
+            </div>
+            <p class="login-subtitle">Accede a tu panel de farmacia para gestionar tus ubicaciones</p>
+
+            <!-- error -->
+            {% if error %}
+            <div class="error-msg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
+                <span>{{ error }}</span>
             </div>
-            <span class="login-logo-text">FarmaSearch</span>
+            {% endif %}
+
+            <!-- form -->
+            <form method="POST" action="/acceso-farmacias" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuario</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            placeholder="Introduce tu usuario"
+                            required
+                            autofocus
+                            autocomplete="username"
+                        >
+                        <span class="input-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="Introduce tu contraseña"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <span class="input-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+                            <svg class="icon-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <svg class="icon-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                                <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+                                <line x1="1" y1="1" x2="23" y2="23"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Iniciar sesión</span>
+                    <span class="btn-loading-text">Accediendo...</span>
+                    <span class="btn-spinner"></span>
+                </button>
+            </form>
+
+            <hr class="card-divider">
+
+            <a href="/" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Volver al buscador
+            </a>
         </div>
-        <p class="login-subtitle">Acceso para farmacias — gestiona tus ubicaciones</p>
 
-        {% if error %}
-        <div class="error-msg">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" action="/login">
-            <div class="form-group">
-                <label class="form-label" for="username">Usuario</label>
-                <input type="text" id="username" name="username" class="form-input" placeholder="ej: dosfarma" required
-                    autofocus>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="password">Contraseña</label>
-                <input type="password" id="password" name="password" class="form-input" placeholder="••••" required>
-            </div>
-            <button type="submit" class="login-btn">Iniciar sesión</button>
-        </form>
-
-        <a href="/" class="back-link">← Volver al buscador</a>
-
-        <div class="login-hint">
-            <strong>Usuarios disponibles:</strong>
-            dosfarma · farmaciasdirect · promofarma · atida · farmaciasvazquez · farmacoslada<br>
-            Contraseña: 1234
+        <!-- footer -->
+        <div class="card-footer">
+            <p>¿No tienes cuenta? <a href="mailto:soporte@farmasearch.es">Contacta con nosotros</a></p>
         </div>
     </div>
+
+    <script>
+        // password visibility toggle
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        toggleBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleBtn.classList.toggle('active', isPassword);
+            toggleBtn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+
+        // loading state on submit
+        const form = document.getElementById('loginForm');
+        const btn = document.getElementById('loginBtn');
+
+        form.addEventListener('submit', function () {
+            btn.classList.add('loading');
+            btn.disabled = true;
+        });
+    </script>
 </body>
 
 </html>

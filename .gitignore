@@ -1,24 +1,33 @@
 # Python
 __pycache__/
 *.pyc
+*.pyo
 venv/
+.venv/
+*.egg-info/
 
-# Logs (se regeneran al ejecutar)
+# Logs
 logs/*.log
 
-# Credenciales
+# Credentials
 .env
 
-# Exports (se regeneran al ejecutar)
+# Exports (regenerated)
 exports/*.xlsx
 exports/*.csv
 
-# Backups and data
+# Backups (large binary files)
 backups/
-data/*.csv
 
-# SQL descomprimido (el .gz ya está en el repo)
+# Uncompressed SQL (the .gz is in the repo)
 migration/supabase_import.sql
+
+# IDE
+.vscode/
+.idea/
 
 # macOS
 .DS_Store
+
+# Node (if any)
+node_modules/

@@ -20,6 +20,9 @@ FARMACIAS_DISPONIBLES = {
     "promofarma": "scrapers.promofarma",
     "atida": "scrapers.atida",
     "vazquez": "scrapers.vazquez",
+    "farmaciabarata": "scrapers.farmaciabarata",
+    "okfarma": "scrapers.okfarma",
+    "farmacoslada": "scrapers.farmacoslada",
 }
 
 

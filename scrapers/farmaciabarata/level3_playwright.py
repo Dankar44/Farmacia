@@ -29,7 +29,7 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.orm import sessionmaker
 
 # Directorio raíz del proyecto
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, PROJECT_ROOT)
 from db_models import get_engine, Producto, Precio, Base
 
