@@ -17,5 +17,8 @@ exports/*.csv
 backups/
 data/*.csv
 
+# SQL descomprimido (el .gz ya está en el repo)
+migration/supabase_import.sql
+
 # macOS
 .DS_Store
