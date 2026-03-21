@@ -1205,7 +1205,19 @@
                 document.body.classList.add('authenticated');
                 const userEl = document.getElementById('sidebarUser');
                 const loginEl = document.getElementById('sidebarLogin');
-                if (userEl) { userEl.style.display = 'flex'; userEl.querySelector('.sidebar-user-name').textContent = currentUser.nombre; }
+                if (userEl) {
+                    userEl.style.display = 'flex';
+                    userEl.querySelector('.sidebar-user-name').textContent = currentUser.nombre;
+                    const planEl = document.getElementById('userPlan');
+                    if (planEl) {
+                        const plan = (currentUser.plan || 'estandar').toLowerCase();
+                        const isPro = plan === 'pro' || plan === 'premium';
+                        planEl.className = 'plan-badge ' + (isPro ? 'pro' : 'estandar');
+                        planEl.textContent = isPro ? 'PRO' : 'ESTANDAR';
+                    }
+                    const avatarEl = document.getElementById('userAvatar');
+                    if (avatarEl && currentUser.nombre) avatarEl.textContent = currentUser.nombre.charAt(0).toUpperCase();
+                }
                 if (loginEl) loginEl.style.display = 'none';
             } else {
                 document.body.classList.remove('authenticated');
