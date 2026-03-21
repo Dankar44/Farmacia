@@ -16,3 +16,6 @@ exports/*.csv
 # Backups and data
 backups/
 data/*.csv
+
+# macOS
+.DS_Store
