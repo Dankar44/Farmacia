@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmaSearch - Comparador de Precios de Farmacia</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta name="description" content="Busca y compara precios de productos de farmacia en las principales tiendas online de Espana.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root {
+            --bg-body:#f5f6f8; --bg-white:#ffffff; --bg-light:#f9fafb;
+            --primary:#00a99d; --primary-dark:#008f85; --primary-light:#e0f7f5;
+            --primary-glow:rgba(0,169,157,0.12);
+            --accent:#f57c00; --accent-bg:rgba(245,124,0,0.08);
+            --text-dark:#1a1a2e; --text-body:#374151; --text-secondary:#6b7280; --text-muted:#9ca3af;
+            --green:#059669; --green-light:#ecfdf5; --red:#dc2626; --red-light:#fef2f2;
+            --border:#e5e7eb; --border-light:#f3f4f6;
+            --shadow-xs:0 1px 2px rgba(0,0,0,0.04);
+            --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.07);
+            --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.08);
+            --radius:12px; --radius-lg:16px;
+            --transition:0.2s cubic-bezier(0.4,0,0.2,1);
+            --sidebar-w:240px;
+        }
+        body {
+            font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+            background:var(--bg-body); color:var(--text-body);
+            min-height:100vh; display:flex; -webkit-font-smoothing:antialiased;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width:var(--sidebar-w); background:var(--bg-white);
+            border-right:1px solid var(--border-light);
+            display:flex; flex-direction:column;
+            position:fixed; top:0; left:0; bottom:0;
+            z-index:200; transition:transform 0.3s ease;
+        }
+        .sidebar-logo {
+            display:flex; align-items:center; gap:10px;
+            padding:24px 20px 20px; text-decoration:none;
+        }
+        .sidebar-logo-icon {
+            width:36px; height:36px;
+            filter:drop-shadow(0 2px 4px rgba(0,169,157,0.3));
+            flex-shrink:0;
+        }
+        .sidebar-logo-text {
+            font-size:1.25rem; font-weight:800; color:var(--text-dark); letter-spacing:-0.3px;
+        }
+        .sidebar-logo-text span { color:var(--primary); }
+        .sidebar-divider { height:1px; background:var(--border-light); margin:4px 16px; }
+
+        /* Nav items */
+        .sidebar-nav { flex:1; padding:8px 12px; display:flex; flex-direction:column; gap:2px; }
+        .sidebar-item {
+            display:flex; align-items:center; gap:12px;
+            padding:11px 14px; border-radius:10px;
+            font-size:0.88rem; font-weight:500; color:var(--text-secondary);
+            text-decoration:none; transition:all var(--transition); cursor:pointer;
+            border:none; background:none; width:100%; text-align:left;
+            font-family:inherit;
+        }
+        .sidebar-item:hover { background:var(--bg-light); color:var(--text-dark); }
+        .sidebar-item.active {
+            background:var(--primary-light); color:var(--primary-dark); font-weight:600;
+        }
+        .sidebar-item svg { width:20px; height:20px; flex-shrink:0; }
+        /* Accessibility panel */
+        .sidebar-a11y { border-top:1px solid var(--border-light); }
+        .a11y-toggle {
+            display:flex; align-items:center; gap:8px; width:100%;
+            padding:10px 16px; font-size:0.78rem; font-weight:600;
+            color:var(--text-secondary); background:none; border:none;
+            cursor:pointer; font-family:inherit; transition:all var(--transition);
+        }
+        .a11y-toggle:hover { background:var(--bg-light); color:var(--text-dark); }
+        .a11y-content {
+            max-height:0; overflow:hidden; transition:max-height 0.3s ease;
+            padding:0 14px;
+        }
+        .a11y-content.open { max-height:200px; padding:0 14px 12px; }
+        .a11y-section { margin-bottom:8px; }
+        .a11y-label { font-size:0.68rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px; }
+        .a11y-row { display:flex; gap:4px; }
+        .a11y-btn {
+            flex:1; padding:6px 0; font-size:0.72rem; font-weight:700;
+            font-family:inherit; background:var(--bg-light); color:var(--text-secondary);
+            border:1px solid var(--border-light); border-radius:6px;
+            cursor:pointer; transition:all var(--transition);
+            display:flex; align-items:center; justify-content:center; gap:4px;
+        }
+        .a11y-btn:hover { border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); }
+        .a11y-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .a11y-wide { flex:1 1 100%; }
+
+        /* High contrast mode */
+        body.high-contrast { --text-body:#000; --text-dark:#000; --text-secondary:#333; --text-muted:#555; --border:#999; --bg-body:#f0f0f0; }
+        body.high-contrast .sidebar { border-right:2px solid #333; }
+        body.high-contrast .product-card { border:2px solid #666; }
+
+        .sidebar-item .item-badge {
+            margin-left:auto; font-size:0.68rem; font-weight:700;
+            background:var(--primary); color:#fff; padding:2px 7px;
+            border-radius:10px; min-width:20px; text-align:center;
+        }
+        .sidebar-section-label {
+            font-size:0.68rem; font-weight:600; color:var(--text-muted);
+            text-transform:uppercase; letter-spacing:1px;
+            padding:16px 14px 6px;
+        }
+
+        /* Sidebar user */
+        .sidebar-user {
+            padding:16px; border-top:1px solid var(--border-light);
+            display:flex; align-items:center; gap:10px;
+        }
+        .sidebar-avatar {
+            width:34px; height:34px; border-radius:50%;
+            background:linear-gradient(135deg,var(--primary),#00c9bc);
+            color:#fff; display:flex; align-items:center; justify-content:center;
+            font-size:0.82rem; font-weight:700; flex-shrink:0;
+        }
+        .sidebar-user-info { flex:1; min-width:0; }
+        .sidebar-user-name {
+            font-size:0.82rem; font-weight:600; color:var(--text-dark);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .sidebar-user-plan {
+            font-size:0.68rem; color:var(--text-muted); display:flex; align-items:center; gap:4px;
+        }
+        .plan-badge {
+            font-size:0.6rem; font-weight:700; padding:1px 6px;
+            border-radius:4px; text-transform:uppercase;
+        }
+        .plan-badge.estandar, .plan-badge.free { background:var(--border-light); color:var(--text-secondary); }
+        .plan-badge.pro { background:var(--accent); color:#fff; }
+        .sidebar-logout {
+            background:none; border:none; cursor:pointer; padding:6px;
+            color:var(--text-muted); border-radius:8px; transition:all var(--transition);
+            display:flex; align-items:center;
+        }
+        .sidebar-logout:hover { background:var(--red-light); color:var(--red); }
+
+        /* Mobile hamburger */
+        .hamburger {
+            display:none; position:fixed; top:16px; left:16px; z-index:300;
+            width:40px; height:40px; border-radius:10px;
+            background:var(--bg-white); border:1px solid var(--border);
+            box-shadow:var(--shadow-sm); cursor:pointer;
+            align-items:center; justify-content:center;
+        }
+        .sidebar-overlay {
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3);
+            z-index:199;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .app-main {
+            margin-left:var(--sidebar-w); flex:1; min-height:100vh;
+            display:flex; flex-direction:column;
+        }
+
+        /* Top search bar */
+        .topbar {
+            background:var(--bg-white); border-bottom:1px solid var(--border-light);
+            padding:14px 28px; display:flex; align-items:center; gap:16px;
+            position:sticky; top:0; z-index:100;
+            max-width:900px; margin:0 auto; width:100%;
+            border-bottom:none;
+        }
+        .topbar-wrap {
+            background:var(--bg-white); border-bottom:1px solid var(--border-light);
+            position:sticky; top:0; z-index:100;
+        }
+        .search-wrap { flex:1; position:relative; }
+        .search-input {
+            width:100%; height:46px; padding:0 42px 0 44px;
+            border:2px solid var(--border); border-radius:12px;
+            background:var(--bg-light); font-size:0.95rem;
+            transition:all var(--transition); color:var(--text-dark);
+            font-family:inherit; outline:none;
+        }
+        .search-input::placeholder { color:var(--text-muted); }
+        .search-input:focus {
+            border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-glow);
+            background:var(--bg-white);
+        }
+        .search-icon {
+            position:absolute; left:14px; top:50%; transform:translateY(-50%);
+            color:var(--text-muted); pointer-events:none; display:flex;
+            transition:color var(--transition);
+        }
+        .search-input:focus ~ .search-icon { color:var(--primary); }
+        .search-clear {
+            position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            width:28px; height:28px; border-radius:50%; border:none;
+            background:var(--border-light); color:var(--text-muted);
+            cursor:pointer; display:none; align-items:center; justify-content:center;
+            transition:all var(--transition);
+        }
+        .search-clear.visible { display:flex; }
+        .search-clear:hover { background:var(--border); color:var(--text-secondary); }
+        .pharm-badges { display:flex; gap:4px; flex-wrap:wrap; }
+        .pharm-pill {
+            padding:4px 10px; font-size:0.68rem; font-weight:600;
+            color:var(--text-muted); background:var(--bg-light);
+            border-radius:6px; white-space:nowrap;
+        }
+
+        /* Search dropdown with categories */
+        .search-dropdown {
+            display:none; position:absolute; top:calc(100% + 4px); left:0; right:0;
+            background:var(--bg-white); border:1px solid var(--border);
+            border-radius:12px; box-shadow:var(--shadow-lg); z-index:300;
+            padding:16px 20px; max-height:420px; overflow-y:auto;
+        }
+        .search-dropdown.open { display:block; }
+        .search-dd-title {
+            font-size:0.7rem; font-weight:700; color:var(--text-muted);
+            text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;
+        }
+        .search-dd-grid {
+            display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px;
+        }
+        .search-dd-group { margin-bottom:14px; }
+        .search-dd-group-name {
+            font-size:0.78rem; font-weight:600; color:var(--text-dark);
+            padding:6px 0 4px; display:flex; align-items:center; gap:6px;
+        }
+        .search-dd-group-name svg { width:14px; height:14px; color:var(--primary); }
+        .search-dd-item {
+            display:block; padding:5px 8px 5px 20px; font-size:0.78rem;
+            color:var(--text-secondary); background:none; border:none;
+            cursor:pointer; font-family:inherit; text-align:left;
+            border-radius:6px; transition:all 0.1s; width:100%;
+        }
+        .search-dd-item:hover { background:var(--primary-light); color:var(--primary-dark); }
+        @media (max-width:600px) { .search-dd-grid { grid-template-columns:1fr 1fr; } }
+
+        /* Content area */
+        .content { max-width:900px; margin:0 auto; padding:20px 28px 60px; width:100%; flex:1; }
+
+        /* ===== STATUS & SORT ===== */
+        .status-bar { display:none; align-items:center; justify-content:space-between; padding:0 2px; margin-bottom:12px; }
+        .status-bar.visible { display:flex; }
+        .status-text { font-size:0.82rem; color:var(--text-muted); }
+        .status-count { font-size:0.82rem; color:var(--text-secondary); font-weight:600; background:var(--bg-light); padding:4px 12px; border-radius:20px; }
+        .sort-bar { display:none; align-items:center; gap:10px; padding:8px 14px; margin-bottom:12px; background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); flex-wrap:wrap; }
+        .sort-bar.active { display:flex; }
+        .sort-label { font-size:0.78rem; color:var(--text-muted); font-weight:500; display:flex; align-items:center; gap:4px; flex-shrink:0; }
+        .sort-options { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+        .sort-btn { padding:5px 12px; font-size:0.75rem; font-weight:500; font-family:inherit; border:1px solid var(--border); border-radius:8px; background:var(--bg-white); color:var(--text-secondary); cursor:pointer; transition:all var(--transition); white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
+        .sort-btn:hover { border-color:var(--primary); color:var(--primary-dark); }
+        .sort-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; }
+
+        /* ===== SKELETON ===== */
+        .skeleton-list { display:none; }
+        .skeleton-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:18px 20px; margin-bottom:10px; display:flex; align-items:center; gap:16px; }
+        .skeleton-line { height:14px; background:linear-gradient(90deg,var(--border-light) 25%,#e8e9eb 50%,var(--border-light) 75%); background-size:200% 100%; border-radius:6px; animation:shimmer 1.5s ease-in-out infinite; }
+        .skeleton-line.w70 { width:70%; } .skeleton-line.w40 { width:40%; height:12px; margin-top:8px; }
+        .skeleton-line.w20 { width:80px; height:24px; border-radius:8px; margin-left:auto; flex-shrink:0; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* ===== HERO ===== */
+        .hero-state { padding:0; }
+        .hero-banner { background:linear-gradient(135deg,#00a99d 0%,#00c9bc 40%,#00d4aa 100%); border-radius:var(--radius-lg); padding:36px 32px 28px; color:#fff; position:relative; overflow:hidden; margin-bottom:24px; }
+        .hero-banner::before { content:''; position:absolute; top:-40%; right:-15%; width:320px; height:320px; background:radial-gradient(circle,rgba(255,255,255,0.12) 0%,transparent 70%); border-radius:50%; }
+        .hero-banner-content { position:relative; z-index:1; }
+        .hero-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.18); backdrop-filter:blur(4px); padding:5px 14px; border-radius:20px; font-size:0.72rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
+        .hero-badge-dot { width:6px; height:6px; background:#80ffb4; border-radius:50%; animation:pulse-dot 2s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+        .hero-title { font-size:1.6rem; font-weight:700; margin-bottom:8px; line-height:1.2; letter-spacing:-0.5px; }
+        .hero-sub { font-size:0.9rem; opacity:0.9; max-width:480px; line-height:1.5; }
+        .hero-stats { display:flex; gap:28px; margin-top:20px; }
+        .hero-stat-value { font-size:1.4rem; font-weight:800; line-height:1; }
+        .hero-stat-label { font-size:0.68rem; opacity:0.8; margin-top:3px; text-transform:uppercase; letter-spacing:0.5px; }
+
+        /* Categories */
+        .categories-section { margin-bottom:20px; }
+        .categories-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        .categories-title { font-size:0.95rem; font-weight:600; color:var(--text-dark); }
+        .categories-subtitle { font-size:0.75rem; color:var(--text-muted); }
+        .categories-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+        .cat-card { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 8px 10px; background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); cursor:pointer; transition:all var(--transition); }
+        .cat-card:hover { border-color:var(--primary); box-shadow:var(--shadow-md); transform:translateY(-2px); }
+        .cat-card-icon { width:38px; height:38px; background:var(--primary-light); border-radius:10px; display:flex; align-items:center; justify-content:center; transition:all var(--transition); }
+        .cat-card:hover .cat-card-icon { background:var(--primary); }
+        .cat-card-icon svg { width:18px; height:18px; stroke:var(--primary); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:stroke var(--transition); }
+        .cat-card:hover .cat-card-icon svg { stroke:#fff; }
+        .cat-card-name { font-size:0.72rem; font-weight:500; color:var(--text-body); text-align:center; }
+
+        /* ===== PRODUCT CARDS ===== */
+        .product-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); margin-bottom:8px; overflow:hidden; transition:all var(--transition); cursor:pointer; animation:fadeInUp 0.35s ease forwards; opacity:0; }
+        .product-card:hover { border-color:var(--border); box-shadow:var(--shadow-md); }
+        .product-card.expanded { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow),var(--shadow-md); }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .product-header { display:flex; align-items:center; padding:14px 18px; gap:12px; }
+        .product-info { flex:1; min-width:0; }
+        .product-name { font-size:0.88rem; font-weight:500; color:var(--text-dark); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .product-meta { display:flex; gap:12px; margin-top:4px; font-size:0.73rem; color:var(--text-muted); flex-wrap:wrap; }
+        .product-meta span { display:flex; align-items:center; gap:3px; }
+        .product-price-area { display:flex; flex-direction:column; align-items:flex-end; flex-shrink:0; }
+        .best-price { font-size:1.2rem; font-weight:700; color:var(--primary-dark); }
+        .price-label { font-size:0.63rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; }
+        .savings-badge { display:inline-flex; align-items:center; gap:3px; margin-top:3px; padding:2px 8px; border-radius:6px; background:var(--green-light); color:var(--green); font-size:0.66rem; font-weight:700; }
+        .expand-icon { flex-shrink:0; width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:all 0.3s ease; background:var(--bg-light); border-radius:50%; }
+        .product-card.expanded .expand-icon { transform:rotate(180deg); background:var(--primary-light); color:var(--primary); }
+        .product-detail { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+        .product-card.expanded .product-detail { max-height:700px; }
+        .detail-inner { padding:0 18px 14px; border-top:1px solid var(--border-light); }
+        .pharmacy-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-light); gap:10px; }
+        .pharmacy-row:last-child { border-bottom:none; }
+        .pharmacy-name { font-size:0.83rem; font-weight:500; color:var(--text-body); min-width:110px; }
+        .pharmacy-price { font-size:0.92rem; font-weight:700; min-width:68px; text-align:right; }
+        .pharmacy-price.best { color:var(--primary-dark); } .pharmacy-price.normal { color:var(--text-secondary); }
+        .stock-badge { font-size:0.68rem; padding:3px 10px; border-radius:6px; font-weight:600; min-width:66px; text-align:center; }
+        .stock-badge.in-stock { background:var(--green-light); color:var(--green); }
+        .stock-badge.out-stock { background:var(--red-light); color:var(--red); }
+        .buy-link { font-size:0.76rem; font-weight:600; color:#fff; text-decoration:none; padding:6px 14px; background:var(--primary); border-radius:8px; transition:all var(--transition); white-space:nowrap; }
+        .buy-link:hover { background:var(--primary-dark); transform:translateY(-1px); }
+
+        /* Empty / Report / Fav / Toast */
+        .empty-state { text-align:center; padding:60px 20px; }
+        .empty-icon { margin-bottom:16px; opacity:0.5; }
+        .empty-title { font-size:1rem; color:var(--text-body); font-weight:500; margin-bottom:6px; }
+        .empty-sub { font-size:0.85rem; color:var(--text-muted); }
+        .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+        .modal-overlay.active { opacity:1; pointer-events:auto; }
+        .modal-content { background:#fff; border-radius:var(--radius-lg); width:90%; max-width:480px; padding:28px; box-shadow:var(--shadow-lg); transform:translateY(20px) scale(0.98); transition:transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform:translateY(0) scale(1); }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .modal-title { font-size:1rem; font-weight:600; color:var(--text-dark); display:flex; align-items:center; gap:8px; }
+        .modal-close { background:none; border:none; font-size:1.5rem; color:var(--text-muted); cursor:pointer; padding:4px; border-radius:6px; }
+        .modal-close:hover { background:var(--bg-light); }
+        .modal-subtitle { font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px; }
+        .modal-textarea { width:100%; min-height:80px; padding:12px; border:2px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.88rem; resize:vertical; margin-bottom:20px; outline:none; }
+        .modal-textarea:focus { border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-glow); }
+        .modal-actions { display:flex; justify-content:flex-end; gap:10px; }
+        .btn-btn { padding:10px 20px; border-radius:10px; font-weight:600; font-size:0.88rem; cursor:pointer; border:none; font-family:inherit; transition:all var(--transition); }
+        .btn-cancel { background:var(--bg-light); color:var(--text-secondary); } .btn-cancel:hover { background:var(--border-light); }
+        .btn-submit { background:var(--primary); color:#fff; display:flex; align-items:center; gap:6px; }
+        .btn-submit:hover { background:var(--primary-dark); } .btn-submit:disabled { opacity:0.7; cursor:not-allowed; }
+        .fav-btn { background:none; border:none; cursor:pointer; padding:4px; color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center; border-radius:6px; transition:all 0.2s; }
+        .fav-btn:hover { color:#e91e63; background:rgba(233,30,99,0.08); }
+        .fav-btn.active { color:#e91e63; } .fav-btn.active svg { fill:#e91e63; }
+        .report-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition:all var(--transition); }
+        .report-btn:hover { color:var(--red); background:var(--red-light); }
+        mark.search-highlight { background:rgba(0,169,157,0.18); color:inherit; border-radius:2px; padding:0 2px; }
+        .toast-container { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast { padding:14px 20px; border-radius:12px; font-size:0.85rem; font-weight:500; color:#fff; display:flex; align-items:center; gap:10px; box-shadow:var(--shadow-lg); transform:translateX(120%); transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); max-width:360px; }
+        .toast.show { transform:translateX(0); } .toast.success { background:var(--green); } .toast.error { background:var(--red); } .toast.info { background:var(--text-dark); }
+        .back-to-top { position:fixed; bottom:24px; right:24px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,169,157,0.4); opacity:0; visibility:hidden; transform:translateY(10px); transition:all 0.3s ease; z-index:50; }
+        .back-to-top.visible { opacity:1; visibility:visible; transform:translateY(0); }
+        .back-to-top:hover { transform:translateY(-2px); }
+
+        /* ===== SIDEBAR VIEWS ===== */
+        .view-panel { display:none; }
+        .view-panel.active { display:block; }
+        .view-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; }
+        .view-title {
+            font-size:1.35rem; font-weight:800; color:var(--text-dark); letter-spacing:-0.5px;
+            position:relative; display:inline-block; padding-bottom:6px;
+        }
+        .view-title::after {
+            content:''; position:absolute; bottom:0; left:0;
+            width:40px; height:3px; border-radius:2px;
+            background:linear-gradient(90deg, var(--primary), #00c9bc);
+        }
+        .view-subtitle { font-size:0.78rem; color:var(--text-muted); margin-top:8px; }
+        .view-empty { text-align:center; padding:60px 20px; color:var(--text-muted); }
+        .view-empty svg { width:48px; height:48px; margin-bottom:12px; opacity:0.4; }
+        .view-empty p { font-size:0.9rem; margin-top:8px; }
+
+        /* Login modal */
+        .auth-tabs { display:flex; border-bottom:2px solid var(--border-light); margin-bottom:20px; }
+        .auth-tab { flex:1; padding:10px; text-align:center; font-size:0.88rem; font-weight:600; color:var(--text-muted); cursor:pointer; border:none; background:none; font-family:inherit; transition:all var(--transition); border-bottom:2px solid transparent; margin-bottom:-2px; }
+        .auth-tab.active { color:var(--primary-dark); border-bottom-color:var(--primary); }
+        .auth-tab:hover { color:var(--text-dark); }
+        .auth-input { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-size:0.9rem; font-family:inherit; outline:none; transition:border-color 0.2s; margin-bottom:12px; }
+        .auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-glow); }
+        .auth-input-label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dark); margin-bottom:4px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width:900px) {
+            .sidebar { transform:translateX(-100%); }
+            .sidebar.open { transform:translateX(0); }
+            .sidebar-overlay.open { display:block; }
+            .hamburger { display:flex; }
+            .app-main { margin-left:0 !important; }
+            .topbar { padding-left:64px; }
+        }
+        @media (max-width:600px) {
+            .categories-grid { grid-template-columns:repeat(3,1fr); }
+            .search-input { height:40px; font-size:0.88rem; }
+            .pharmacy-row { flex-wrap:wrap; gap:6px; }
+            .pharmacy-name { min-width:100%; }
+            .pharm-badges { display:none; }
+        }
+        @media (max-width:480px) { .categories-grid { grid-template-columns:repeat(2,1fr); } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a class="sidebar-logo" href="/">
+            <svg class="sidebar-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="url(#cg)"/>
+                <circle cx="12" cy="12" r="5.5" fill="#fff" stroke="#00796b" stroke-width="2"/>
+                <path d="M14 8.5C14 8.5 15 9.5 15.5 10.5C16 11.5 14 13.5 11 14.5C11 14.5 9 10.5 14 8.5Z" fill="#00a99d"/>
+                <path d="M11 14.5C11 14.5 12 12 14 10" stroke="#fff" stroke-width="1" stroke-linecap="round"/>
+                <path d="M16 16L20.5 20.5" stroke="#00796b" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M17.5 17.5L20.5 20.5" stroke="#4db6ac" stroke-width="1.5" stroke-linecap="round"/>
+                <defs><linearGradient id="cg" x1="3" y1="3" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#26a69a"/><stop offset="1" stop-color="#00695c"/></linearGradient></defs>
+            </svg>
+            <span class="sidebar-logo-text">Farma<span>Search</span></span>
+        </a>
+        <div class="sidebar-divider"></div>
+
+        <nav class="sidebar-nav">
+            <button class="sidebar-item active" data-view="buscador" onclick="switchView('buscador')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Buscador
+            </button>
+            <button class="sidebar-item" data-view="ofertas" onclick="switchView('ofertas')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg>
+                Ofertas
+            </button>
+            <button class="sidebar-item" data-view="listas" onclick="switchView('listas')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+                Mis Listas
+            </button>
+            <button class="sidebar-item" data-view="dashboard" onclick="switchView('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </button>
+
+            <div class="sidebar-section-label">Seguimiento</div>
+            <button class="sidebar-item" data-view="favoritos" onclick="switchView('favoritos')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                Favoritos
+            </button>
+            <button class="sidebar-item" data-view="historial" onclick="switchView('historial')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Historial
+            </button>
+
+            <div class="sidebar-section-label">Cuenta</div>
+            <button class="sidebar-item" data-view="suscripcion" onclick="switchView('suscripcion')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Suscripcion
+            </button>
+            <button class="sidebar-item" data-view="perfil" onclick="switchView('perfil')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Mi Perfil
+            </button>
+        </nav>
+
+        <!-- Accessibility panel (collapsible) -->
+        <div class="sidebar-a11y">
+            <button class="a11y-toggle" onclick="toggleA11yPanel()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:15px;height:15px"><circle cx="12" cy="12" r="10"/><path d="M12 8a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2h0a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2"/><path d="M12 6v1M12 17v1"/></svg>
+                Accesibilidad
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;margin-left:auto;transition:transform 0.2s" id="a11yChevron"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+            <div class="a11y-content" id="a11yContent">
+                <div class="a11y-section">
+                    <span class="a11y-label">Texto</span>
+                    <div class="a11y-row">
+                        <button class="a11y-btn" onclick="changeFontSize(-1)" title="Reducir">A-</button>
+                        <button class="a11y-btn" onclick="changeFontSize(0)" title="Normal" style="font-weight:400">A</button>
+                        <button class="a11y-btn" onclick="changeFontSize(1)" title="Aumentar">A+</button>
+                    </div>
+                </div>
+                <div class="a11y-section">
+                    <span class="a11y-label">Panel lateral</span>
+                    <div class="a11y-row">
+                        <button class="a11y-btn" onclick="changeSidebar(-1)" title="Estrecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="m15 18-6-6 6-6"/></svg></button>
+                        <button class="a11y-btn" onclick="changeSidebar(0)" title="Normal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></button>
+                        <button class="a11y-btn" onclick="changeSidebar(1)" title="Ancho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="m9 18 6-6-6-6"/></svg></button>
+                    </div>
+                </div>
+                <div class="a11y-section">
+                    <div class="a11y-row">
+                        <button class="a11y-btn a11y-wide" onclick="toggleContrast()" title="Alto contraste" id="contrastBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+                            Alto contraste
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User section (dynamic) -->
+        <div class="sidebar-user" id="sidebarUser" style="display:none">
+            <div class="sidebar-avatar" id="userAvatar">U</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="userName">Usuario</div>
+                <div class="sidebar-user-plan"><span class="plan-badge estandar" id="userPlan">ESTANDAR</span></div>
+            </div>
+            <button class="sidebar-logout" title="Cerrar sesion" onclick="doLogout()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+        <!-- Login button when not logged in -->
+        <div class="sidebar-user" id="sidebarLogin">
+            <button onclick="openAuthModal()" style="width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all var(--transition)">Iniciar sesion</button>
+        </div>
+    </aside>
+
+    <!-- Mobile hamburger -->
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main content -->
+    <div class="app-main">
+        <!-- Top search bar -->
+        <div class="topbar-wrap">
+        <div class="topbar">
+            <div class="search-wrap">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos de farmacia..." autocomplete="off">
+                <span class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><circle cx="11" cy="11" r="8" stroke="currentColor"/><path d="m21 21-4.3-4.3" stroke="currentColor"/></svg>
+                </span>
+                <button class="search-clear" id="searchClear" aria-label="Limpiar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+
+                <!-- Categories dropdown -->
+                <div class="search-dropdown" id="searchDropdown">
+                    <div class="search-dd-title">Explorar por categoria</div>
+                    <div class="search-dd-grid">
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg> Facial</div>
+                            <button class="search-dd-item" onclick="pickCat('crema hidratante')">Cremas hidratantes</button>
+                            <button class="search-dd-item" onclick="pickCat('serum facial')">Serums</button>
+                            <button class="search-dd-item" onclick="pickCat('contorno de ojos')">Contorno de ojos</button>
+                            <button class="search-dd-item" onclick="pickCat('mascarilla facial')">Mascarillas</button>
+                            <button class="search-dd-item" onclick="pickCat('limpiador facial')">Limpiadores</button>
+                            <button class="search-dd-item" onclick="pickCat('acido hialuronico')">Ac. hialuronico</button>
+                            <button class="search-dd-item" onclick="pickCat('retinol')">Retinol</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M20 12h2"/></svg> Solar</div>
+                            <button class="search-dd-item" onclick="pickCat('proteccion solar 50')">SPF 50+</button>
+                            <button class="search-dd-item" onclick="pickCat('proteccion solar 30')">SPF 30</button>
+                            <button class="search-dd-item" onclick="pickCat('after sun')">After Sun</button>
+                            <button class="search-dd-item" onclick="pickCat('protector solar facial')">Solar facial</button>
+                            <button class="search-dd-item" onclick="pickCat('protector solar infantil')">Solar infantil</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 22V7l9-5 9 5v15"/></svg> Cabello</div>
+                            <button class="search-dd-item" onclick="pickCat('champu')">Champus</button>
+                            <button class="search-dd-item" onclick="pickCat('acondicionador')">Acondicionadores</button>
+                            <button class="search-dd-item" onclick="pickCat('mascarilla capilar')">Mascarillas</button>
+                            <button class="search-dd-item" onclick="pickCat('anticaida')">Anticaida</button>
+                            <button class="search-dd-item" onclick="pickCat('tinte cabello')">Tintes</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/></svg> Salud</div>
+                            <button class="search-dd-item" onclick="pickCat('paracetamol')">Paracetamol</button>
+                            <button class="search-dd-item" onclick="pickCat('ibuprofeno')">Ibuprofeno</button>
+                            <button class="search-dd-item" onclick="pickCat('antihistaminico')">Antihistaminicos</button>
+                            <button class="search-dd-item" onclick="pickCat('vitamina d')">Vitamina D</button>
+                            <button class="search-dd-item" onclick="pickCat('magnesio')">Magnesio</button>
+                            <button class="search-dd-item" onclick="pickCat('probiotico')">Probioticos</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 12h.01M15 12h.01"/></svg> Bebe</div>
+                            <button class="search-dd-item" onclick="pickCat('panal bebe')">Panales</button>
+                            <button class="search-dd-item" onclick="pickCat('crema bebe')">Cremas bebe</button>
+                            <button class="search-dd-item" onclick="pickCat('toallitas bebe')">Toallitas</button>
+                            <button class="search-dd-item" onclick="pickCat('leche infantil')">Leches infantiles</button>
+                            <button class="search-dd-item" onclick="pickCat('biberon')">Biberones</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg> Higiene</div>
+                            <button class="search-dd-item" onclick="pickCat('gel de ducha')">Geles de ducha</button>
+                            <button class="search-dd-item" onclick="pickCat('desodorante')">Desodorantes</button>
+                            <button class="search-dd-item" onclick="pickCat('higiene intima')">Higiene intima</button>
+                            <button class="search-dd-item" onclick="pickCat('pasta de dientes')">Dental</button>
+                            <button class="search-dd-item" onclick="pickCat('colutorio')">Colutorios</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Optica</div>
+                            <button class="search-dd-item" onclick="pickCat('lentillas')">Lentillas</button>
+                            <button class="search-dd-item" onclick="pickCat('solucion lentillas')">Liquido lentillas</button>
+                            <button class="search-dd-item" onclick="pickCat('lagrimas artificiales')">Lagrimas artificiales</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Mujer</div>
+                            <button class="search-dd-item" onclick="pickCat('compresas')">Compresas</button>
+                            <button class="search-dd-item" onclick="pickCat('tampon')">Tampones</button>
+                            <button class="search-dd-item" onclick="pickCat('copa menstrual')">Copa menstrual</button>
+                            <button class="search-dd-item" onclick="pickCat('test embarazo')">Test embarazo</button>
+                        </div>
+                        <div class="search-dd-group">
+                            <div class="search-dd-group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Nutricion</div>
+                            <button class="search-dd-item" onclick="pickCat('proteina whey')">Proteinas</button>
+                            <button class="search-dd-item" onclick="pickCat('colageno')">Colageno</button>
+                            <button class="search-dd-item" onclick="pickCat('batido sustitutivo')">Batidos</button>
+                            <button class="search-dd-item" onclick="pickCat('infusion')">Infusiones</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="content">
+            <!-- SEARCH AREA (main view) -->
+            <div id="searchArea">
+            <div class="status-bar" id="statusBar">
+                <span class="status-text" id="statusText"></span>
+                <span class="status-count" id="statusCount"></span>
+            </div>
+            <div class="sort-bar" id="sortBar">
+                <span class="sort-label"><svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M3 6h18M7 12h10M10 18h4"/></svg> Ordenar:</span>
+                <div class="sort-options">
+                    <button class="sort-btn active" data-sort="relevancia" onclick="setSort('relevancia')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Relevancia</button>
+                    <button class="sort-btn" data-sort="nombre-asc" onclick="setSort('nombre-asc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M3 6h18M3 12h12M3 18h6"/></svg> A-Z</button>
+                    <button class="sort-btn" data-sort="nombre-desc" onclick="setSort('nombre-desc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M3 6h6M3 12h12M3 18h18"/></svg> Z-A</button>
+                    <button class="sort-btn" data-sort="precio-asc" onclick="setSort('precio-asc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M12 19V5M5 12l7-7 7 7"/></svg> Precio &#8593;</button>
+                    <button class="sort-btn" data-sort="precio-desc" onclick="setSort('precio-desc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M12 5v14M19 12l-7 7-7-7"/></svg> Precio &#8595;</button>
+                    <button class="sort-btn" data-sort="farmacias-desc" onclick="setSort('farmacias-desc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> + Farmacias</button>
+                    <button class="sort-btn" data-sort="stock" onclick="setSort('stock')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:13px;height:13px"><path d="M20 6 9 17l-5-5"/></svg> En stock</button>
+                </div>
+            </div>
+
+            <div class="skeleton-list" id="skeletonLoader">
+                <div class="skeleton-card"><div style="flex:1"><div class="skeleton-line w70"></div><div class="skeleton-line w40"></div></div><div class="skeleton-line w20"></div></div>
+                <div class="skeleton-card"><div style="flex:1"><div class="skeleton-line w70"></div><div class="skeleton-line w40"></div></div><div class="skeleton-line w20"></div></div>
+                <div class="skeleton-card"><div style="flex:1"><div class="skeleton-line w70"></div><div class="skeleton-line w40"></div></div><div class="skeleton-line w20"></div></div>
+                <div class="skeleton-card"><div style="flex:1"><div class="skeleton-line w70"></div><div class="skeleton-line w40"></div></div><div class="skeleton-line w20"></div></div>
+            </div>
+
+            <div id="heroState" class="hero-state">
+                <div class="hero-banner">
+                    <div class="hero-banner-content">
+                        <div class="hero-badge"><span class="hero-badge-dot"></span> Comparador activo</div>
+                        <div class="hero-title">Encuentra el mejor precio<br>en farmacia online</div>
+                        <div class="hero-sub">Compara precios de 8 farmacias en tiempo real. Busca cualquier producto y te mostramos donde esta mas barato.</div>
+                        <div class="hero-stats">
+                            <div><span class="hero-stat-value">8</span><div class="hero-stat-label">Farmacias</div></div>
+                            <div><span class="hero-stat-value">280K+</span><div class="hero-stat-label">Productos</div></div>
+                            <div><span class="hero-stat-value">100%</span><div class="hero-stat-label">Gratuito</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="categories-section">
+                    <div class="categories-header">
+                        <span class="categories-title">Explorar por categoria</span>
+                        <span class="categories-subtitle">Clic para buscar</span>
+                    </div>
+                    <div class="categories-grid">
+                        <div class="cat-card" onclick="searchCategory('crema hidratante')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M2 12h20"/><path d="M12 2v20"/><circle cx="12" cy="12" r="10"/></svg></div><span class="cat-card-name">Cremas</span></div>
+                        <div class="cat-card" onclick="searchCategory('champu')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M3 22V7l9-5 9 5v15"/><path d="M9 22V12h6v10"/></svg></div><span class="cat-card-name">Cabello</span></div>
+                        <div class="cat-card" onclick="searchCategory('proteccion solar')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></div><span class="cat-card-name">Solar</span></div>
+                        <div class="cat-card" onclick="searchCategory('pasta de dientes')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M8 2h8l2 4H6l2-4Z"/><rect x="6" y="6" width="12" height="16" rx="2"/><path d="M12 10v6"/></svg></div><span class="cat-card-name">Dental</span></div>
+                        <div class="cat-card" onclick="searchCategory('desodorante')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M8 2h8v4H8z"/><rect x="7" y="6" width="10" height="16" rx="3"/><path d="M12 12v4"/></svg></div><span class="cat-card-name">Desodorante</span></div>
+                        <div class="cat-card" onclick="searchCategory('vitamina')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></div><span class="cat-card-name">Vitaminas</span></div>
+                        <div class="cat-card" onclick="searchCategory('paracetamol ibuprofeno')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M12 10v4"/><path d="M10 12h4"/></svg></div><span class="cat-card-name">Analgesicos</span></div>
+                        <div class="cat-card" onclick="searchCategory('probiotico')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10Z"/><path d="M8 12s1.5 2 4 2 4-2 4-2"/><path d="M9 8h.01M15 8h.01"/></svg></div><span class="cat-card-name">Digestivo</span></div>
+                        <div class="cat-card" onclick="searchCategory('spray nasal')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M6 2v6a6 6 0 0 0 12 0V2"/><path d="M12 8v8"/><path d="M8 20h8"/></svg></div><span class="cat-card-name">Resfriado</span></div>
+                        <div class="cat-card" onclick="searchCategory('alergia antihistaminico')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></div><span class="cat-card-name">Alergias</span></div>
+                        <div class="cat-card" onclick="searchCategory('bebe panal')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M9 12h.01M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/></svg></div><span class="cat-card-name">Bebes</span></div>
+                        <div class="cat-card" onclick="searchCategory('colageno acido hialuronico')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M12 3c-1.13 0-2.17.61-2.83 1.57L4.73 11.5A4 4 0 0 0 8 18h8a4 4 0 0 0 3.27-6.5l-4.44-6.93A3.24 3.24 0 0 0 12 3Z"/></svg></div><span class="cat-card-name">Antiedad</span></div>
+                        <div class="cat-card" onclick="searchCategory('proteina whey')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/><circle cx="12" cy="12" r="10"/></svg></div><span class="cat-card-name">Deportivo</span></div>
+                        <div class="cat-card" onclick="searchCategory('compresas tampon')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><span class="cat-card-name">Menstrual</span></div>
+                        <div class="cat-card" onclick="searchCategory('lentillas solucion')"><div class="cat-card-icon"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div><span class="cat-card-name">Optica</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results" id="results"></div>
+            <div id="sentinel" style="height:10px;margin-top:20px"></div>
+            </div><!-- /searchArea -->
+
+            <!-- PLACEHOLDER VIEWS -->
+            <div class="view-panel" id="viewFavoritos">
+                <div class="view-header"><div><div class="view-title">Mis Favoritos</div><div class="view-subtitle">Productos que has guardado</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewHistorial">
+                <div class="view-header"><div><div class="view-title">Historial</div><div class="view-subtitle">Productos que has consultado</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewSuscripcion">
+                <div class="view-header"><div><div class="view-title">Suscripcion</div><div class="view-subtitle">Tu plan actual</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewDashboard">
+                <div class="view-header"><div class="view-title">Dashboard</div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewOfertas">
+                <div class="view-header"><div><div class="view-title">Ofertas del dia</div><div class="view-subtitle">Productos con mayor bajada de precio</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewListas">
+                <div class="view-header"><div><div class="view-title">Mis Listas</div><div class="view-subtitle">Cestas de productos para comparar</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><p>Disponible proximamente</p></div>
+            </div>
+            <div class="view-panel" id="viewPerfil">
+                <div class="view-header"><div><div class="view-title">Mi Perfil</div><div class="view-subtitle">Configuracion de tu cuenta</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><p>Disponible proximamente</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeAuthModal()">
+        <div class="modal-content" style="max-width:400px">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span id="authModalTitle">Iniciar sesion</span>
+                </div>
+                <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar sesion</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrarse</button>
+            </div>
+            <!-- Login form -->
+            <div id="authLoginForm">
+                <label class="auth-input-label">Email</label>
+                <input type="email" id="loginEmail" class="auth-input" placeholder="tu@email.com">
+                <label class="auth-input-label">Contrasena</label>
+                <input type="password" id="loginPassword" class="auth-input" placeholder="Tu contrasena">
+                <button class="btn-btn btn-submit" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Entrar</button>
+            </div>
+            <!-- Register form -->
+            <div id="authRegisterForm" style="display:none">
+                <label class="auth-input-label">Nombre</label>
+                <input type="text" id="regName" class="auth-input" placeholder="Tu nombre">
+                <label class="auth-input-label">Email</label>
+                <input type="email" id="regEmail" class="auth-input" placeholder="tu@email.com">
+                <label class="auth-input-label">Contrasena</label>
+                <input type="password" id="regPassword" class="auth-input" placeholder="Minimo 6 caracteres">
+                <button class="btn-btn btn-submit" style="width:100%;justify-content:center;margin-top:4px" onclick="doRegister()">Crear cuenta</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Volver arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="m18 15-6-6-6 6"/></svg></button>
+
+    <script>
+        // ===== SUPABASE CONFIG =====
+        const SUPABASE_URL = 'https://qebstbtokosvhngubnqj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlYnN0YnRva29zdmhuZ3VibnFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDA4NzQsImV4cCI6MjA4OTY3Njg3NH0.DDGEvJzvtdThKakK3WsF20UNlVepgds_bpuD9VTQxbc';
+
+        // Helper for Supabase REST calls
+        function supabaseHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+            };
+        }
+
+        // ===== ACCESSIBILITY =====
+        function toggleA11yPanel() {
+            const content = document.getElementById('a11yContent');
+            const chevron = document.getElementById('a11yChevron');
+            content.classList.toggle('open');
+            chevron.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+        let currentFontLevel = 0;
+        let currentSidebarLevel = 0;
+
+        function changeFontSize(dir) {
+            if (dir === 0) { currentFontLevel = 0; }
+            else { currentFontLevel = Math.max(-2, Math.min(3, currentFontLevel + dir)); }
+            const base = 16 + (currentFontLevel * 2);
+            document.documentElement.style.fontSize = base + 'px';
+            localStorage.setItem('fs-font', currentFontLevel);
+        }
+
+        function changeSidebar(dir) {
+            if (dir === 0) { currentSidebarLevel = 0; }
+            else { currentSidebarLevel = Math.max(-1, Math.min(1, dir)); }
+            const widths = {'-1': '180px', '0': '240px', '1': '300px'};
+            const w = widths[currentSidebarLevel];
+            document.documentElement.style.setProperty('--sidebar-w', w);
+            localStorage.setItem('fs-sidebar', currentSidebarLevel);
+        }
+
+        function toggleContrast() {
+            document.body.classList.toggle('high-contrast');
+            const btn = document.querySelector('.a11y-btn[onclick*="toggleContrast"]');
+            if (btn) btn.classList.toggle('active');
+            localStorage.setItem('fs-contrast', document.body.classList.contains('high-contrast'));
+        }
+
+        // Restore saved preferences
+        (function() {
+            const savedFont = localStorage.getItem('fs-font');
+            if (savedFont) { currentFontLevel = parseInt(savedFont); changeFontSize(0); currentFontLevel = parseInt(savedFont); document.documentElement.style.fontSize = (16 + currentFontLevel * 2) + 'px'; }
+            const savedSidebar = localStorage.getItem('fs-sidebar');
+            if (savedSidebar) { changeSidebar(parseInt(savedSidebar)); }
+            if (localStorage.getItem('fs-contrast') === 'true') { toggleContrast(); }
+        })();
+
+        // Sidebar toggle (mobile)
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        // ===== AUTH MODAL =====
+        function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+        function switchAuthTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('authLoginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('authRegisterForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('authModalTitle').textContent = tab === 'login' ? 'Iniciar sesion' : 'Crear cuenta';
+        }
+        function doLogin() {
+            // Placeholder - Supabase Auth will be connected later
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showToast('Completa todos los campos', 'error'); return; }
+            showToast('Autenticacion con Supabase Auth pendiente de configurar', 'info');
+            closeAuthModal();
+        }
+        function doRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            if (!name || !email || !password) { showToast('Completa todos los campos', 'error'); return; }
+            if (password.length < 6) { showToast('La contrasena debe tener al menos 6 caracteres', 'error'); return; }
+            showToast('Registro con Supabase Auth pendiente de configurar', 'info');
+            closeAuthModal();
+        }
+        function doLogout() {
+            showToast('Sesion cerrada', 'info');
+            document.getElementById('sidebarUser').style.display = 'none';
+            document.getElementById('sidebarLogin').style.display = 'flex';
+        }
+
+        // ===== DOM REFS =====
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const resultsDiv = document.getElementById('results');
+        const skeletonLoader = document.getElementById('skeletonLoader');
+        const heroState = document.getElementById('heroState');
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const statusCount = document.getElementById('statusCount');
+        const sortBar = document.getElementById('sortBar');
+        const backToTopBtn = document.getElementById('backToTop');
+        let debounceTimer = null, currentQuery = '', currentData = [], currentSort = 'relevancia', itemsPerPage = 50, currentPage = 1, observer = null;
+
+        // Search dropdown (categories)
+        const searchDD = document.getElementById('searchDropdown');
+        function pickCat(term) { searchDD.classList.remove('open'); searchCategory(term); }
+        searchInput.addEventListener('focus', () => { if (searchInput.value.trim().length === 0) searchDD.classList.add('open'); });
+        document.addEventListener('click', (e) => { if (!e.target.closest('.search-wrap')) searchDD.classList.remove('open'); });
+
+        searchInput.addEventListener('input', () => {
+            searchClear.classList.toggle('visible', searchInput.value.length > 0);
+            if (searchInput.value.trim().length > 0) searchDD.classList.remove('open');
+        });
+        searchClear.addEventListener('click', () => { searchInput.value=''; searchClear.classList.remove('visible'); resultsDiv.innerHTML=''; statusBar.classList.remove('visible'); sortBar.classList.remove('active'); heroState.style.display='block'; skeletonLoader.style.display='none'; searchInput.focus(); });
+        window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('visible', window.scrollY > 400); });
+        backToTopBtn.addEventListener('click', () => { window.scrollTo({top:0,behavior:'smooth'}); });
+
+        function showToast(message, type='info') { const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className='toast '+type; t.textContent=message; c.appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400)},3500); }
+
+        function searchCategory(term) { searchInput.value=term; searchClear.classList.add('visible'); heroState.style.display='none'; doSearch(term); }
+        searchInput.addEventListener('input', () => { clearTimeout(debounceTimer); const q=searchInput.value.trim(); if(q.length<2){resultsDiv.innerHTML='';statusBar.classList.remove('visible');sortBar.classList.remove('active');heroState.style.display=q.length===0?'block':'none';skeletonLoader.style.display='none';return;} heroState.style.display='none'; debounceTimer=setTimeout(()=>doSearch(q),300); });
+
+        // ===== SUPABASE SEARCH =====
+        async function doSearch(q, page=1) {
+            currentQuery = q;
+            currentPage = page;
+            if (page === 1) {
+                skeletonLoader.style.display = 'block';
+                resultsDiv.innerHTML = '';
+                statusBar.classList.remove('visible');
+                sortBar.classList.remove('active');
+                currentData = [];
+            }
+            try {
+                const response = await fetch(SUPABASE_URL + '/rest/v1/rpc/search_products', {
+                    method: 'POST',
+                    headers: supabaseHeaders(),
+                    body: JSON.stringify({
+                        search_term: q,
+                        page_num: page,
+                        page_size: itemsPerPage,
+                        sort_by: currentSort
+                    })
+                });
+                const data = await response.json();
+
+                if (q !== currentQuery) return;
+                if (page === 1) skeletonLoader.style.display = 'none';
+
+                // Handle Supabase error responses
+                if (data.error || data.message) {
+                    skeletonLoader.style.display = 'none';
+                    resultsDiv.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" stroke="#dc2626"/><path d="M12 9v4" stroke="#dc2626"/><path d="M12 17h.01" stroke="#dc2626" stroke-width="3"/></svg></div><div class="empty-title">Error de conexion</div><div class="empty-sub">No se pudo conectar a la base de datos. Verifica la configuracion de Supabase.</div></div>';
+                    return;
+                }
+
+                const total = data.total || 0;
+                const items = data.items || [];
+
+                if (page === 1) {
+                    currentData = items;
+                    updateSortButtons();
+                    renderResults(currentData, q, false, 0, total);
+                    setupIntersectionObserver(total);
+                } else {
+                    currentData = currentData.concat(items);
+                    renderResults(items, q, true, (page - 1) * itemsPerPage, total);
+                }
+            } catch(err) {
+                skeletonLoader.style.display = 'none';
+                resultsDiv.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" stroke="#dc2626"/><path d="M12 9v4" stroke="#dc2626"/><path d="M12 17h.01" stroke="#dc2626" stroke-width="3"/></svg></div><div class="empty-title">Error de conexion</div><div class="empty-sub">No se pudo conectar al servidor.</div></div>';
+            }
+        }
+
+        function setSort(s) { currentSort = s; updateSortButtons(); doSearch(currentQuery, 1); }
+        function setupIntersectionObserver(total) { if(observer) observer.disconnect(); const s=document.getElementById('sentinel'); if(!s) return; observer=new IntersectionObserver((e)=>{if(e[0].isIntersecting)loadMore(total)},{rootMargin:'200px'}); observer.observe(s); }
+        function loadMore(total) { if(!currentData||currentData.length===0||currentData.length>=total) return; doSearch(currentQuery,currentPage+1); }
+        function updateSortButtons() { document.querySelectorAll('.sort-btn').forEach(b=>{b.classList.toggle('active',b.dataset.sort===currentSort)}); }
+
+        // ===== RENDER RESULTS =====
+        function renderResults(data, query, append, startIndex, total) {
+            if (!append && (!data || data.length === 0)) {
+                statusBar.classList.remove('visible');
+                sortBar.classList.remove('active');
+                resultsDiv.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="11" cy="11" r="8" stroke="var(--primary)"/><path d="m21 21-4.3-4.3" stroke="var(--accent)"/></svg></div><div class="empty-title">Sin resultados para "' + escapeHtml(query) + '"</div><div class="empty-sub">Prueba con otro termino de busqueda.</div></div>';
+                return;
+            }
+            statusBar.classList.add('visible');
+            sortBar.classList.add('active');
+            statusText.textContent = 'Resultados para "' + query + '"';
+            statusCount.textContent = new Intl.NumberFormat('es-ES').format(total) + ' producto' + (total !== 1 ? 's' : '');
+
+            let html = '';
+            data.forEach((prod, idx) => {
+                const globalIdx = startIndex + idx;
+                const priceStr = prod.mejor_precio ? prod.mejor_precio.toFixed(2) + ' \u20ac' : '\u2014';
+
+                let savingsHtml = '';
+                if (prod.farmacias && prod.farmacias.length > 1) {
+                    const prices = prod.farmacias.filter(f => f.precio).map(f => f.precio);
+                    if (prices.length > 1) {
+                        const s = Math.max(...prices) - Math.min(...prices);
+                        if (s >= 0.10) savingsHtml = '<span class="savings-badge">Ahorra ' + s.toFixed(2) + ' \u20ac</span>';
+                    }
+                }
+
+                const bestPrice = prod.mejor_precio;
+                let farmaciasHtml = '';
+                if (prod.farmacias) {
+                    prod.farmacias.forEach(f => {
+                        const isBest = f.precio === bestPrice;
+                        const p = f.precio ? f.precio.toFixed(2) + ' \u20ac' : '\u2014';
+                        farmaciasHtml += '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(f.farmacia) + '</span><span class="pharmacy-price ' + (isBest ? 'best' : 'normal') + '">' + p + '</span><span class="stock-badge ' + (f.en_stock ? 'in-stock' : 'out-stock') + '">' + (f.en_stock ? 'Disponible' : 'Sin stock') + '</span><a href="' + escapeHtml(f.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar \u2192</a></div>';
+                    });
+                }
+
+                const metaParts = [(prod.num_farmacias || 0) + ' farmacia' + ((prod.num_farmacias || 0) !== 1 ? 's' : '')];
+
+                html += '<div class="product-card" id="card-' + globalIdx + '" onclick="toggleCard(' + globalIdx + ')" style="animation-delay:' + ((idx % itemsPerPage) * 0.03) + 's">' +
+                    '<div class="product-header">' +
+                        '<div class="product-info">' +
+                            '<div class="product-name" title="' + escapeHtml(prod.nombre || '') + '">' + highlightMatch(prod.nombre || '', query) + '</div>' +
+                            '<div class="product-meta">' + metaParts.map(function(m){return '<span>'+m+'</span>'}).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="product-price-area">' +
+                            '<div class="best-price">' + priceStr + '</div>' +
+                            '<div class="price-label">mejor precio</div>' +
+                            savingsHtml +
+                        '</div>' +
+                        '<div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>' +
+                    '</div>' +
+                    '<div class="product-detail"><div class="detail-inner">' + farmaciasHtml + '</div></div>' +
+                '</div>';
+            });
+            if (append) resultsDiv.insertAdjacentHTML('beforeend', html);
+            else resultsDiv.innerHTML = html;
+        }
+
+        function toggleCard(idx) { document.getElementById('card-' + idx).classList.toggle('expanded'); }
+        function highlightMatch(text, query) {
+            const e = escapeHtml(text);
+            const q = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return e.replace(new RegExp('(' + q + ')', 'gi'), '<mark class="search-highlight">$1</mark>');
+        }
+        function escapeHtml(str) { if (!str) return ''; const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+        // ===== VIEW SWITCHING =====
+        const allViews = { dashboard:'viewDashboard', buscador:'searchArea', ofertas:'viewOfertas', listas:'viewListas', favoritos:'viewFavoritos', historial:'viewHistorial', suscripcion:'viewSuscripcion', perfil:'viewPerfil' };
+        function switchView(view) {
+            Object.values(allViews).forEach(id => { const el = document.getElementById(id); if (el) { el.style.display = 'none'; el.classList.remove('active'); } });
+            const target = document.getElementById(allViews[view]);
+            if (target) { target.style.display = 'block'; target.classList.add('active'); }
+            const tw = document.querySelector('.topbar-wrap'); if (tw) tw.style.display = view === 'buscador' ? 'block' : 'none';
+            document.querySelectorAll('.sidebar-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+            // Close sidebar on mobile
+            if (window.innerWidth <= 900) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+        }
+    </script>
+</body>
+</html>
