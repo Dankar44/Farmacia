@@ -9,6 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
+        /* Auth: hide app until logged in */
+        .sidebar, .app-main, .hamburger { display:none !important; }
+        #authWall { display:flex; }
+        body.authenticated .sidebar { display:flex !important; }
+        body.authenticated .app-main { display:flex !important; }
+        body.authenticated #authWall { display:none !important; }
         :root {
             --bg-body:#f5f6f8; --bg-white:#ffffff; --bg-light:#f9fafb;
             --primary:#00a99d; --primary-dark:#008f85; --primary-light:#e0f7f5;
@@ -407,7 +413,7 @@
 <body>
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar" style="display:none">
+    <aside class="sidebar" id="sidebar">
         <a class="sidebar-logo" href="/">
             <svg class="sidebar-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="url(#cg)"/>
@@ -520,7 +526,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- Main content -->
-    <div class="app-main" style="display:none">
+    <div class="app-main">
         <!-- Top search bar -->
         <div class="topbar-wrap">
         <div class="topbar">
@@ -914,21 +920,14 @@
         }
 
         function applyAuthState() {
-            const sidebar = document.querySelector('.sidebar');
-            const appMain = document.querySelector('.app-main');
-            const authWall = document.getElementById('authWall');
             if (currentUser) {
-                if (sidebar) sidebar.style.display = 'flex';
-                if (appMain) appMain.style.display = 'flex';
-                if (authWall) authWall.style.display = 'none';
+                document.body.classList.add('authenticated');
                 const userEl = document.getElementById('sidebarUser');
                 const loginEl = document.getElementById('sidebarLogin');
                 if (userEl) { userEl.style.display = 'flex'; userEl.querySelector('.sidebar-user-name').textContent = currentUser.nombre; }
                 if (loginEl) loginEl.style.display = 'none';
             } else {
-                if (sidebar) sidebar.style.display = 'none';
-                if (appMain) appMain.style.display = 'none';
-                if (authWall) authWall.style.display = 'flex';
+                document.body.classList.remove('authenticated');
             }
         }
 
