@@ -10,11 +10,10 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         /* Auth: hide app until logged in */
-        .sidebar, .app-main, .hamburger { display:none !important; }
+        .sidebar, .app-main, .mobile-topbar { display:none !important; }
         #authWall { display:flex; }
         body.authenticated .sidebar { display:flex !important; }
         body.authenticated .app-main { display:flex !important; }
-        body.authenticated .hamburger { display:none; }
         body.authenticated #authWall { display:none !important; }
         :root {
             --bg-body:#f5f6f8; --bg-white:#ffffff; --bg-light:#f9fafb;
@@ -157,14 +156,19 @@
         }
         .sidebar-logout:hover { background:var(--red-light); color:var(--red); }
 
-        /* Mobile hamburger */
-        .hamburger {
-            display:none; position:fixed; top:12px; left:12px; z-index:300;
-            width:40px; height:40px; border-radius:10px;
-            background:var(--bg-white); border:1px solid var(--border);
-            box-shadow:var(--shadow-sm); cursor:pointer;
-            align-items:center; justify-content:center;
+        /* Mobile top bar (like NutriApp) */
+        .mobile-topbar {
+            position:fixed; top:0; left:0; right:0; z-index:140;
+            height:56px; background:var(--bg-white); border-bottom:1px solid var(--border-light);
+            align-items:center; padding:0 16px; gap:12px;
         }
+        .mobile-topbar .hamburger-btn {
+            width:40px; height:40px; border-radius:10px; border:none;
+            background:transparent; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .mobile-topbar .hamburger-btn:hover { background:var(--bg-light); }
         .sidebar-overlay {
             display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3);
             z-index:199;
@@ -679,13 +683,12 @@
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
             .sidebar-overlay.open { display:block; }
-            body.authenticated .hamburger { display:flex !important; }
-            body.authenticated .hamburger.hidden { display:none !important; }
-            .app-main { margin-left:0 !important; }
-            /* Topbar: leave space for hamburger on the left */
-            .topbar { padding:12px 16px 12px 60px; }
-            /* View headers: indent title so hamburger doesn't cover it */
-            .view-header { padding-left:48px; }
+            /* Show mobile top bar, hide desktop sidebar */
+            body.authenticated .mobile-topbar { display:flex !important; }
+            .sidebar { transform:translateX(-100%); }
+            .app-main { margin-left:0 !important; padding-top:56px; }
+            /* Topbar: normal padding, no indent needed */
+            .topbar { padding:12px 16px; }
             /* Auth wall: stack vertically */
             .auth-wall { flex-direction:column; }
             .auth-wall-brand { width:100%; padding:40px 28px 32px; min-height:auto; }
@@ -697,7 +700,7 @@
         @media (max-width:600px) {
             /* Content & topbar padding */
             .content { padding:16px 16px 48px; }
-            .topbar { padding:10px 12px 10px 58px; }
+            .topbar { padding:10px 12px; }
             /* Search */
             .search-input { height:40px; font-size:0.88rem; }
             .search-dropdown { padding:12px 14px; }
@@ -918,10 +921,19 @@
         </div>
     </aside>
 
-    <!-- Mobile hamburger -->
-    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
+    <!-- Mobile top bar (visible on <=900px) -->
+    <div class="mobile-topbar" id="mobileTopbar">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;flex-shrink:0">
+            <path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="url(#cg3)"/>
+            <circle cx="12" cy="12" r="5.5" fill="#fff" stroke="#00796b" stroke-width="2"/>
+            <path d="M14 8.5C14 8.5 15 9.5 15.5 10.5C16 11.5 14 13.5 11 14.5C11 14.5 9 10.5 14 8.5Z" fill="#00a99d"/>
+            <defs><linearGradient id="cg3" x1="3" y1="2" x2="24" y2="22"><stop stop-color="#00a99d"/><stop offset="1" stop-color="#00796b"/></linearGradient></defs>
+        </svg>
+        <span style="font-weight:800;font-size:0.95rem;color:var(--text-dark)">Farma<span style="color:var(--primary)">Search</span></span>
+    </div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- Main content -->
@@ -1370,7 +1382,6 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
-            document.getElementById('hamburger').classList.toggle('hidden');
         }
 
         // ===== AUTH =====
