@@ -1398,6 +1398,8 @@
                 closeAuthModal();
                 applyAuthState();
                 await enrichUserData();
+                await loadUserAlerts();
+                await loadUserHistorial();
                 showToast('Bienvenido, ' + data.nombre, 'success');
             } catch(e) { showToast('Error de conexion', 'error'); }
         }
@@ -1419,14 +1421,20 @@
                 localStorage.setItem('fs_user', JSON.stringify(data));
                 closeAuthModal();
                 applyAuthState();
+                await loadUserAlerts();
+                await loadUserHistorial();
                 showToast('Cuenta creada. Bienvenido!', 'success');
             } catch(e) { showToast('Error de conexion', 'error'); }
         }
 
         function doLogout() {
             currentUser = null;
+            alertsCache = [];
+            historialCache = [];
+            catalogoCache = [];
             localStorage.removeItem('fs_user');
             applyAuthState();
+            updateAlertsBadge();
             showToast('Sesion cerrada', 'info');
         }
 
@@ -1555,6 +1563,8 @@
                 }
                 applyAuthState();
                 await enrichUserData();
+                await loadUserAlerts();
+                await loadUserHistorial();
 
                 // TODO: Email de verificacion (requiere backend Flask/Railway con SMTP)
                 // Cuando el backend este activo, descomentar:
@@ -1619,11 +1629,18 @@
                 localStorage.setItem('fs_user', JSON.stringify(data));
                 applyAuthState();
                 await enrichUserData();
+                await loadUserAlerts();
+                await loadUserHistorial();
             } catch(e) { showWallMsg('Error de conexion'); }
         }
         // Apply auth state on load
         applyAuthState();
         enrichUserData();
+        // Load user data from Supabase on page load if already logged in
+        if (currentUser && currentUser.id) {
+            loadUserAlerts();
+            loadUserHistorial();
+        }
 
         // ===== DOM REFS =====
         const searchInput = document.getElementById('searchInput');
@@ -1896,11 +1913,11 @@
             const el = document.getElementById('dashContent');
             el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">Cargando dashboard...</div>';
 
-            // Read local data
+            // Read cached data (Supabase-backed)
             const hist = getHistorial();
             const alerts = getAlerts();
-            const catalogo = JSON.parse(localStorage.getItem(CATALOGO_KEY) || '[]');
-            const totalProducts = hist.reduce((sum, h) => sum + h.productos.length, 0);
+            const catalogo = catalogoCache.length > 0 ? catalogoCache : JSON.parse(localStorage.getItem(CATALOGO_KEY) || '[]');
+            const totalProducts = hist.reduce((sum, h) => sum + (h.productos || []).length, 0);
             const totalSearches = hist.length;
             const totalAlerts = alerts.length;
             const alertsChanged = alerts.filter(a => !a.leido).length;
@@ -2237,61 +2254,135 @@
             showToast('Perfil guardado correctamente', 'success');
         }
 
-        // ===== ALERTAS / SEGUIMIENTO (localStorage) =====
-        const ALERTS_KEY = 'fs_alertas';
+        // ===== ALERTAS / SEGUIMIENTO (Supabase + in-memory cache) =====
+        const ALERTS_KEY = 'fs_alertas'; // localStorage fallback key
         const ALERTS_MAX = 30;
+        let alertsCache = [];
+
+        async function loadUserAlerts() {
+            if (!currentUser || !currentUser.id) { alertsCache = []; updateAlertsBadge(); return; }
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/alertas_precio?usuario_id=eq.' + currentUser.id + '&order=fecha_creacion.desc', { headers: supabaseHeaders() });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const rows = await res.json();
+                alertsCache = (Array.isArray(rows) ? rows : []).map(function(r) {
+                    return {
+                        _id: r.id,
+                        nombre: r.nombre_display || r.nombre_normalizado,
+                        nombre_normalizado: r.nombre_normalizado,
+                        precio_guardado: r.precio_objetivo,
+                        precio_actual: r.precio_actual,
+                        activa: r.activa !== false,
+                        leido: r.notificada === true,
+                        fecha: r.fecha_creacion
+                    };
+                });
+            } catch(e) {
+                // Fallback to localStorage
+                try { alertsCache = JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch(e2) { alertsCache = []; }
+            }
+            updateAlertsBadge();
+        }
 
         function getAlerts() {
-            try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch(e) { return []; }
-        }
-        function saveAlerts(alerts) {
-            localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts.slice(0, ALERTS_MAX)));
+            return alertsCache;
         }
         function isAlertActive(nombre) {
-            return getAlerts().some(a => a.nombre === nombre);
+            return alertsCache.some(function(a) { return a.nombre === nombre; });
         }
         function hasAlertChanged(nombre, currentPrice) {
-            const alert = getAlerts().find(a => a.nombre === nombre);
+            var alert = alertsCache.find(function(a) { return a.nombre === nombre; });
             if (!alert || !alert.precio_guardado || !currentPrice) return false;
             return Math.abs(alert.precio_guardado - currentPrice) >= 0.01 && !alert.leido;
         }
 
-        function toggleAlertByIdx(globalIdx, btn) {
-            const prod = currentData[globalIdx];
+        async function toggleAlertByIdx(globalIdx, btn) {
+            var prod = currentData[globalIdx];
             if (!prod) return;
-            const nombre = prod.nombre;
-            const precio = prod.mejor_precio || null;
-            const farmacia = prod.farmacia || '';
-            const url = prod.url || '';
-            const alerts = getAlerts();
-            const existing = alerts.findIndex(a => a.nombre === nombre);
+            var nombre = prod.nombre;
+            var precio = prod.mejor_precio || null;
+            var existing = alertsCache.findIndex(function(a) { return a.nombre === nombre; });
+
+            if (!currentUser || !currentUser.id) {
+                showToast('Inicia sesion para usar alertas', 'error');
+                return;
+            }
+
             if (existing >= 0) {
-                alerts.splice(existing, 1);
+                // Remove from Supabase
+                var alertId = alertsCache[existing]._id;
+                try {
+                    if (alertId) {
+                        await fetch(SUPABASE_URL + '/rest/v1/alertas_precio?id=eq.' + alertId, { method: 'DELETE', headers: supabaseHeaders() });
+                    }
+                } catch(e) {}
+                alertsCache.splice(existing, 1);
                 btn.classList.remove('active', 'changed');
                 showToast('Alerta eliminada', 'info');
             } else {
-                alerts.unshift({ nombre, precio_guardado: precio, farmacia, url, fecha: new Date().toISOString(), leido: true });
+                // Insert into Supabase
+                var nombreNorm = nombre.toLowerCase();
+                var newAlert = {
+                    usuario_id: currentUser.id,
+                    nombre_normalizado: nombreNorm,
+                    nombre_display: nombre,
+                    precio_objetivo: precio,
+                    precio_actual: precio,
+                    activa: true,
+                    notificada: true
+                };
+                try {
+                    var res = await fetch(SUPABASE_URL + '/rest/v1/alertas_precio', {
+                        method: 'POST',
+                        headers: Object.assign({}, supabaseHeaders(), { 'Prefer': 'return=representation' }),
+                        body: JSON.stringify(newAlert)
+                    });
+                    var rows = await res.json();
+                    var inserted = Array.isArray(rows) ? rows[0] : rows;
+                    alertsCache.unshift({
+                        _id: inserted.id,
+                        nombre: nombre,
+                        nombre_normalizado: nombreNorm,
+                        precio_guardado: precio,
+                        precio_actual: precio,
+                        activa: true,
+                        leido: true,
+                        fecha: inserted.fecha_creacion || new Date().toISOString()
+                    });
+                } catch(e) {
+                    // Fallback: add to cache without DB id
+                    alertsCache.unshift({
+                        _id: null,
+                        nombre: nombre,
+                        nombre_normalizado: nombre.toLowerCase(),
+                        precio_guardado: precio,
+                        precio_actual: precio,
+                        activa: true,
+                        leido: true,
+                        fecha: new Date().toISOString()
+                    });
+                }
                 btn.classList.add('active');
                 btn.classList.remove('changed');
                 showToast('Alerta activada', 'success');
             }
-            saveAlerts(alerts);
+            // Sync fallback localStorage
+            try { localStorage.setItem(ALERTS_KEY, JSON.stringify(alertsCache.slice(0, ALERTS_MAX))); } catch(e) {}
             updateAlertsBadge();
         }
 
         function updateAlertsBadge() {
-            const alerts = getAlerts();
-            const unread = alerts.filter(a => !a.leido).length;
-            const dot = document.getElementById('alertasDot');
+            var unread = alertsCache.filter(function(a) { return !a.leido; }).length;
+            var dot = document.getElementById('alertasDot');
             if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
         }
 
-        function checkAlertChanges(searchResults) {
-            const alerts = getAlerts();
-            if (alerts.length === 0) return;
-            let changed = false;
-            searchResults.forEach(prod => {
-                const alert = alerts.find(a => a.nombre === prod.nombre);
+        async function checkAlertChanges(searchResults) {
+            if (alertsCache.length === 0) return;
+            var changed = false;
+            var patchPromises = [];
+            searchResults.forEach(function(prod) {
+                var alert = alertsCache.find(function(a) { return a.nombre === prod.nombre; });
                 if (alert && prod.mejor_precio && alert.precio_guardado) {
                     if (Math.abs(alert.precio_guardado - prod.mejor_precio) >= 0.01) {
                         alert.precio_anterior = alert.precio_guardado;
@@ -2299,34 +2390,45 @@
                         alert.leido = false;
                         alert.fecha_cambio = new Date().toISOString();
                         changed = true;
+                        // Update Supabase
+                        if (alert._id && currentUser && currentUser.id) {
+                            patchPromises.push(
+                                fetch(SUPABASE_URL + '/rest/v1/alertas_precio?id=eq.' + alert._id, {
+                                    method: 'PATCH', headers: supabaseHeaders(),
+                                    body: JSON.stringify({ precio_actual: prod.mejor_precio, notificada: false })
+                                }).catch(function() {})
+                            );
+                        }
                     }
                 }
             });
-            if (changed) { saveAlerts(alerts); updateAlertsBadge(); }
+            if (changed) {
+                await Promise.all(patchPromises);
+                try { localStorage.setItem(ALERTS_KEY, JSON.stringify(alertsCache.slice(0, ALERTS_MAX))); } catch(e) {}
+                updateAlertsBadge();
+            }
         }
 
         let alertCardCounter = 10000;
 
         function loadAlertasView() {
-            const el = document.getElementById('alertasList');
-            const alerts = getAlerts();
+            var el = document.getElementById('alertasList');
+            var alerts = alertsCache;
             if (alerts.length === 0) {
                 el.innerHTML = '<div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><p>No tienes alertas activas.<br>Busca un producto y pulsa la campanita para seguirlo.</p></div>';
                 return;
             }
 
-            let html = '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">' + alerts.length + ' producto' + (alerts.length !== 1 ? 's' : '') + ' en seguimiento</div>';
+            var html = '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">' + alerts.length + ' producto' + (alerts.length !== 1 ? 's' : '') + ' en seguimiento</div>';
 
             alerts.forEach(function(a, i) {
-                const cardIdx = alertCardCounter++;
-                const priceStr = a.precio_guardado ? a.precio_guardado.toFixed(2) + ' \u20ac' : '\u2014';
-                const farmaciaHtml = a.farmacia ?
-                    '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(a.farmacia) + '</span><span class="pharmacy-price best">' + priceStr + '</span>' +
-                    '<a href="' + escapeHtml(a.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar \u2192</a></div>' : '';
+                var cardIdx = alertCardCounter++;
+                var priceStr = a.precio_guardado ? a.precio_guardado.toFixed(2) + ' \u20ac' : '\u2014';
+                var farmaciaHtml = '';
 
-                let changeInfo = '';
+                var changeInfo = '';
                 if (!a.leido && a.precio_anterior && a.precio_actual) {
-                    const diff = a.precio_actual - a.precio_anterior;
+                    var diff = a.precio_actual - a.precio_anterior;
                     changeInfo = '<div style="padding:6px 14px;margin-bottom:2px;background:' + (diff < 0 ? 'var(--green-light)' : 'var(--red-light)') + ';border-radius:var(--radius) var(--radius) 0 0;font-size:0.78rem;font-weight:600;color:' + (diff < 0 ? 'var(--green)' : 'var(--red)') + '">' + (diff < 0 ? '\u2193 Precio bajo' : '\u2191 Precio subio') + ': ' + a.precio_anterior.toFixed(2) + ' \u2192 ' + a.precio_actual.toFixed(2) + ' \u20ac</div>';
                 }
 
@@ -2335,11 +2437,11 @@
                         '<div class="product-header">' +
                             '<div class="product-info">' +
                                 '<div class="product-name">' + escapeHtml(a.nombre) + '</div>' +
-                                '<div class="product-meta"><span>' + escapeHtml(a.farmacia || '') + '</span><span>Guardado: ' + new Date(a.fecha).toLocaleDateString('es-ES') + '</span></div>' +
+                                '<div class="product-meta"><span>Guardado: ' + new Date(a.fecha).toLocaleDateString('es-ES') + '</span></div>' +
                             '</div>' +
                             '<div class="product-price-area">' +
                                 '<div class="best-price">' + priceStr + '</div>' +
-                                '<div class="price-label">precio guardado</div>' +
+                                '<div class="price-label">precio objetivo</div>' +
                             '</div>' +
                             '<button class="alert-bell active" onclick="event.stopPropagation();removeAlert(' + i + ')" title="Eliminar alerta"><svg viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>' +
                             '<div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>' +
@@ -2351,78 +2453,164 @@
             el.innerHTML = html;
         }
 
-        function removeAlert(idx) {
-            const alerts = getAlerts();
-            alerts.splice(idx, 1);
-            saveAlerts(alerts);
+        async function removeAlert(idx) {
+            var alert = alertsCache[idx];
+            if (!alert) return;
+            // Delete from Supabase
+            if (alert._id && currentUser && currentUser.id) {
+                try {
+                    await fetch(SUPABASE_URL + '/rest/v1/alertas_precio?id=eq.' + alert._id, { method: 'DELETE', headers: supabaseHeaders() });
+                } catch(e) {}
+            }
+            alertsCache.splice(idx, 1);
+            try { localStorage.setItem(ALERTS_KEY, JSON.stringify(alertsCache.slice(0, ALERTS_MAX))); } catch(e) {}
             loadAlertasView();
             updateAlertsBadge();
             showToast('Alerta eliminada', 'info');
         }
 
-        function markAllAlertsRead() {
-            const alerts = getAlerts();
-            alerts.forEach(a => { a.leido = true; });
-            saveAlerts(alerts);
+        async function markAllAlertsRead() {
+            var patchPromises = [];
+            alertsCache.forEach(function(a) {
+                a.leido = true;
+                if (a._id && currentUser && currentUser.id) {
+                    patchPromises.push(
+                        fetch(SUPABASE_URL + '/rest/v1/alertas_precio?id=eq.' + a._id, {
+                            method: 'PATCH', headers: supabaseHeaders(),
+                            body: JSON.stringify({ notificada: true })
+                        }).catch(function() {})
+                    );
+                }
+            });
+            await Promise.all(patchPromises);
+            try { localStorage.setItem(ALERTS_KEY, JSON.stringify(alertsCache.slice(0, ALERTS_MAX))); } catch(e) {}
             updateAlertsBadge();
             loadAlertasView();
             showToast('Alertas marcadas como leidas', 'info');
         }
 
-        // Check for price changes on search results
+        // Initialize badge on load
         updateAlertsBadge();
 
-        // ===== HISTORIAL (localStorage) =====
+        // ===== HISTORIAL (Supabase + localStorage product fallback) =====
         const HIST_KEY = 'fs_historial';
         const HIST_MAX = 15;
         const HIST_MAX_PRODUCTS = 8;
+        let historialCache = [];
 
         function getHistorial() {
-            try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch(e) { return []; }
+            return historialCache;
         }
 
-        function saveHistorial(hist) {
-            localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, HIST_MAX)));
+        // Load historial product details from localStorage (products not yet in Supabase)
+        function getHistorialProducts() {
+            try { return JSON.parse(localStorage.getItem(HIST_KEY + '_products') || '{}'); } catch(e) { return {}; }
+        }
+        function saveHistorialProducts(prods) {
+            try { localStorage.setItem(HIST_KEY + '_products', JSON.stringify(prods)); } catch(e) {}
         }
 
-        function addToHistorial(termino, productoNombre, precio) {
-            const hist = getHistorial();
-            const term = termino.trim().toLowerCase();
-            // Find or create entry for this search term
-            let entry = hist.find(h => h.termino.toLowerCase() === term);
-            if (!entry) {
-                entry = { termino: termino.trim(), fecha: new Date().toISOString(), productos: [] };
-                hist.unshift(entry);
-            } else {
+        async function loadUserHistorial() {
+            if (!currentUser || !currentUser.id) { historialCache = []; return; }
+            try {
+                var res = await fetch(SUPABASE_URL + '/rest/v1/historial_busquedas?usuario_id=eq.' + currentUser.id + '&order=fecha.desc&limit=' + HIST_MAX, { headers: supabaseHeaders() });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                var rows = await res.json();
+                var prodMap = getHistorialProducts();
+                historialCache = (Array.isArray(rows) ? rows : []).map(function(r) {
+                    var termLower = (r.termino || '').toLowerCase();
+                    return {
+                        _id: r.id,
+                        termino: r.termino,
+                        fecha: r.fecha,
+                        resultados_count: r.resultados_count || 0,
+                        productos: (prodMap[termLower] || [])
+                    };
+                });
+            } catch(e) {
+                // Fallback to localStorage
+                try { historialCache = JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch(e2) { historialCache = []; }
+            }
+        }
+
+        async function addToHistorial(termino, productoNombre, precio) {
+            var term = termino.trim().toLowerCase();
+            var cleanName = productoNombre.replace(/<[^>]*>/g, '').trim();
+
+            // Save product details locally (keyed by search term)
+            var prodMap = getHistorialProducts();
+            if (!prodMap[term]) prodMap[term] = [];
+            if (!prodMap[term].find(function(p) { return p.nombre === cleanName; })) {
+                prodMap[term].unshift({ nombre: cleanName, precio: precio, fecha: new Date().toISOString() });
+                if (prodMap[term].length > HIST_MAX_PRODUCTS) prodMap[term].pop();
+            }
+            saveHistorialProducts(prodMap);
+
+            // Update or insert in cache
+            var existing = historialCache.find(function(h) { return h.termino.toLowerCase() === term; });
+            if (existing) {
+                existing.fecha = new Date().toISOString();
+                existing.productos = prodMap[term] || [];
                 // Move to top
-                const idx = hist.indexOf(entry);
-                if (idx > 0) { hist.splice(idx, 1); hist.unshift(entry); }
-                entry.fecha = new Date().toISOString();
+                var idx = historialCache.indexOf(existing);
+                if (idx > 0) { historialCache.splice(idx, 1); historialCache.unshift(existing); }
             }
-            // Add product if not already there
-            const cleanName = productoNombre.replace(/<[^>]*>/g, '').trim();
-            if (!entry.productos.find(p => p.nombre === cleanName)) {
-                entry.productos.unshift({ nombre: cleanName, precio: precio, fecha: new Date().toISOString() });
-                if (entry.productos.length > HIST_MAX_PRODUCTS) entry.productos.pop();
+
+            // Insert search term into Supabase (only if no recent identical entry)
+            if (!existing && currentUser && currentUser.id) {
+                try {
+                    var res = await fetch(SUPABASE_URL + '/rest/v1/historial_busquedas', {
+                        method: 'POST',
+                        headers: Object.assign({}, supabaseHeaders(), { 'Prefer': 'return=representation' }),
+                        body: JSON.stringify({
+                            usuario_id: currentUser.id,
+                            termino: termino.trim(),
+                            resultados_count: 0
+                        })
+                    });
+                    var rows = await res.json();
+                    var inserted = Array.isArray(rows) ? rows[0] : rows;
+                    historialCache.unshift({
+                        _id: inserted.id,
+                        termino: termino.trim(),
+                        fecha: inserted.fecha || new Date().toISOString(),
+                        resultados_count: 0,
+                        productos: prodMap[term] || []
+                    });
+                } catch(e) {
+                    historialCache.unshift({
+                        _id: null,
+                        termino: termino.trim(),
+                        fecha: new Date().toISOString(),
+                        resultados_count: 0,
+                        productos: prodMap[term] || []
+                    });
+                }
             }
-            saveHistorial(hist);
+            // Trim cache
+            if (historialCache.length > HIST_MAX) historialCache = historialCache.slice(0, HIST_MAX);
         }
 
-        function loadHistorialView() {
-            const el = document.getElementById('histList');
-            const hist = getHistorial();
+        async function loadHistorialView() {
+            var el = document.getElementById('histList');
+            // Reload from Supabase if cache is empty and user is logged in
+            if (historialCache.length === 0 && currentUser && currentUser.id) {
+                await loadUserHistorial();
+            }
+            var hist = historialCache;
             if (hist.length === 0) {
                 el.innerHTML = '<div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>No has buscado nada todavia.<br>Busca productos y despliega tarjetas para verlos aqui.</p></div>';
                 return;
             }
-            el.innerHTML = hist.map((h, i) => {
-                const timeAgo = getTimeAgo(h.fecha);
-                const prodsHtml = h.productos.map(p =>
-                    '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-light);border-radius:8px;margin-top:4px">' +
+            el.innerHTML = hist.map(function(h, i) {
+                var timeAgo = getTimeAgo(h.fecha);
+                var prodsHtml = (h.productos || []).map(function(p) {
+                    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-light);border-radius:8px;margin-top:4px">' +
                         '<div style="flex:1;min-width:0"><div style="font-size:0.8rem;font-weight:500;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(p.nombre) + '</div></div>' +
                         (p.precio ? '<div style="font-size:0.82rem;font-weight:700;color:var(--primary-dark);flex-shrink:0">' + escapeHtml(p.precio) + '</div>' : '') +
-                    '</div>'
-                ).join('');
+                    '</div>';
+                }).join('');
+                var prodCount = (h.productos || []).length;
                 return '<div style="background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px;margin-bottom:10px">' +
                     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
                         '<div style="display:flex;align-items:center;gap:10px">' +
@@ -2435,32 +2623,50 @@
                             '<button onclick="removeHistEntry(' + i + ')" style="padding:5px 8px;font-size:0.72rem;background:var(--red-light);color:var(--red);border:none;border-radius:6px;cursor:pointer" title="Eliminar">&#10005;</button>' +
                         '</div>' +
                     '</div>' +
-                    (h.productos.length > 0 ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">' + h.productos.length + ' producto' + (h.productos.length !== 1 ? 's' : '') + ' consultado' + (h.productos.length !== 1 ? 's' : '') + '</div>' + prodsHtml : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic">Busqueda sin productos desplegados</div>') +
+                    (prodCount > 0 ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">' + prodCount + ' producto' + (prodCount !== 1 ? 's' : '') + ' consultado' + (prodCount !== 1 ? 's' : '') + '</div>' + prodsHtml : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic">Busqueda sin productos desplegados</div>') +
                 '</div>';
             }).join('');
         }
 
         function getTimeAgo(dateStr) {
-            const diff = Date.now() - new Date(dateStr).getTime();
-            const mins = Math.floor(diff / 60000);
+            var diff = Date.now() - new Date(dateStr).getTime();
+            var mins = Math.floor(diff / 60000);
             if (mins < 1) return 'ahora';
             if (mins < 60) return 'hace ' + mins + ' min';
-            const hours = Math.floor(mins / 60);
+            var hours = Math.floor(mins / 60);
             if (hours < 24) return 'hace ' + hours + 'h';
-            const days = Math.floor(hours / 24);
+            var days = Math.floor(hours / 24);
             if (days < 7) return 'hace ' + days + 'd';
             return new Date(dateStr).toLocaleDateString('es-ES', {day:'numeric',month:'short'});
         }
 
-        function removeHistEntry(idx) {
-            const hist = getHistorial();
-            hist.splice(idx, 1);
-            saveHistorial(hist);
+        async function removeHistEntry(idx) {
+            var entry = historialCache[idx];
+            if (!entry) return;
+            // Delete from Supabase
+            if (entry._id && currentUser && currentUser.id) {
+                try {
+                    await fetch(SUPABASE_URL + '/rest/v1/historial_busquedas?id=eq.' + entry._id, { method: 'DELETE', headers: supabaseHeaders() });
+                } catch(e) {}
+            }
+            // Remove local product data for this term
+            var prodMap = getHistorialProducts();
+            delete prodMap[(entry.termino || '').toLowerCase()];
+            saveHistorialProducts(prodMap);
+            historialCache.splice(idx, 1);
             loadHistorialView();
         }
 
-        function clearHistorial() {
-            localStorage.removeItem(HIST_KEY);
+        async function clearHistorial() {
+            // Delete all from Supabase for this user
+            if (currentUser && currentUser.id) {
+                try {
+                    await fetch(SUPABASE_URL + '/rest/v1/historial_busquedas?usuario_id=eq.' + currentUser.id, { method: 'DELETE', headers: supabaseHeaders() });
+                } catch(e) {}
+            }
+            historialCache = [];
+            // Clear local product data
+            try { localStorage.removeItem(HIST_KEY + '_products'); localStorage.removeItem(HIST_KEY); } catch(e) {}
             loadHistorialView();
             showToast('Historial borrado', 'info');
         }
@@ -2477,58 +2683,130 @@
             });
         }
 
-        // ===== CATALOGO =====
+        // ===== CATALOGO (Supabase + localStorage fallback) =====
         const CATALOGO_KEY = 'fs_catalogo';
+        let catalogoCache = [];
 
         function downloadCatalogoTemplate() {
             if (typeof XLSX === 'undefined') { showToast('Error: libreria Excel no cargada', 'error'); return; }
-            const data = [
+            var data = [
                 ['Nombre', 'Precio', 'EAN'],
                 ['Paracetamol 500mg 20 comprimidos', 1.50, ''],
                 ['Crema hidratante Avene 400ml', 14.99, ''],
                 ['Proteccion solar SPF50 200ml', 12.00, '']
             ];
-            const ws = XLSX.utils.aoa_to_sheet(data);
+            var ws = XLSX.utils.aoa_to_sheet(data);
             ws['!cols'] = [{wch:40},{wch:10},{wch:16}];
-            const wb = XLSX.utils.book_new();
+            var wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Catalogo');
             XLSX.writeFile(wb, 'plantilla_catalogo_farmasearch.xlsx');
             showToast('Plantilla descargada', 'success');
         }
 
         function importCatalogoExcel(input) {
-            const file = input.files[0];
+            var file = input.files[0];
             if (!file) return;
             if (typeof XLSX === 'undefined') { showToast('Error: libreria Excel no cargada', 'error'); return; }
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            var reader = new FileReader();
+            reader.onload = async function(e) {
                 try {
-                    const wb = XLSX.read(e.target.result, {type:'array'});
-                    const ws = wb.Sheets[wb.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(ws);
+                    var wb = XLSX.read(e.target.result, {type:'array'});
+                    var ws = wb.Sheets[wb.SheetNames[0]];
+                    var rows = XLSX.utils.sheet_to_json(ws);
                     if (rows.length === 0) { showToast('El archivo esta vacio', 'error'); return; }
-                    const products = rows.map(r => ({
-                        nombre: r.Nombre || r.nombre || r.NOMBRE || r.Producto || r.producto || '',
-                        precio: parseFloat(r.Precio || r.precio || r.PRECIO || r.PVP || r.pvp || 0) || null,
-                        ean: (r.EAN || r.ean || r.Codigo || r.codigo || '').toString()
-                    })).filter(p => p.nombre.trim().length > 0);
+                    var products = rows.map(function(r) {
+                        return {
+                            nombre: r.Nombre || r.nombre || r.NOMBRE || r.Producto || r.producto || '',
+                            precio: parseFloat(r.Precio || r.precio || r.PRECIO || r.PVP || r.pvp || 0) || null,
+                            ean: (r.EAN || r.ean || r.Codigo || r.codigo || '').toString()
+                        };
+                    }).filter(function(p) { return p.nombre.trim().length > 0; });
                     if (products.length === 0) { showToast('No se encontraron productos. Asegurate de que la columna se llama "Nombre"', 'error'); return; }
-                    localStorage.setItem(CATALOGO_KEY, JSON.stringify(products));
+
+                    // Save to Supabase
+                    if (currentUser && currentUser.id) {
+                        // First clear existing catalogo for this user
+                        try {
+                            await fetch(SUPABASE_URL + '/rest/v1/catalogo_farmacia?usuario_id=eq.' + currentUser.id, { method: 'DELETE', headers: supabaseHeaders() });
+                        } catch(e2) {}
+                        // Insert all products
+                        var supaRows = products.map(function(p) {
+                            var nombreNorm = p.nombre.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+                            return {
+                                usuario_id: currentUser.id,
+                                nombre_producto: p.nombre.trim(),
+                                nombre_normalizado: nombreNorm,
+                                precio_propio: p.precio
+                            };
+                        });
+                        try {
+                            var res = await fetch(SUPABASE_URL + '/rest/v1/catalogo_farmacia', {
+                                method: 'POST',
+                                headers: Object.assign({}, supabaseHeaders(), { 'Prefer': 'return=representation' }),
+                                body: JSON.stringify(supaRows)
+                            });
+                            var inserted = await res.json();
+                            if (Array.isArray(inserted)) {
+                                catalogoCache = inserted.map(function(r, idx) {
+                                    return {
+                                        _id: r.id,
+                                        nombre: r.nombre_producto,
+                                        precio: r.precio_propio,
+                                        ean: products[idx] ? products[idx].ean : ''
+                                    };
+                                });
+                            }
+                        } catch(e3) {
+                            catalogoCache = products;
+                        }
+                    } else {
+                        catalogoCache = products;
+                    }
+                    // localStorage fallback
+                    try { localStorage.setItem(CATALOGO_KEY, JSON.stringify(products)); } catch(e4) {}
                     showToast(products.length + ' productos importados', 'success');
-                    compareCatalogo(products);
+                    compareCatalogo(catalogoCache.length > 0 ? catalogoCache : products);
                 } catch(err) { showToast('Error al leer el archivo: ' + err.message, 'error'); }
             };
             reader.readAsArrayBuffer(file);
             input.value = '';
         }
 
-        function loadCatalogoView() {
-            const saved = localStorage.getItem(CATALOGO_KEY);
-            if (saved) {
+        async function loadCatalogoView() {
+            // Try loading from Supabase first
+            if (currentUser && currentUser.id && catalogoCache.length === 0) {
                 try {
-                    const products = JSON.parse(saved);
-                    if (products.length > 0) { compareCatalogo(products); return; }
+                    var res = await fetch(SUPABASE_URL + '/rest/v1/catalogo_farmacia?usuario_id=eq.' + currentUser.id + '&order=fecha_creacion.desc', { headers: supabaseHeaders() });
+                    if (res.ok) {
+                        var rows = await res.json();
+                        if (Array.isArray(rows) && rows.length > 0) {
+                            catalogoCache = rows.map(function(r) {
+                                return {
+                                    _id: r.id,
+                                    nombre: r.nombre_producto,
+                                    precio: r.precio_propio,
+                                    precio_competencia_min: r.precio_competencia_min,
+                                    precio_competencia_max: r.precio_competencia_max,
+                                    ean: ''
+                                };
+                            });
+                        }
+                    }
                 } catch(e) {}
+            }
+            // Fallback to localStorage
+            if (catalogoCache.length === 0) {
+                var saved = localStorage.getItem(CATALOGO_KEY);
+                if (saved) {
+                    try {
+                        var products = JSON.parse(saved);
+                        if (products.length > 0) { catalogoCache = products; }
+                    } catch(e) {}
+                }
+            }
+            if (catalogoCache.length > 0) {
+                compareCatalogo(catalogoCache);
+                return;
             }
             document.getElementById('catalogoResults').innerHTML =
                 '<div style="text-align:center;padding:60px 20px">' +
@@ -2539,33 +2817,33 @@
         }
 
         async function compareCatalogo(products) {
-            const el = document.getElementById('catalogoResults');
+            var el = document.getElementById('catalogoResults');
             el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">Comparando ' + products.length + ' productos con FarmaSearch...</div>';
 
-            let found = 0, cheaper = 0, cardIdx = 20000;
-            let html = '';
+            var found = 0, cheaper = 0, cardIdx = 20000;
+            var html = '';
 
-            for (let i = 0; i < products.length; i++) {
-                const p = products[i];
-                let matchHtml = '';
-                let vsHtml = '<span class="catalogo-vs nomatch">No encontrado</span>';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var matchHtml = '';
+                var vsHtml = '<span class="catalogo-vs nomatch">No encontrado</span>';
 
                 try {
-                    const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/search_products', {
+                    var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/search_products', {
                         method: 'POST', headers: supabaseHeaders(),
                         body: JSON.stringify({ search_term: p.nombre, page_num: 1, page_size: 3, sort_by: 'relevancia' })
                     });
-                    const data = await res.json();
-                    const items = data.items || [];
-                    const match = items.length > 0 ? items[0] : null;
+                    var data = await res.json();
+                    var items = data.items || [];
+                    var match = items.length > 0 ? items[0] : null;
 
                     if (match && match.mejor_precio) {
                         found++;
-                        const bestPrice = match.mejor_precio;
-                        const priceStr = bestPrice.toFixed(2) + ' \u20ac';
+                        var bestPrice = match.mejor_precio;
+                        var priceStr = bestPrice.toFixed(2) + ' \u20ac';
 
                         if (p.precio) {
-                            const diff = p.precio - bestPrice;
+                            var diff = p.precio - bestPrice;
                             if (diff > 0.01) {
                                 vsHtml = '<span class="catalogo-vs expensive">+' + diff.toFixed(2) + ' \u20ac mas caro</span>';
                             } else if (diff < -0.01) {
@@ -2576,8 +2854,20 @@
                             }
                         }
 
-                        const cIdx = cardIdx++;
-                        const farmHtml = match.farmacia ?
+                        // Update Supabase catalogo record with competition prices
+                        if (p._id && currentUser && currentUser.id) {
+                            fetch(SUPABASE_URL + '/rest/v1/catalogo_farmacia?id=eq.' + p._id, {
+                                method: 'PATCH', headers: supabaseHeaders(),
+                                body: JSON.stringify({
+                                    precio_competencia_min: bestPrice,
+                                    farmacias_competencia: match.farmacia || null,
+                                    ultimo_cambio: new Date().toISOString()
+                                })
+                            }).catch(function() {});
+                        }
+
+                        var cIdx = cardIdx++;
+                        var farmHtml = match.farmacia ?
                             '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(match.farmacia) + '</span><span class="pharmacy-price best">' + priceStr + '</span><span class="stock-badge ' + (match.en_stock ? 'in-stock' : 'out-stock') + '">' + (match.en_stock ? 'Disponible' : 'Sin stock') + '</span><a href="' + escapeHtml(match.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Ver \u2192</a></div>' : '';
 
                         matchHtml = '<div class="catalogo-competitor" onclick="document.getElementById(\'catcard-' + cIdx + '\').classList.toggle(\'open\')" style="cursor:pointer">' +
@@ -2625,15 +2915,22 @@
             '</div>' + html;
 
             // Add toggle logic for catcard
-            document.querySelectorAll('[id^="catcard-"]').forEach(el => {
-                el.parentElement.addEventListener('click', () => {
+            document.querySelectorAll('[id^="catcard-"]').forEach(function(el) {
+                el.parentElement.addEventListener('click', function() {
                     el.style.maxHeight = el.style.maxHeight === '0px' || !el.style.maxHeight ? '200px' : '0px';
                 });
             });
         }
 
-        function clearCatalogo() {
-            localStorage.removeItem(CATALOGO_KEY);
+        async function clearCatalogo() {
+            // Delete from Supabase
+            if (currentUser && currentUser.id) {
+                try {
+                    await fetch(SUPABASE_URL + '/rest/v1/catalogo_farmacia?usuario_id=eq.' + currentUser.id, { method: 'DELETE', headers: supabaseHeaders() });
+                } catch(e) {}
+            }
+            catalogoCache = [];
+            try { localStorage.removeItem(CATALOGO_KEY); } catch(e) {}
             loadCatalogoView();
             showToast('Catalogo limpiado', 'info');
         }
