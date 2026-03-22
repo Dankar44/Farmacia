@@ -679,7 +679,8 @@
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
             .sidebar-overlay.open { display:block; }
-            body.authenticated .hamburger { display:flex !important; }
+            body.authenticated .hamburger { display:flex; }
+            body.authenticated .hamburger.hidden { display:none !important; }
             .app-main { margin-left:0 !important; }
             /* Topbar: leave space for hamburger on the left */
             .topbar { padding:12px 16px 12px 60px; }
@@ -1369,8 +1370,7 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
-            var isOpen = document.getElementById('sidebar').classList.contains('open');
-            document.getElementById('hamburger').style.display = isOpen ? 'none' : '';
+            document.getElementById('hamburger').classList.toggle('hidden');
         }
 
         // ===== AUTH =====
