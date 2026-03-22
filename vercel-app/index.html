@@ -14,6 +14,7 @@
         #authWall { display:flex; }
         body.authenticated .sidebar { display:flex !important; }
         body.authenticated .app-main { display:flex !important; }
+        body.authenticated .hamburger { display:none !important; }
         body.authenticated #authWall { display:none !important; }
         :root {
             --bg-body:#f5f6f8; --bg-white:#ffffff; --bg-light:#f9fafb;
@@ -563,7 +564,7 @@
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
             .sidebar-overlay.open { display:block; }
-            .hamburger { display:flex; }
+            body.authenticated .hamburger { display:flex !important; }
             .app-main { margin-left:0 !important; }
             /* Topbar */
             .topbar { padding:12px 16px 12px 56px; }
@@ -1290,7 +1291,7 @@
         // Search dropdown (categories)
         const searchDD = document.getElementById('searchDropdown');
         function pickCat(term) { searchDD.classList.remove('open'); searchCategory(term); }
-        searchInput.addEventListener('focus', () => { if (searchInput.value.trim().length === 0) searchDD.classList.add('open'); });
+        searchInput.addEventListener('focus', () => { if (searchInput.value.trim().length === 0 && window.innerWidth > 600) searchDD.classList.add('open'); });
         document.addEventListener('click', (e) => { if (!e.target.closest('.search-wrap')) searchDD.classList.remove('open'); });
 
         searchInput.addEventListener('input', () => {
