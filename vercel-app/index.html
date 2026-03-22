@@ -683,9 +683,8 @@
             .app-main { margin-left:0 !important; }
             /* Topbar: leave space for hamburger on the left */
             .topbar { padding:12px 16px 12px 60px; }
-            /* View headers (Alertas, Historial, etc): leave space for hamburger */
-            .content { padding-top:60px; }
-            .topbar-wrap + .content { padding-top:16px; }
+            /* View headers: indent title so hamburger doesn't cover it */
+            .view-header { padding-left:48px; }
             /* Auth wall: stack vertically */
             .auth-wall { flex-direction:column; }
             .auth-wall-brand { width:100%; padding:40px 28px 32px; min-height:auto; }
@@ -1370,6 +1369,8 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
+            var isOpen = document.getElementById('sidebar').classList.contains('open');
+            document.getElementById('hamburger').style.display = isOpen ? 'none' : '';
         }
 
         // ===== AUTH =====
