@@ -14,6 +14,8 @@ class Producto(Base):
 
     id = Column(Integer, primary_key=True)
     nombre = Column(String(255), nullable=False)
+    nombre_normalizado = Column(String(500))
+    nombre_display = Column(String(500))
     url = Column(Text, unique=True, nullable=False)
     farmacia = Column(String(100), nullable=False)
     categoria = Column(String(100))

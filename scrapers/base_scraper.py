@@ -118,8 +118,19 @@ class BaseScraper:
         """Level 3: Full browser automation. Override in subclass."""
         raise NotImplementedError(f"{self.FARMACIA} no tiene implementado el nivel 3 (Playwright)")
 
+    @staticmethod
+    def _clean_raw_name(nombre):
+        """Strip pharmacy prefixes and normalize spacing."""
+        import re
+        nombre = re.sub(
+            r'^\s*(PromoFarma|Atida|Mifarma|DosFarma|Farmacia\s*Barata|OkFarma|Farmacoslada|Farmacias\s*Direct|Farmacias\s*Vazquez)\s*[-:|/·]\s*',
+            '', nombre, flags=re.IGNORECASE
+        )
+        return re.sub(r'\s+', ' ', nombre).strip()
+
     def save_product(self, db, nombre, url, farmacia, categoria, ean, precio, precio_original, en_stock):
         """Save or update a product in the database."""
+        nombre = self._clean_raw_name(nombre)
         try:
             existing = db.query(Producto).filter_by(url=url).first()
             if existing:

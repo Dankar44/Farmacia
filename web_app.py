@@ -400,7 +400,7 @@ def buscar():
                 MIN(pr.precio) as mejor_precio,
                 COUNT(p.id) as num_farmacias,
                 BOOL_OR(pr.en_stock) as tiene_stock,
-                (SELECT nombre FROM productos p2 WHERE p2.nombre_normalizado = p.nombre_normalizado ORDER BY LENGTH(nombre) ASC LIMIT 1) as display_name
+                (SELECT nombre_display FROM productos p2 WHERE p2.nombre_normalizado = p.nombre_normalizado ORDER BY LENGTH(nombre_display) DESC LIMIT 1) as display_name
             FROM productos p
             LEFT JOIN latest_prices pr ON p.id = pr.producto_id
             WHERE p.nombre_normalizado LIKE '%' || normalize_product_name(:search_raw) || '%'
@@ -440,7 +440,7 @@ def buscar():
         if key not in productos:
             d_name = display_names.get(key, "Producto Desconocido")
             productos[key] = {
-                "nombre": d_name[:1].upper() + d_name[1:].lower(),
+                "nombre": d_name,
                 "ean": row.ean if row.ean else None,
                 "farmacias": []
             }
@@ -698,7 +698,7 @@ def get_ofertas():
             ),
             latest AS (SELECT producto_id, precio as precio_actual FROM ranked WHERE rn = 1),
             previous AS (SELECT producto_id, precio as precio_anterior FROM ranked WHERE rn = 2)
-            SELECT p.nombre, p.farmacia, p.url, p.nombre_normalizado,
+            SELECT COALESCE(p.nombre_display, p.nombre) as nombre, p.farmacia, p.url, p.nombre_normalizado,
                    l.precio_actual, v.precio_anterior,
                    ROUND((1 - l.precio_actual / NULLIF(v.precio_anterior, 0)) * 100, 1) as descuento_pct
             FROM latest l
@@ -862,7 +862,7 @@ def comparar_productos():
         return jsonify({"error": "Selecciona entre 2 y 5 productos"}), 400
     with engine.connect() as con:
         rows = con.execute(text("""
-            SELECT p.nombre_normalizado, p.nombre, p.farmacia, p.url, p.ean, pr.precio, pr.en_stock
+            SELECT p.nombre_normalizado, COALESCE(p.nombre_display, p.nombre) as nombre, p.farmacia, p.url, p.ean, pr.precio, pr.en_stock
             FROM productos p
             JOIN (SELECT DISTINCT ON (producto_id) producto_id, precio, en_stock FROM precios ORDER BY producto_id, fecha_captura DESC) pr
             ON p.id = pr.producto_id
@@ -900,7 +900,7 @@ def get_similares():
                 FROM precios WHERE precio > 0 ORDER BY producto_id, fecha_captura DESC
             )
             SELECT DISTINCT ON (p.nombre_normalizado)
-                p.nombre_normalizado, p.nombre, pr.precio, p.farmacia
+                p.nombre_normalizado, COALESCE(p.nombre_display, p.nombre) as nombre, pr.precio, p.farmacia
             FROM productos p
             JOIN latest_prices pr ON p.id = pr.producto_id
             WHERE p.nombre_normalizado LIKE :pattern

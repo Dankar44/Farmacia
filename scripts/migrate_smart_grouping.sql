@@ -1,3 +1,7 @@
+-- NOTE: This function is superseded by migration/005_auto_normalization.sql
+-- which includes the trigger and clean_display_name(). Use that migration instead.
+-- This file is kept for reference.
+
 CREATE OR REPLACE FUNCTION normalize_product_name(input_string TEXT)
 RETURNS TEXT AS $$
 DECLARE
@@ -5,34 +9,35 @@ DECLARE
 BEGIN
     -- lower and unaccent
     clean_str := unaccent(lower(input_string));
-    
-    -- Normalize weird multiplier symbols (e.g. math times symbol or asterisks) to the letter 'x'
+
+    -- Normalize multiplier symbols
     clean_str := replace(clean_str, '×', 'x');
     clean_str := replace(clean_str, '*', 'x');
-    
-    -- Separate numbers and letters with a space (e.g., '60caps' -> '60 caps', '2x10' -> '2 x 10')
+
+    -- Strip known pharmacy prefixes
+    clean_str := regexp_replace(clean_str, '^\s*(promofarma|atida|mifarma|dosfarma|farmacia\s*barata|okfarma|farmacoslada|farmacias\s*direct|farmacias\s*vazquez)\s*[-:|/·]\s*', '', 'i');
+
+    -- Separate numbers and letters (e.g., '60caps' -> '60 caps', '50ml' -> '50 ml')
     clean_str := regexp_replace(clean_str, '([0-9])([a-z])', '\1 \2', 'g');
     clean_str := regexp_replace(clean_str, '([a-z])([0-9])', '\1 \2', 'g');
-    
-    -- Strip common noise words (units, formats, etc) completely
-    -- caps, capsula, capsulas, cap
+
+    -- Strip common noise words
     clean_str := regexp_replace(clean_str, '\y(capsulas?|caps?)\y', '', 'g');
-    -- comp, comprimido, comprimidos
     clean_str := regexp_replace(clean_str, '\y(comprimidos?|comp?)\y', '', 'g');
-    
-    -- REMOVED: stripping of 'pack', 'envase', 'duplo', 'triplo' to preserve variant distinctness
-    
-    -- x (used as multiplier) 
+
+    -- Strip multiplier 'x'
     clean_str := regexp_replace(clean_str, '\yx\y', '', 'g');
-    -- ml, mg, gr, g, kg, l
-    clean_str := regexp_replace(clean_str, '\y(ml|mg|gr|g|kg|l)\y', '', 'g');
-    
-    -- Semantic strip: Remove specific brand prefixes that act as noise (e.g., 'Thea', 'Laboratorios Thea')
+
+    -- Strip units ONLY when preceded by a number (safer)
+    clean_str := regexp_replace(clean_str, '([0-9])\s*(ml|mg|gr|kg)\y', '\1', 'g');
+    clean_str := regexp_replace(clean_str, '([0-9])\s*(g|l)\y', '\1', 'g');
+
+    -- Semantic strip: brand prefixes
     clean_str := regexp_replace(clean_str, '\y(thea|laboratorios)\y', '', 'g');
-    
-    -- remove all non-alphanumeric
+
+    -- Remove all non-alphanumeric
     clean_str := regexp_replace(clean_str, '[^a-z0-9]', '', 'g');
-    
+
     RETURN clean_str;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;

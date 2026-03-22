@@ -62,7 +62,7 @@
         .sidebar-divider { height:1px; background:var(--border-light); margin:4px 16px; }
 
         /* Nav items */
-        .sidebar-nav { flex:1; padding:8px 12px; display:flex; flex-direction:column; gap:2px; }
+        .sidebar-nav { flex:1; padding:8px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; min-height:0; }
         .sidebar-item {
             display:flex; align-items:center; gap:12px;
             padding:11px 14px; border-radius:10px;
@@ -1750,9 +1750,14 @@
                 const globalIdx = startIndex + idx;
                 const priceStr = prod.mejor_precio ? prod.mejor_precio.toFixed(2) + ' \u20ac' : '\u2014';
 
-                // Build pharmacy row from flat API data
+                // Build pharmacy rows from grouped API data
                 let farmaciasHtml = '';
-                if (prod.farmacia) {
+                if (prod.farmacias && Array.isArray(prod.farmacias)) {
+                    prod.farmacias.forEach(function(f, fi) {
+                        const fp = f.precio ? f.precio.toFixed(2) + ' \u20ac' : '\u2014';
+                        farmaciasHtml += '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(f.farmacia) + '</span><span class="pharmacy-price' + (fi === 0 ? ' best' : '') + '">' + fp + '</span><span class="stock-badge ' + (f.en_stock ? 'in-stock' : 'out-stock') + '">' + (f.en_stock ? 'Disponible' : 'Sin stock') + '</span><a href="' + escapeHtml(f.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar \u2192</a></div>';
+                    });
+                } else if (prod.farmacia) {
                     const p = prod.mejor_precio ? prod.mejor_precio.toFixed(2) + ' \u20ac' : '\u2014';
                     farmaciasHtml = '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(prod.farmacia) + '</span><span class="pharmacy-price best">' + p + '</span><span class="stock-badge ' + (prod.en_stock ? 'in-stock' : 'out-stock') + '">' + (prod.en_stock ? 'Disponible' : 'Sin stock') + '</span><a href="' + escapeHtml(prod.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar \u2192</a></div>';
                 }
