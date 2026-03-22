@@ -157,23 +157,14 @@
         }
         .sidebar-logout:hover { background:var(--red-light); color:var(--red); }
 
-        /* Mobile hamburger (hidden by default, shown via mobile-header on small screens) */
+        /* Mobile hamburger */
         .hamburger {
-            display:none; z-index:300;
+            display:none; position:fixed; top:12px; left:12px; z-index:300;
             width:40px; height:40px; border-radius:10px;
             background:var(--bg-white); border:1px solid var(--border);
             box-shadow:var(--shadow-sm); cursor:pointer;
             align-items:center; justify-content:center;
-            flex-shrink:0;
         }
-        /* Mobile header bar */
-        .mobile-header {
-            display:none;
-            background:var(--bg-white); border-bottom:1px solid var(--border-light);
-            padding:10px 16px; align-items:center; gap:12px;
-            position:sticky; top:0; z-index:150;
-        }
-        .mobile-header .hamburger { display:flex; position:static; }
         .sidebar-overlay {
             display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3);
             z-index:199;
@@ -688,12 +679,13 @@
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
             .sidebar-overlay.open { display:block; }
-            /* Show mobile header instead of floating hamburger */
-            body.authenticated .mobile-header { display:flex !important; }
-            body.authenticated .hamburger#hamburger { display:none !important; }
+            body.authenticated .hamburger { display:flex !important; }
             .app-main { margin-left:0 !important; }
-            /* Topbar - no extra left padding needed now */
-            .topbar { padding:12px 16px; }
+            /* Topbar: leave space for hamburger on the left */
+            .topbar { padding:12px 16px 12px 60px; }
+            /* View headers (Alertas, Historial, etc): leave space for hamburger */
+            .content { padding-top:60px; }
+            .topbar-wrap + .content { padding-top:16px; }
             /* Auth wall: stack vertically */
             .auth-wall { flex-direction:column; }
             .auth-wall-brand { width:100%; padding:40px 28px 32px; min-height:auto; }
@@ -705,7 +697,7 @@
         @media (max-width:600px) {
             /* Content & topbar padding */
             .content { padding:16px 16px 48px; }
-            .topbar { padding:10px 12px; }
+            .topbar { padding:10px 12px 10px 58px; }
             /* Search */
             .search-input { height:40px; font-size:0.88rem; }
             .search-dropdown { padding:12px 14px; }
@@ -926,12 +918,10 @@
         </div>
     </aside>
 
-    <!-- Mobile header (hamburger only) -->
-    <div class="mobile-header" id="mobileHeader">
-        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
-    </div>
+    <!-- Mobile hamburger -->
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- Main content -->
