@@ -145,6 +145,11 @@
         }
         .plan-badge.estandar, .plan-badge.free { background:var(--border-light); color:var(--text-secondary); }
         .plan-badge.pro { background:var(--accent); color:#fff; }
+        .plan-badge.admin { background:#7c3aed; color:#fff; }
+
+        /* Admin-only sidebar items */
+        .sidebar-admin-only { display:none; }
+        body.user-admin .sidebar-admin-only { display:flex; }
         .sidebar-logout {
             background:none; border:none; cursor:pointer; padding:6px;
             color:var(--text-muted); border-radius:8px; transition:all var(--transition);
@@ -497,6 +502,109 @@
         .view-empty svg { width:48px; height:48px; margin-bottom:12px; opacity:0.4; }
         .view-empty p { font-size:0.9rem; margin-top:8px; }
 
+        /* Subscription cards */
+        .sub-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .sub-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:32px; position:relative; transition:all var(--transition); }
+        .sub-card:hover { box-shadow:var(--shadow-md); }
+        .sub-card.recommended { border-color:var(--primary); box-shadow:0 0 0 2px var(--primary-glow); }
+        .sub-badge-rec { position:absolute; top:-12px; right:20px; background:var(--primary); color:#fff; font-size:0.68rem; font-weight:700; padding:4px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; }
+        .sub-plan-name { font-size:1.1rem; font-weight:700; color:var(--text-dark); margin-bottom:4px; }
+        .sub-price { font-size:2rem; font-weight:800; color:var(--primary-dark); }
+        .sub-price span { font-size:0.82rem; font-weight:500; color:var(--text-muted); }
+        .sub-features { list-style:none; padding:0; margin:20px 0; }
+        .sub-features li { display:flex; align-items:center; gap:10px; padding:8px 0; font-size:0.85rem; color:var(--text-body); border-bottom:1px solid var(--border-light); }
+        .sub-features li:last-child { border-bottom:none; }
+        .sub-features li svg { width:16px; height:16px; flex-shrink:0; }
+        .sub-features li.locked { color:var(--text-muted); }
+        .sub-status { display:inline-flex; padding:4px 12px; border-radius:8px; font-size:0.78rem; font-weight:600; margin-bottom:16px; }
+        .sub-status.active { background:var(--accent-bg); color:var(--accent); }
+        .sub-status.estandar, .sub-status.free { background:var(--bg-light); color:var(--text-secondary); }
+        .sub-btn { display:inline-flex; align-items:center; gap:6px; padding:12px 24px; border-radius:10px; font-size:0.88rem; font-weight:600; border:none; cursor:pointer; font-family:inherit; color:#fff; transition:all var(--transition); width:100%; justify-content:center; }
+        .sub-btn.primary { background:var(--primary); }
+        .sub-btn.primary:hover { background:var(--primary-dark); }
+        .sub-btn.muted { background:var(--bg-light); color:var(--text-secondary); cursor:default; }
+
+        /* Oferta cards */
+        .oferta-card { display:flex; align-items:center; gap:12px; padding:14px 18px; background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); margin-bottom:8px; transition:all var(--transition); }
+        .oferta-card:hover { border-color:var(--accent); box-shadow:var(--shadow-md); }
+        .oferta-badge { flex-shrink:0; background:var(--red); color:#fff; font-size:0.78rem; font-weight:800; padding:6px 10px; border-radius:8px; min-width:52px; text-align:center; }
+        .oferta-info { flex:1; min-width:0; }
+        .oferta-name { font-size:0.85rem; font-weight:500; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .oferta-farm { font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+        .oferta-prices { text-align:right; flex-shrink:0; }
+        .oferta-old { font-size:0.75rem; color:var(--text-muted); text-decoration:line-through; }
+        .oferta-new { font-size:1rem; font-weight:700; color:var(--green); }
+
+        /* Alert bell on product cards */
+        .alert-bell { background:none; border:none; cursor:pointer; padding:4px; color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center; border-radius:6px; transition:all 0.2s; position:relative; }
+        .alert-bell:hover { color:var(--accent); background:var(--accent-bg); }
+        .alert-bell.active { color:var(--accent); }
+        .alert-bell.active svg { fill:var(--accent); }
+        .alert-bell .bell-changed { display:none; position:absolute; top:0; right:0; width:7px; height:7px; background:var(--red); border-radius:50%; }
+        .alert-bell.changed .bell-changed { display:block; }
+
+        /* Catalogo */
+        .catalogo-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .catalogo-btn { padding:8px 16px; font-size:0.78rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:6px; transition:all var(--transition); }
+        .catalogo-btn.primary { background:var(--primary); color:#fff; }
+        .catalogo-btn.primary:hover { background:var(--primary-dark); }
+        .catalogo-btn.accent { background:var(--accent); color:#fff; }
+        .catalogo-btn.accent:hover { opacity:0.9; }
+        .catalogo-btn.muted { background:var(--bg-light); color:var(--text-secondary); }
+        .catalogo-btn.muted:hover { background:var(--border-light); }
+        .catalogo-summary { display:flex; gap:16px; flex-wrap:wrap; padding:16px; background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); margin-bottom:16px; }
+        .catalogo-stat { text-align:center; }
+        .catalogo-stat-val { font-size:1.4rem; font-weight:800; color:var(--text-dark); }
+        .catalogo-stat-label { font-size:0.7rem; color:var(--text-muted); }
+        .catalogo-item { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); margin-bottom:10px; overflow:hidden; }
+        .catalogo-item-header { display:flex; align-items:center; padding:14px 18px; gap:12px; }
+        .catalogo-item-client { flex:1; min-width:0; }
+        .catalogo-item-name { font-size:0.85rem; font-weight:500; color:var(--text-dark); }
+        .catalogo-item-meta { font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+        .catalogo-item-price { font-size:1rem; font-weight:700; color:var(--text-dark); flex-shrink:0; }
+        .catalogo-vs { display:flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:700; flex-shrink:0; padding:4px 10px; border-radius:6px; }
+        .catalogo-vs.cheaper { background:var(--green-light); color:var(--green); }
+        .catalogo-vs.expensive { background:var(--red-light); color:var(--red); }
+        .catalogo-vs.equal { background:var(--bg-light); color:var(--text-muted); }
+        .catalogo-vs.nomatch { background:var(--border-light); color:var(--text-muted); font-weight:500; }
+        .catalogo-competitor { border-top:1px solid var(--border-light); padding:10px 18px; background:var(--bg-light); }
+
+        /* View filter input */
+        .view-filter { width:100%; padding:10px 16px 10px 38px; border:2px solid var(--border); border-radius:10px; font-size:0.85rem; font-family:inherit; outline:none; background:var(--bg-light) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") 12px center no-repeat; margin-bottom:14px; transition:border-color 0.2s; }
+        .view-filter:focus { border-color:var(--primary); background-color:var(--bg-white); }
+
+        /* Dashboard cards */
+        .dash-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
+        .dash-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:20px; cursor:pointer; transition:all var(--transition); }
+        .dash-card:hover { border-color:var(--primary); box-shadow:var(--shadow-md); }
+        .dash-card-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+        .dash-card-value { font-size:1.8rem; font-weight:800; color:var(--text-dark); }
+        .dash-card-label { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+
+        /* Info panel (used by informational views) */
+        .info-panel { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:32px; text-align:center; }
+        .info-panel-icon { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+        .info-panel-title { font-size:1rem; font-weight:700; color:var(--text-dark); margin-bottom:8px; }
+        .info-panel-desc { font-size:0.85rem; color:var(--text-muted); line-height:1.6; max-width:480px; margin:0 auto; }
+        .info-feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:20px; }
+        .info-feature-item { display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--bg-light); border-radius:var(--radius); font-size:0.82rem; color:var(--text-body); text-align:left; }
+        .info-feature-item svg { width:18px; height:18px; color:var(--primary); flex-shrink:0; }
+
+        /* Profile card */
+        .profile-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:32px; }
+        .profile-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#00c9bc); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:800; margin:0 auto 16px; }
+        .profile-name { font-size:1.2rem; font-weight:700; color:var(--text-dark); text-align:center; }
+        .profile-email { font-size:0.85rem; color:var(--text-muted); text-align:center; margin-top:4px; }
+        .profile-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+        .profile-detail-item { }
+        .profile-label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dark); margin-bottom:6px; }
+        .profile-input { width:100%; padding:11px 14px; border:2px solid var(--border); border-radius:10px; font-size:0.88rem; font-family:inherit; outline:none; transition:border-color 0.2s; background:var(--bg-light); }
+        .profile-input:focus { border-color:var(--primary); background:var(--bg-white); }
+
+        /* Premium-only sidebar items */
+        .sidebar-premium-only { display:none; }
+        body.user-premium .sidebar-premium-only { display:flex; }
+
         /* Login modal */
         .auth-tabs { display:flex; border-bottom:2px solid var(--border-light); margin-bottom:20px; }
         .auth-tab { flex:1; padding:10px; text-align:center; font-size:0.88rem; font-weight:600; color:var(--text-muted); cursor:pointer; border:none; background:none; font-family:inherit; transition:all var(--transition); border-bottom:2px solid transparent; margin-bottom:-2px; }
@@ -509,13 +617,17 @@
         /* ===== AUTH WALL ===== */
         .auth-wall { display:flex; min-height:100vh; width:100%; }
         .auth-wall-brand {
-            width:50%; background:linear-gradient(160deg,#00a99d 0%,#00c9bc 40%,#00d4aa 100%);
+            width:50%; background:url('/images/farmacias.png') center/cover no-repeat;
             display:flex; flex-direction:column; justify-content:center;
             padding:60px; color:#fff; position:relative; overflow:hidden;
         }
+        .auth-wall-brand::before {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(160deg,rgba(0,169,157,0.88) 0%,rgba(0,201,188,0.85) 40%,rgba(0,212,170,0.82) 100%);
+        }
         .auth-wall-brand-decor {
             position:absolute; top:-20%; right:-15%; width:500px; height:500px;
-            background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%); border-radius:50%;
+            background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%); border-radius:50%;
         }
         .auth-wall-brand-inner { position:relative; z-index:1; max-width:480px; }
         .auth-wall-brand-logo { display:flex; align-items:center; gap:14px; margin-bottom:40px; }
@@ -555,6 +667,9 @@
         }
         .auth-wall-submit:hover { opacity:0.9; }
         #wallMsg { margin-top:12px; font-size:0.82rem; text-align:center; color:#dc2626; display:none; }
+        .reg-step-dot { width:28px; height:28px; border-radius:50%; background:var(--border-light); color:var(--text-muted); font-size:0.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
+        .reg-step-dot.active { background:var(--primary); color:#fff; }
+        .reg-step-dot.done { background:var(--green); color:#fff; }
 
         /* ===== RESPONSIVE ===== */
 
@@ -611,6 +726,9 @@
             .pharmacy-row { flex-wrap:wrap; gap:6px; }
             .pharmacy-name { min-width:100%; }
             .buy-link { width:100%; text-align:center; padding:10px 14px; display:block; }
+            .oferta-card { flex-wrap:wrap; padding:12px 14px; }
+            #dashContent div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+            .oferta-name { white-space:normal; -webkit-line-clamp:2; display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden; }
             .detail-inner { padding:0 12px 12px; }
             /* Sort bar */
             .sort-bar { padding:8px 10px; gap:8px; }
@@ -650,6 +768,14 @@
             .auth-wall-form { padding:20px 16px 32px; }
             .auth-wall-card { padding:24px 20px; }
             .auth-wall-brand-logo span { font-size:1.5rem; }
+            /* Subscription cards */
+            .sub-grid { grid-template-columns:1fr; }
+            .sub-card { padding:20px; }
+            .sub-price { font-size:1.5rem; }
+            /* Dashboard cards */
+            .dash-grid { grid-template-columns:repeat(2,1fr); }
+            /* Profile */
+            .profile-detail-grid { grid-template-columns:1fr; }
         }
 
         /* --- Small phones (<=480px) --- */
@@ -669,6 +795,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -697,23 +824,32 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg>
                 Ofertas
             </button>
-            <button class="sidebar-item" data-view="listas" onclick="switchView('listas')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
-                Mis Listas
-            </button>
             <button class="sidebar-item" data-view="dashboard" onclick="switchView('dashboard')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 Dashboard
             </button>
 
             <div class="sidebar-section-label">Seguimiento</div>
-            <button class="sidebar-item" data-view="favoritos" onclick="switchView('favoritos')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                Favoritos
+            <button class="sidebar-item" data-view="alertas" onclick="switchView('alertas')" id="sidebarAlertas" style="position:relative">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Alertas
+                <span class="notif-dot" id="alertasDot" style="display:none;position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--red);border-radius:50%"></span>
             </button>
             <button class="sidebar-item" data-view="historial" onclick="switchView('historial')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 Historial
+            </button>
+
+            <div class="sidebar-section-label sidebar-premium-only">Farmacia</div>
+            <button class="sidebar-item sidebar-premium-only" data-view="catalogo" onclick="switchView('catalogo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
+                Mi Catalogo
+            </button>
+
+            <div class="sidebar-section-label sidebar-admin-only">Administracion</div>
+            <button class="sidebar-item sidebar-admin-only" data-view="admin" onclick="switchView('admin')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                Panel Admin
             </button>
 
             <div class="sidebar-section-label">Cuenta</div>
@@ -947,34 +1083,62 @@
             <div id="sentinel" style="height:10px;margin-top:20px"></div>
             </div><!-- /searchArea -->
 
-            <!-- PLACEHOLDER VIEWS -->
-            <div class="view-panel" id="viewFavoritos">
-                <div class="view-header"><div><div class="view-title">Mis Favoritos</div><div class="view-subtitle">Productos que has guardado</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><p>Disponible proximamente</p></div>
-            </div>
             <div class="view-panel" id="viewHistorial">
-                <div class="view-header"><div><div class="view-title">Historial</div><div class="view-subtitle">Productos que has consultado</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Disponible proximamente</p></div>
+                <div class="view-header">
+                    <div><div class="view-title">Historial</div><div class="view-subtitle">Tus busquedas y productos consultados</div></div>
+                    <button onclick="clearHistorial()" style="padding:8px 16px;font-size:0.78rem;font-weight:600;background:var(--red-light);color:var(--red);border:none;border-radius:8px;cursor:pointer;font-family:inherit">Borrar todo</button>
+                </div>
+                <div id="histList"></div>
             </div>
             <div class="view-panel" id="viewSuscripcion">
-                <div class="view-header"><div><div class="view-title">Suscripcion</div><div class="view-subtitle">Tu plan actual</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p>Disponible proximamente</p></div>
+                <div class="view-header"><div><div class="view-title">Suscripcion</div><div class="view-subtitle">Elige el plan que mejor se adapte a tus necesidades</div></div></div>
+                <div id="subContent"></div>
             </div>
             <div class="view-panel" id="viewDashboard">
-                <div class="view-header"><div class="view-title">Dashboard</div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><p>Disponible proximamente</p></div>
+                <div class="view-header"><div><div class="view-title">Dashboard</div><div class="view-subtitle">Resumen de tu actividad</div></div></div>
+                <div id="dashContent"></div>
             </div>
             <div class="view-panel" id="viewOfertas">
                 <div class="view-header"><div><div class="view-title">Ofertas del dia</div><div class="view-subtitle">Productos con mayor bajada de precio</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg><p>Disponible proximamente</p></div>
-            </div>
-            <div class="view-panel" id="viewListas">
-                <div class="view-header"><div><div class="view-title">Mis Listas</div><div class="view-subtitle">Cestas de productos para comparar</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><p>Disponible proximamente</p></div>
+                <input type="text" id="ofertasFilter" class="view-filter" placeholder="Filtrar ofertas por nombre..." oninput="filterView('ofertasList',this.value)">
+                <div id="ofertasList"><div style="text-align:center;padding:40px;color:var(--text-muted);font-size:0.85rem">Pulsa "Ofertas" para cargar las mejores ofertas</div></div>
             </div>
             <div class="view-panel" id="viewPerfil">
                 <div class="view-header"><div><div class="view-title">Mi Perfil</div><div class="view-subtitle">Configuracion de tu cuenta</div></div></div>
-                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><p>Disponible proximamente</p></div>
+                <div class="profile-card" id="profileContent"></div>
+            </div>
+            <!-- Alertas view -->
+            <div class="view-panel" id="viewAlertas">
+                <div class="view-header">
+                    <div><div class="view-title">Mis Alertas</div><div class="view-subtitle">Productos que estas siguiendo</div></div>
+                    <button onclick="markAllAlertsRead()" style="padding:8px 16px;font-size:0.78rem;font-weight:600;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:8px;cursor:pointer;font-family:inherit">Marcar como leidas</button>
+                </div>
+                <input type="text" id="alertasFilter" class="view-filter" placeholder="Filtrar alertas por nombre..." oninput="filterView('alertasList',this.value)">
+                <div id="alertasList"></div>
+            </div>
+            <!-- Catalogo view -->
+            <div class="view-panel" id="viewCatalogo">
+                <div class="view-header">
+                    <div><div class="view-title">Mi Catalogo</div><div class="view-subtitle">Sube tus productos y compara con la competencia</div></div>
+                    <div class="catalogo-actions">
+                        <button class="catalogo-btn primary" onclick="downloadCatalogoTemplate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar plantilla</button>
+                        <button class="catalogo-btn accent" onclick="document.getElementById('catalogoUpload').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importar Excel</button>
+                        <button class="catalogo-btn muted" onclick="clearCatalogo()">Limpiar</button>
+                        <input type="file" id="catalogoUpload" accept=".xlsx,.xls,.csv" style="display:none" onchange="importCatalogoExcel(this)">
+                    </div>
+                </div>
+                <input type="text" id="catalogoFilter" class="view-filter" placeholder="Filtrar productos del catalogo..." oninput="filterView('catalogoResults',this.value)">
+                <div id="catalogoResults"></div>
+            </div>
+            <!-- Comparador (placeholder) -->
+            <div class="view-panel" id="viewComparador">
+                <div class="view-header"><div><div class="view-title">Comparador Avanzado</div><div class="view-subtitle">Comparacion detallada de productos</div></div></div>
+                <div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/></svg><p>Proximamente</p></div>
+            </div>
+            <!-- Admin panel -->
+            <div class="view-panel" id="viewAdmin">
+                <div class="view-header"><div><div class="view-title">Panel de Administracion</div><div class="view-subtitle">Gestion de usuarios y estadisticas</div></div></div>
+                <div id="adminContent"></div>
             </div>
         </div>
     </div>
@@ -1020,7 +1184,7 @@
             <div class="auth-wall-brand-decor"></div>
             <div class="auth-wall-brand-inner">
                 <div class="auth-wall-brand-logo">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:50px;height:50px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15))"><path d="M10.5 21V15H4C3.45 15 3 14.55 3 14V10C3 9.45 3.45 9 4 9H10.5V3C10.5 2.45 10.95 2 11.5 2H15.5C16.05 2 16.5 2.45 16.5 3V9H23C23.55 9 24 9.45 24 10V14C24 14.55 23.55 15 23 15H16.5V21C16.5 21.55 16.05 22 15.5 22H11.5C10.95 22 10.5 21.55 10.5 21Z" fill="rgba(255,255,255,0.3)"/><circle cx="12" cy="12" r="5.5" fill="#fff" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><path d="M16 16L20.5 20.5" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
+                    <img src="/favicon.svg" alt="FarmaSearch" style="width:50px;height:50px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.2))">
                     <span style="font-size:2rem;font-weight:800">FarmaSearch</span>
                 </div>
                 <h1 class="auth-wall-brand-title">Compara precios en farmacias de toda Espana</h1>
@@ -1033,21 +1197,85 @@
         </div>
         <div class="auth-wall-form">
             <div class="auth-wall-card">
-                <div class="auth-wall-tabs">
-                    <button id="wallTabLogin" class="auth-wall-tab active" onclick="switchWallTab('login')">Iniciar sesion</button>
-                    <button id="wallTabReg" class="auth-wall-tab" onclick="switchWallTab('register')">Crear cuenta</button>
-                </div>
-                <div id="wallLogin">
+                <!-- LOGIN -->
+                <div id="wallLoginPanel">
+                    <div style="text-align:center;margin-bottom:24px">
+                        <div style="font-size:1.2rem;font-weight:700;color:var(--text-dark)">Bienvenido de nuevo</div>
+                        <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px">Inicia sesion en tu cuenta</div>
+                    </div>
                     <div class="auth-wall-field"><label class="auth-wall-label">Email</label><input type="email" id="wallEmail" class="auth-wall-input" placeholder="tu@email.com"></div>
                     <div class="auth-wall-field"><label class="auth-wall-label">Contrasena</label><input type="password" id="wallPass" class="auth-wall-input" placeholder="Tu contrasena" onkeypress="if(event.key==='Enter')wallLogin()"></div>
                     <button onclick="wallLogin()" class="auth-wall-submit">Iniciar sesion</button>
+                    <div style="text-align:center;margin-top:16px;font-size:0.82rem;color:var(--text-muted)">
+                        No tienes cuenta? <button onclick="showRegisterWizard()" style="color:var(--primary);font-weight:600;background:none;border:none;cursor:pointer;font-family:inherit;font-size:inherit;text-decoration:underline">Crea tu cuenta aqui</button>
+                    </div>
                 </div>
-                <div id="wallReg" style="display:none">
-                    <div class="auth-wall-field"><label class="auth-wall-label">Nombre</label><input type="text" id="wallRegName" class="auth-wall-input" placeholder="Tu nombre"></div>
-                    <div class="auth-wall-field"><label class="auth-wall-label">Email</label><input type="email" id="wallRegEmail" class="auth-wall-input" placeholder="tu@email.com"></div>
-                    <div class="auth-wall-field"><label class="auth-wall-label">Contrasena</label><input type="password" id="wallRegPass" class="auth-wall-input" placeholder="Minimo 6 caracteres"></div>
-                    <button onclick="wallRegister()" class="auth-wall-submit">Crear cuenta</button>
+
+                <!-- REGISTER WIZARD -->
+                <div id="wallRegPanel" style="display:none">
+                    <!-- Step indicators -->
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px">
+                        <div class="reg-step-dot active" id="regDot1">1</div>
+                        <div style="width:32px;height:2px;background:var(--border);border-radius:2px" id="regLine1"></div>
+                        <div class="reg-step-dot" id="regDot2">2</div>
+                        <div style="width:32px;height:2px;background:var(--border);border-radius:2px" id="regLine2"></div>
+                        <div class="reg-step-dot" id="regDot3">3</div>
+                    </div>
+
+                    <!-- Step 1: Datos personales -->
+                    <div id="regStep1">
+                        <div style="text-align:center;margin-bottom:20px">
+                            <div style="font-size:1rem;font-weight:700;color:var(--text-dark)">Datos personales</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">Paso 1 de 3</div>
+                        </div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Nombre</label><input type="text" id="regStepName" class="auth-wall-input" placeholder="Tu nombre completo"></div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Email</label><input type="email" id="regStepEmail" class="auth-wall-input" placeholder="tu@email.com"></div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Contrasena</label><input type="password" id="regStepPass" class="auth-wall-input" placeholder="Minimo 6 caracteres"></div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Confirmar contrasena</label><input type="password" id="regStepPassConfirm" class="auth-wall-input" placeholder="Repite la contrasena"></div>
+                        <button onclick="regNextStep(2)" class="auth-wall-submit">Siguiente</button>
+                    </div>
+
+                    <!-- Step 2: Plan -->
+                    <div id="regStep2" style="display:none">
+                        <div style="text-align:center;margin-bottom:20px">
+                            <div style="font-size:1rem;font-weight:700;color:var(--text-dark)">Elige tu plan</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">Paso 2 de 3</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                            <label id="regPlanEstandar" onclick="selectRegPlan('estandar')" style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--primary);border-radius:12px;cursor:pointer;transition:all 0.2s;background:var(--primary-light)">
+                                <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:10px;height:10px;border-radius:50%;background:var(--primary)" id="regPlanDotE"></div></div>
+                                <div style="flex:1"><div style="font-size:0.88rem;font-weight:700;color:var(--text-dark)">Estandar <span style="font-weight:500;color:var(--text-muted)">- 50 EUR/mes</span></div><div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px">Busqueda, comparacion, ofertas, historial</div></div>
+                            </label>
+                            <label id="regPlanPremium" onclick="selectRegPlan('premium')" style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s">
+                                <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:10px;height:10px;border-radius:50%;background:transparent" id="regPlanDotP"></div></div>
+                                <div style="flex:1"><div style="font-size:0.88rem;font-weight:700;color:var(--text-dark)">Premium <span style="font-weight:500;color:var(--accent)">- 70 EUR/mes</span></div><div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px">Todo + catalogo, alertas ilimitadas, competencia</div></div>
+                            </label>
+                        </div>
+                        <div style="display:flex;gap:10px">
+                            <button onclick="regNextStep(1)" style="flex:1;padding:12px;background:var(--bg-light);color:var(--text-secondary);border:none;border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit">Atras</button>
+                            <button onclick="regNextStep(3)" class="auth-wall-submit" style="flex:2">Siguiente</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Farmacia -->
+                    <div id="regStep3" style="display:none">
+                        <div style="text-align:center;margin-bottom:20px">
+                            <div style="font-size:1rem;font-weight:700;color:var(--text-dark)">Tu farmacia</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">Paso 3 de 3 (opcional)</div>
+                        </div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Nombre de la farmacia</label><input type="text" id="regStepFarmacia" class="auth-wall-input" placeholder="Farmacia Lopez"></div>
+                        <div class="auth-wall-field"><label class="auth-wall-label">Direccion / Ubicacion</label><input type="text" id="regStepUbicacion" class="auth-wall-input" placeholder="Calle Mayor 1, Madrid"></div>
+                        <div style="display:flex;gap:10px;margin-top:4px">
+                            <button onclick="regNextStep(2)" style="flex:1;padding:12px;background:var(--bg-light);color:var(--text-secondary);border:none;border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit">Atras</button>
+                            <button onclick="completeRegistration()" class="auth-wall-submit" style="flex:2">Crear mi cuenta</button>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;margin-top:16px;font-size:0.82rem;color:var(--text-muted)">
+                        Ya tienes cuenta? <button onclick="showLoginPanel()" style="color:var(--primary);font-weight:600;background:none;border:none;cursor:pointer;font-family:inherit;font-size:inherit;text-decoration:underline">Inicia sesion</button>
+                    </div>
                 </div>
+
                 <div id="wallMsg"></div>
             </div>
         </div>
@@ -1169,6 +1397,7 @@
                 localStorage.setItem('fs_user', JSON.stringify(data));
                 closeAuthModal();
                 applyAuthState();
+                await enrichUserData();
                 showToast('Bienvenido, ' + data.nombre, 'success');
             } catch(e) { showToast('Error de conexion', 'error'); }
         }
@@ -1201,6 +1430,25 @@
             showToast('Sesion cerrada', 'info');
         }
 
+        // Fetch full user data from DB to enrich localStorage data
+        async function enrichUserData() {
+            if (!currentUser || !currentUser.email) return;
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/usuarios?email=eq.' + encodeURIComponent(currentUser.email) + '&select=plan,is_admin,fecha_registro,ultimo_login&limit=1', {
+                    headers: supabaseHeaders()
+                });
+                const rows = await res.json();
+                if (Array.isArray(rows) && rows.length > 0) {
+                    const db = rows[0];
+                    currentUser.plan = db.plan || currentUser.plan;
+                    currentUser.is_admin = db.is_admin || false;
+                    currentUser.fecha_registro = db.fecha_registro || currentUser.fecha_registro;
+                    localStorage.setItem('fs_user', JSON.stringify(currentUser));
+                    applyAuthState();
+                }
+            } catch(e) {}
+        }
+
         function applyAuthState() {
             if (currentUser) {
                 document.body.classList.add('authenticated');
@@ -1213,8 +1461,16 @@
                     if (planEl) {
                         const plan = (currentUser.plan || 'estandar').toLowerCase();
                         const isPro = plan === 'pro' || plan === 'premium';
-                        planEl.className = 'plan-badge ' + (isPro ? 'pro' : 'estandar');
-                        planEl.textContent = isPro ? 'PRO' : 'ESTANDAR';
+                        const isAdmin = currentUser.is_admin === true;
+                        if (isAdmin) {
+                            planEl.className = 'plan-badge admin';
+                            planEl.textContent = 'ADMIN';
+                        } else {
+                            planEl.className = 'plan-badge ' + (isPro ? 'pro' : 'estandar');
+                            planEl.textContent = isPro ? 'PRO' : 'ESTANDAR';
+                        }
+                        document.body.classList.toggle('user-premium', isPro || isAdmin);
+                        document.body.classList.toggle('user-admin', isAdmin);
                     }
                     const avatarEl = document.getElementById('userAvatar');
                     if (avatarEl && currentUser.nombre) avatarEl.textContent = currentUser.nombre.charAt(0).toUpperCase();
@@ -1222,17 +1478,128 @@
                 if (loginEl) loginEl.style.display = 'none';
             } else {
                 document.body.classList.remove('authenticated');
+                document.body.classList.remove('user-premium');
             }
         }
 
         // ===== AUTH WALL FUNCTIONS =====
-        function switchWallTab(tab) {
-            document.getElementById('wallLogin').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('wallReg').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('wallTabLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('wallTabReg').classList.toggle('active', tab === 'register');
+        // Auth wall panel switching
+        function showRegisterWizard() {
+            document.getElementById('wallLoginPanel').style.display = 'none';
+            document.getElementById('wallRegPanel').style.display = 'block';
+            document.getElementById('wallMsg').style.display = 'none';
+            regNextStep(1);
+        }
+        function showLoginPanel() {
+            document.getElementById('wallLoginPanel').style.display = 'block';
+            document.getElementById('wallRegPanel').style.display = 'none';
             document.getElementById('wallMsg').style.display = 'none';
         }
+
+        let regSelectedPlan = 'estandar';
+        function selectRegPlan(plan) {
+            regSelectedPlan = plan;
+            const estandar = document.getElementById('regPlanEstandar');
+            const premium = document.getElementById('regPlanPremium');
+            estandar.style.borderColor = plan === 'estandar' ? 'var(--primary)' : 'var(--border)';
+            estandar.style.background = plan === 'estandar' ? 'var(--primary-light)' : 'transparent';
+            document.getElementById('regPlanDotE').style.background = plan === 'estandar' ? 'var(--primary)' : 'transparent';
+            premium.style.borderColor = plan === 'premium' ? 'var(--accent)' : 'var(--border)';
+            premium.style.background = plan === 'premium' ? 'var(--accent-bg)' : 'transparent';
+            document.getElementById('regPlanDotP').style.background = plan === 'premium' ? 'var(--accent)' : 'transparent';
+        }
+
+        function regNextStep(step) {
+            // Validate current step before advancing
+            if (step === 2) {
+                const name = document.getElementById('regStepName').value.trim();
+                const email = document.getElementById('regStepEmail').value.trim();
+                const pass = document.getElementById('regStepPass').value;
+                const passC = document.getElementById('regStepPassConfirm').value;
+                if (!name) { showWallMsg('Introduce tu nombre'); return; }
+                if (!email) { showWallMsg('Introduce tu email'); return; }
+                if (pass.length < 6) { showWallMsg('La contrasena debe tener al menos 6 caracteres'); return; }
+                if (pass !== passC) { showWallMsg('Las contrasenas no coinciden'); return; }
+            }
+            document.getElementById('wallMsg').style.display = 'none';
+            document.getElementById('regStep1').style.display = step === 1 ? 'block' : 'none';
+            document.getElementById('regStep2').style.display = step === 2 ? 'block' : 'none';
+            document.getElementById('regStep3').style.display = step === 3 ? 'block' : 'none';
+            // Update dots
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('regDot' + i);
+                dot.className = 'reg-step-dot' + (i === step ? ' active' : i < step ? ' done' : '');
+            }
+            document.getElementById('regLine1').style.background = step > 1 ? 'var(--primary)' : 'var(--border)';
+            document.getElementById('regLine2').style.background = step > 2 ? 'var(--primary)' : 'var(--border)';
+        }
+
+        async function completeRegistration() {
+            const name = document.getElementById('regStepName').value.trim();
+            const email = document.getElementById('regStepEmail').value.trim();
+            const pass = document.getElementById('regStepPass').value;
+            const farmacia = document.getElementById('regStepFarmacia').value.trim();
+            const ubicacion = document.getElementById('regStepUbicacion').value.trim();
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_register', {
+                    method: 'POST', headers: supabaseHeaders(),
+                    body: JSON.stringify({ user_nombre: name, user_email: email, user_password: pass })
+                });
+                const data = await res.json();
+                if (data.error) { showWallMsg(data.error); return; }
+                currentUser = data;
+                localStorage.setItem('fs_user', JSON.stringify(data));
+                // Save pharmacy data locally
+                if (farmacia || ubicacion) {
+                    saveProfileExtra({ farmacia, ubicacion, plan: regSelectedPlan });
+                }
+                applyAuthState();
+                await enrichUserData();
+
+                // TODO: Email de verificacion (requiere backend Flask/Railway con SMTP)
+                // Cuando el backend este activo, descomentar:
+                // await fetch('/api/send-verification-email', {
+                //     method: 'POST',
+                //     headers: {'Content-Type':'application/json'},
+                //     body: JSON.stringify({ email, nombre: name })
+                // });
+                // Plantilla HTML del email preparada en: templates/email_verificacion.html
+
+            } catch(e) { showWallMsg('Error de conexion'); }
+        }
+
+        /* ============================================================
+         * PLANTILLA EMAIL DE VERIFICACION (para cuando se active SMTP)
+         * ============================================================
+         * El backend Flask debe enviar este HTML por email:
+         *
+         * <div style="max-width:500px;margin:0 auto;font-family:Arial,sans-serif">
+         *   <div style="background:linear-gradient(135deg,#00a99d,#00c9bc);padding:30px;text-align:center;border-radius:12px 12px 0 0">
+         *     <img src="https://[DOMINIO]/favicon.svg" alt="FarmaSearch" style="width:40px;height:40px;margin-bottom:10px">
+         *     <h1 style="color:#fff;font-size:1.4rem;margin:0">FarmaSearch</h1>
+         *   </div>
+         *   <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+         *     <h2 style="color:#1a1a2e;font-size:1.1rem;margin:0 0 12px">Bienvenido, {{NOMBRE}}</h2>
+         *     <p style="color:#6b7280;font-size:0.9rem;line-height:1.6;margin:0 0 24px">
+         *       Gracias por registrarte en FarmaSearch. Para verificar tu cuenta y
+         *       empezar a comparar precios de farmacia, pulsa el boton:
+         *     </p>
+         *     <div style="text-align:center;margin-bottom:24px">
+         *       <a href="https://[DOMINIO]/verificar?token={{TOKEN}}"
+         *          style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#00a99d,#00c9bc);
+         *          color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:0.95rem">
+         *         Verificar mi cuenta
+         *       </a>
+         *     </div>
+         *     <p style="color:#9ca3af;font-size:0.78rem;text-align:center">
+         *       Si no creaste esta cuenta, ignora este email.
+         *     </p>
+         *   </div>
+         *   <p style="color:#9ca3af;font-size:0.7rem;text-align:center;margin-top:16px">
+         *     FarmaSearch - Comparador de precios de farmacia
+         *   </p>
+         * </div>
+         * ============================================================ */
         function showWallMsg(msg) {
             const el = document.getElementById('wallMsg');
             el.textContent = msg; el.style.display = 'block';
@@ -1251,29 +1618,12 @@
                 currentUser = data;
                 localStorage.setItem('fs_user', JSON.stringify(data));
                 applyAuthState();
+                await enrichUserData();
             } catch(e) { showWallMsg('Error de conexion'); }
         }
-        async function wallRegister() {
-            const name = document.getElementById('wallRegName').value.trim();
-            const email = document.getElementById('wallRegEmail').value.trim();
-            const pass = document.getElementById('wallRegPass').value;
-            if (!name || !email || !pass) { showWallMsg('Completa todos los campos'); return; }
-            if (pass.length < 6) { showWallMsg('Minimo 6 caracteres'); return; }
-            try {
-                const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/auth_register', {
-                    method: 'POST', headers: supabaseHeaders(),
-                    body: JSON.stringify({ user_nombre: name, user_email: email, user_password: pass })
-                });
-                const data = await res.json();
-                if (data.error) { showWallMsg(data.error); return; }
-                currentUser = data;
-                localStorage.setItem('fs_user', JSON.stringify(data));
-                applyAuthState();
-            } catch(e) { showWallMsg('Error de conexion'); }
-        }
-
         // Apply auth state on load
         applyAuthState();
+        enrichUserData();
 
         // ===== DOM REFS =====
         const searchInput = document.getElementById('searchInput');
@@ -1348,6 +1698,7 @@
                     currentData = items;
                     updateSortButtons();
                     renderResults(currentData, q, false, 0, total);
+                    checkAlertChanges(currentData);
                     setupIntersectionObserver(total);
                 } else {
                     currentData = currentData.concat(items);
@@ -1401,6 +1752,7 @@
                             '<div class="best-price">' + priceStr + '</div>' +
                             '<div class="price-label">mejor precio</div>' +
                         '</div>' +
+                        '<button class="alert-bell' + (isAlertActive(prod.nombre) ? ' active' : '') + (hasAlertChanged(prod.nombre, prod.mejor_precio) ? ' changed' : '') + '" onclick="event.stopPropagation();toggleAlertByIdx(' + globalIdx + ',this)" title="Activar alerta"><span class="bell-changed"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>' +
                         '<div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>' +
                     '</div>' +
                     '<div class="product-detail"><div class="detail-inner">' + farmaciasHtml + '</div></div>' +
@@ -1410,7 +1762,19 @@
             else resultsDiv.innerHTML = html;
         }
 
-        function toggleCard(idx) { document.getElementById('card-' + idx).classList.toggle('expanded'); }
+        function toggleCard(idx) {
+            const card = document.getElementById('card-' + idx);
+            const wasExpanded = card.classList.contains('expanded');
+            card.classList.toggle('expanded');
+            // Save to history when expanding
+            if (!wasExpanded && currentQuery) {
+                const nameEl = card.querySelector('.product-name');
+                const priceEl = card.querySelector('.best-price');
+                if (nameEl) {
+                    addToHistorial(currentQuery, nameEl.textContent, priceEl ? priceEl.textContent : '');
+                }
+            }
+        }
         function highlightMatch(text, query) {
             const e = escapeHtml(text);
             const q = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1419,15 +1783,909 @@
         function escapeHtml(str) { if (!str) return ''; const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
         // ===== VIEW SWITCHING =====
-        const allViews = { dashboard:'viewDashboard', buscador:'searchArea', ofertas:'viewOfertas', listas:'viewListas', favoritos:'viewFavoritos', historial:'viewHistorial', suscripcion:'viewSuscripcion', perfil:'viewPerfil' };
+        const allViews = { dashboard:'viewDashboard', buscador:'searchArea', ofertas:'viewOfertas', historial:'viewHistorial', suscripcion:'viewSuscripcion', perfil:'viewPerfil', alertas:'viewAlertas', catalogo:'viewCatalogo', comparador:'viewComparador', admin:'viewAdmin' };
         function switchView(view) {
             Object.values(allViews).forEach(id => { const el = document.getElementById(id); if (el) { el.style.display = 'none'; el.classList.remove('active'); } });
             const target = document.getElementById(allViews[view]);
             if (target) { target.style.display = 'block'; target.classList.add('active'); }
             const tw = document.querySelector('.topbar-wrap'); if (tw) tw.style.display = view === 'buscador' ? 'block' : 'none';
             document.querySelectorAll('.sidebar-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+            // Load dynamic views
+            if (view === 'dashboard') loadDashboardView();
+            if (view === 'suscripcion') loadSuscripcionView();
+            if (view === 'perfil') loadPerfilView();
+            if (view === 'ofertas') loadOfertasView();
+            if (view === 'historial') loadHistorialView();
+            if (view === 'alertas') loadAlertasView();
+            if (view === 'catalogo') loadCatalogoView();
+            if (view === 'admin') loadAdminView();
             // Close sidebar on mobile
             if (window.innerWidth <= 900) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+        }
+
+        // ===== ADMIN VIEW =====
+        async function loadAdminView() {
+            const el = document.getElementById('adminContent');
+            if (!currentUser || !currentUser.is_admin) {
+                el.innerHTML = '<div class="view-empty"><p>Acceso restringido a administradores</p></div>';
+                return;
+            }
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">Cargando datos de administracion...</div>';
+
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/usuarios?select=id,nombre,email,plan,is_admin,fecha_registro,ultimo_login,activo&order=id.asc', {
+                    headers: supabaseHeaders()
+                });
+                const users = await res.json();
+                if (!Array.isArray(users)) { el.innerHTML = '<div class="view-empty"><p>Error al cargar usuarios</p></div>'; return; }
+
+                const totalUsers = users.length;
+                const proUsers = users.filter(u => u.plan === 'premium' || u.plan === 'pro').length;
+                const activeUsers = users.filter(u => u.activo).length;
+                const adminUsers = users.filter(u => u.is_admin).length;
+
+                const statsHtml = `
+                    <div class="dash-grid" style="margin-bottom:20px">
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:var(--primary-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                            <div class="dash-card-value">${totalUsers}</div>
+                            <div class="dash-card-label">Usuarios totales</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:var(--accent-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                            <div class="dash-card-value">${proUsers}</div>
+                            <div class="dash-card-label">Usuarios Premium</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+                            <div class="dash-card-value">${activeUsers}</div>
+                            <div class="dash-card-label">Usuarios activos</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:#ede9fe"><svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg></div>
+                            <div class="dash-card-value">${adminUsers}</div>
+                            <div class="dash-card-label">Administradores</div>
+                        </div>
+                    </div>
+                `;
+
+                const usersHtml = users.map(u => {
+                    const isAdmin = u.is_admin === true;
+                    const isPro = u.plan === 'premium' || u.plan === 'pro';
+                    const initial = (u.nombre || 'U').charAt(0).toUpperCase();
+                    const registered = u.fecha_registro ? new Date(u.fecha_registro).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'}) : '—';
+                    const lastLogin = u.ultimo_login ? getTimeAgo(u.ultimo_login) : 'Nunca';
+
+                    let badges = '';
+                    if (isAdmin) badges += '<span class="plan-badge admin" style="font-size:0.58rem;padding:1px 6px">ADMIN</span> ';
+                    if (isPro) badges += '<span class="plan-badge pro" style="font-size:0.58rem;padding:1px 6px">PRO</span> ';
+                    if (!isPro && !isAdmin) badges += '<span class="plan-badge estandar" style="font-size:0.58rem;padding:1px 6px">ESTANDAR</span> ';
+
+                    return '<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);margin-bottom:8px">' +
+                        '<div style="width:40px;height:40px;border-radius:50%;background:' + (isAdmin ? 'linear-gradient(135deg,#7c3aed,#a78bfa)' : isPro ? 'linear-gradient(135deg,var(--accent),#ff9800)' : 'linear-gradient(135deg,var(--primary),#00c9bc)') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0">' + initial + '</div>' +
+                        '<div style="flex:1;min-width:0">' +
+                            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+                                '<span style="font-size:0.88rem;font-weight:600;color:var(--text-dark)">' + escapeHtml(u.nombre || 'Sin nombre') + '</span>' +
+                                badges +
+                                (u.activo ? '<span style="font-size:0.6rem;color:var(--green)">● Activo</span>' : '<span style="font-size:0.6rem;color:var(--text-muted)">● Inactivo</span>') +
+                            '</div>' +
+                            '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">' + escapeHtml(u.email || '') + '</div>' +
+                        '</div>' +
+                        '<div style="text-align:right;flex-shrink:0">' +
+                            '<div style="font-size:0.72rem;color:var(--text-muted)">Registro: ' + registered + '</div>' +
+                            '<div style="font-size:0.72rem;color:var(--text-secondary);font-weight:500">Ultimo acceso: ' + lastLogin + '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+
+                el.innerHTML = statsHtml +
+                    '<div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
+                        'Usuarios registrados' +
+                    '</div>' +
+                    '<input type="text" class="view-filter" placeholder="Filtrar usuarios por nombre o email..." oninput="filterView(\'adminUsersList\',this.value)">' +
+                    '<div id="adminUsersList">' + usersHtml + '</div>';
+
+            } catch(e) {
+                el.innerHTML = '<div class="view-empty"><p>Error al cargar datos: ' + e.message + '</p></div>';
+            }
+        }
+
+        // ===== DASHBOARD VIEW =====
+        async function loadDashboardView() {
+            const el = document.getElementById('dashContent');
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">Cargando dashboard...</div>';
+
+            // Read local data
+            const hist = getHistorial();
+            const alerts = getAlerts();
+            const catalogo = JSON.parse(localStorage.getItem(CATALOGO_KEY) || '[]');
+            const totalProducts = hist.reduce((sum, h) => sum + h.productos.length, 0);
+            const totalSearches = hist.length;
+            const totalAlerts = alerts.length;
+            const alertsChanged = alerts.filter(a => !a.leido).length;
+            const catalogoCount = catalogo.length;
+            const user = currentUser || {};
+            const plan = (user.plan || 'estandar').toLowerCase();
+            const isPro = plan === 'pro' || plan === 'premium';
+
+            // Fetch live stats from Supabase
+            let totalProductsDB = '280K+';
+            let totalOffersDB = 0;
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/precios?select=precio,precio_original&precio_original=gt.0&en_stock=eq.true&limit=200', { headers: supabaseHeaders() });
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    totalOffersDB = data.filter(d => d.precio && d.precio_original && d.precio < d.precio_original && ((1 - d.precio / d.precio_original) * 100) >= 5).length;
+                }
+            } catch(e) {}
+
+            // Recent searches for quick access
+            const recentHtml = hist.slice(0, 5).map(h =>
+                '<button onclick="switchView(\'buscador\');searchCategory(\'' + escapeHtml(h.termino).replace(/'/g, "\\'") + '\')" style="padding:8px 14px;font-size:0.78rem;font-weight:500;background:var(--bg-white);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;color:var(--text-body);transition:all 0.2s;display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>' + escapeHtml(h.termino) + '</button>'
+            ).join('');
+
+            // Alerts with changes
+            const alertChangesHtml = alerts.filter(a => !a.leido && a.precio_anterior).slice(0, 3).map(a => {
+                const diff = a.precio_actual - a.precio_anterior;
+                return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:' + (diff < 0 ? 'var(--green-light)' : 'var(--red-light)') + ';border-radius:8px;margin-bottom:6px">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="' + (diff < 0 ? 'var(--green)' : 'var(--red)') + '" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px;flex-shrink:0"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' +
+                    '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:500;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(a.nombre) + '</div>' +
+                    '<div style="font-size:0.7rem;color:' + (diff < 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:600">' + a.precio_anterior.toFixed(2) + ' \u2192 ' + a.precio_actual.toFixed(2) + ' \u20ac</div></div></div>';
+            }).join('');
+
+            el.innerHTML = `
+                <!-- Welcome -->
+                <div style="background:linear-gradient(135deg,var(--primary),#00c9bc);border-radius:var(--radius-lg);padding:24px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden">
+                    <div style="position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);border-radius:50%"></div>
+                    <div style="position:relative;z-index:1">
+                        <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px">Hola, ${escapeHtml(user.nombre || 'Usuario')}</div>
+                        <div style="font-size:0.82rem;opacity:0.9">Plan ${isPro ? 'Premium' : 'Estandar'} · ${totalProductsDB} productos en base de datos</div>
+                    </div>
+                </div>
+
+                <!-- Stats grid -->
+                <div class="dash-grid">
+                    <div class="dash-card" onclick="switchView('historial')">
+                        <div class="dash-card-icon" style="background:var(--primary-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+                        <div class="dash-card-value">${totalSearches}</div>
+                        <div class="dash-card-label">Busquedas</div>
+                    </div>
+                    <div class="dash-card" onclick="switchView('historial')">
+                        <div class="dash-card-icon" style="background:#e8eaf6"><svg viewBox="0 0 24 24" fill="none" stroke="#5c6bc0" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                        <div class="dash-card-value">${totalProducts}</div>
+                        <div class="dash-card-label">Productos consultados</div>
+                    </div>
+                    <div class="dash-card" onclick="switchView('alertas')">
+                        <div class="dash-card-icon" style="background:var(--accent-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+                        <div class="dash-card-value">${totalAlerts}${alertsChanged > 0 ? '<span style="font-size:0.7rem;color:var(--red);margin-left:4px">(' + alertsChanged + ' nuevas)</span>' : ''}</div>
+                        <div class="dash-card-label">Alertas activas</div>
+                    </div>
+                    <div class="dash-card" onclick="switchView('ofertas')">
+                        <div class="dash-card-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg></div>
+                        <div class="dash-card-value">${totalOffersDB}+</div>
+                        <div class="dash-card-label">Ofertas disponibles</div>
+                    </div>
+                </div>
+
+                <!-- Two columns: recent + alerts -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+                    <!-- Recent searches -->
+                    <div style="background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:18px">
+                        <div style="font-size:0.85rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            Busquedas recientes
+                        </div>
+                        ${recentHtml ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + recentHtml + '</div>' : '<div style="font-size:0.82rem;color:var(--text-muted)">Aun no has buscado nada</div>'}
+                    </div>
+
+                    <!-- Price changes -->
+                    <div style="background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:18px">
+                        <div style="font-size:0.85rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                            Cambios de precio
+                        </div>
+                        ${alertChangesHtml || '<div style="font-size:0.82rem;color:var(--text-muted)">Sin cambios de precio en tus alertas</div>'}
+                        ${totalAlerts > 0 ? '<button onclick="switchView(\'alertas\')" style="margin-top:10px;padding:6px 14px;font-size:0.72rem;font-weight:600;background:var(--bg-light);color:var(--primary-dark);border:none;border-radius:6px;cursor:pointer;font-family:inherit">Ver todas las alertas</button>' : ''}
+                    </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div style="margin-top:16px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:18px">
+                    <div style="font-size:0.85rem;font-weight:700;color:var(--text-dark);margin-bottom:14px">Acciones rapidas</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+                        <button onclick="switchView('buscador')" style="padding:12px;font-size:0.82rem;font-weight:500;background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Buscar productos</button>
+                        <button onclick="switchView('ofertas')" style="padding:12px;font-size:0.82rem;font-weight:500;background:var(--green-light);color:var(--green);border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg> Ver ofertas</button>
+                        <button onclick="switchView('alertas')" style="padding:12px;font-size:0.82rem;font-weight:500;background:var(--accent-bg);color:var(--accent);border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Mis alertas</button>
+                        ${isPro ? '<button onclick="switchView(\'catalogo\')" style="padding:12px;font-size:0.82rem;font-weight:500;background:#fff3e0;color:#e65100;border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Mi catalogo</button>' : '<button onclick="switchView(\'suscripcion\')" style="padding:12px;font-size:0.82rem;font-weight:500;background:#fff3e0;color:#e65100;border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Mejorar a Premium</button>'}
+                        <button onclick="switchView('perfil')" style="padding:12px;font-size:0.82rem;font-weight:500;background:var(--bg-light);color:var(--text-secondary);border:none;border-radius:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:all 0.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Mi perfil</button>
+                    </div>
+                </div>
+
+                <!-- Catalogo stats for premium -->
+                ${catalogoCount > 0 ? '<div style="margin-top:16px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:18px"><div style="font-size:0.85rem;font-weight:700;color:var(--text-dark);margin-bottom:8px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Mi Catalogo</div><div style="font-size:0.85rem;color:var(--text-body)">' + catalogoCount + ' productos cargados</div><button onclick="switchView(\'catalogo\')" style="margin-top:8px;padding:6px 14px;font-size:0.72rem;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Ver catalogo</button></div>' : ''}
+            `;
+        }
+
+        // ===== SUBSCRIPTION VIEW =====
+        function loadSuscripcionView() {
+            const plan = currentUser ? (currentUser.plan || 'estandar').toLowerCase() : 'estandar';
+            const isPremium = plan === 'pro' || plan === 'premium';
+            const isEstandar = !isPremium;
+
+            const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>';
+            const lockSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+            const html = `
+                <div class="sub-grid">
+                    <div class="sub-card${isEstandar ? ' recommended' : ''}">
+                        ${isEstandar ? '' : ''}
+                        <div class="sub-plan-name">Plan Estandar</div>
+                        <div class="sub-price">50 &#8364;<span>/mes</span></div>
+                        ${isEstandar ? '<div class="sub-status active">TU PLAN ACTUAL</div>' : '<div class="sub-status estandar">Plan basico</div>'}
+                        <ul class="sub-features">
+                            <li>${checkSvg} Buscador de precios en 8 farmacias</li>
+                            <li>${checkSvg} Hasta 5 productos favoritos</li>
+                            <li>${checkSvg} Historial de busquedas</li>
+                            <li>${checkSvg} Listas de productos</li>
+                            <li>${checkSvg} Ofertas del dia</li>
+                            <li class="locked">${lockSvg} Catalogo personalizado</li>
+                            <li class="locked">${lockSvg} Alertas de precio por email</li>
+                        </ul>
+                        ${isEstandar ? '<button class="sub-btn muted" disabled>Tu plan actual</button>' : '<button class="sub-btn muted" disabled>Plan basico</button>'}
+                    </div>
+                    <div class="sub-card${isPremium ? ' recommended' : ''}">
+                        <div class="sub-badge-rec">RECOMENDADO</div>
+                        <div class="sub-plan-name">Plan Premium</div>
+                        <div class="sub-price">70 &#8364;<span>/mes</span></div>
+                        ${isPremium ? '<div class="sub-status active">TU PLAN ACTUAL</div>' : '<div class="sub-status estandar">Todas las funciones</div>'}
+                        <ul class="sub-features">
+                            <li>${checkSvg} Todo lo del Plan Estandar</li>
+                            <li>${checkSvg} Favoritos ilimitados</li>
+                            <li>${checkSvg} Notificaciones por email</li>
+                            <li>${checkSvg} Catalogo personalizado</li>
+                            <li>${checkSvg} Monitorizacion de competencia</li>
+                            <li>${checkSvg} Alertas de precio avanzadas</li>
+                            <li>${checkSvg} Historial de cambios de precio</li>
+                        </ul>
+                        ${isPremium ? '<button class="sub-btn muted" disabled>Tu plan actual</button>' : '<button class="sub-btn primary" onclick="contactPremium()">Contacta para activar Premium</button>'}
+                    </div>
+                </div>
+                <div style="margin-top:20px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px;text-align:center">
+                    <p style="font-size:0.78rem;color:var(--text-muted)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        Los precios no incluyen IVA. Facturacion mensual. Puedes cancelar en cualquier momento.
+                    </p>
+                </div>
+            `;
+            document.getElementById('subContent').innerHTML = html;
+        }
+
+        function contactPremium() {
+            showToast('Para activar el Plan Premium, contacta con soporte.', 'info');
+        }
+
+        // ===== PROFILE VIEW =====
+        const PROFILE_KEY = 'fs_profile_extra';
+        function getProfileExtra() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); } catch(e) { return {}; } }
+        function saveProfileExtra(data) { localStorage.setItem(PROFILE_KEY, JSON.stringify(data)); }
+
+        function loadPerfilView() {
+            const user = currentUser || {};
+            const extra = getProfileExtra();
+            const nombre = user.nombre || 'Usuario';
+            const email = user.email || '';
+            const plan = (user.plan || 'estandar').toLowerCase();
+            const isPro = plan === 'pro' || plan === 'premium';
+            const initial = nombre.charAt(0).toUpperCase();
+            const createdAt = user.created_at || user.fecha_registro;
+            const createdStr = createdAt ? new Date(createdAt).toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'}) : 'No disponible';
+            const farmacia = extra.farmacia || '';
+            const ubicacion = extra.ubicacion || '';
+            const telefono = extra.telefono || '';
+            const web = extra.web || '';
+
+            const el = document.getElementById('profileContent');
+            el.innerHTML = `
+                <div style="text-align:center;padding-bottom:20px;border-bottom:1px solid var(--border-light);margin-bottom:24px">
+                    <div class="profile-avatar">${escapeHtml(initial)}</div>
+                    <div class="profile-name">${escapeHtml(nombre)}</div>
+                    <div class="profile-email">${escapeHtml(email)}</div>
+                    <div style="margin-top:8px">
+                        <span class="plan-badge ${isPro ? 'pro' : 'estandar'}" style="font-size:0.72rem;padding:3px 12px">${isPro ? 'PREMIUM' : 'ESTANDAR'}</span>
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px">Miembro desde ${createdStr}</div>
+                </div>
+
+                <!-- Datos personales -->
+                <div style="margin-bottom:28px">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Datos personales
+                    </div>
+                    <div class="profile-detail-grid">
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Nombre completo</label>
+                            <input type="text" id="profNombre" class="profile-input" value="${escapeHtml(nombre)}" placeholder="Tu nombre">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Email</label>
+                            <input type="email" id="profEmail" class="profile-input" value="${escapeHtml(email)}" placeholder="tu@email.com" disabled style="opacity:0.6;cursor:not-allowed">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Telefono</label>
+                            <input type="tel" id="profTelefono" class="profile-input" value="${escapeHtml(telefono)}" placeholder="+34 600 000 000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de farmacia -->
+                <div style="margin-bottom:28px">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M12 10v4"/><path d="M10 12h4"/></svg>
+                        Mi farmacia
+                    </div>
+                    <div class="profile-detail-grid">
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Nombre de la farmacia</label>
+                            <input type="text" id="profFarmacia" class="profile-input" value="${escapeHtml(farmacia)}" placeholder="Farmacia Lopez">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Ubicacion / Direccion</label>
+                            <input type="text" id="profUbicacion" class="profile-input" value="${escapeHtml(ubicacion)}" placeholder="Calle Mayor 1, Madrid">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Pagina web</label>
+                            <input type="url" id="profWeb" class="profile-input" value="${escapeHtml(web)}" placeholder="https://www.mifarmacia.es">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seguridad -->
+                <div style="margin-bottom:28px">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Seguridad
+                    </div>
+                    <div class="profile-detail-grid">
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Contrasena actual</label>
+                            <input type="password" id="profPassCurrent" class="profile-input" placeholder="Tu contrasena actual">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Nueva contrasena</label>
+                            <input type="password" id="profPassNew" class="profile-input" placeholder="Minimo 6 caracteres">
+                        </div>
+                        <div class="profile-detail-item">
+                            <label class="profile-label">Confirmar nueva contrasena</label>
+                            <input type="password" id="profPassConfirm" class="profile-input" placeholder="Repite la nueva contrasena">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan y suscripcion -->
+                <div style="margin-bottom:28px">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Plan y suscripcion
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg-light);border-radius:var(--radius)">
+                        <div style="flex:1">
+                            <div style="font-size:0.88rem;font-weight:600;color:var(--text-dark)">Plan ${isPro ? 'Premium' : 'Estandar'}</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">${isPro ? '70 EUR/mes - Todas las funciones' : '50 EUR/mes - Funciones basicas'}</div>
+                        </div>
+                        ${!isPro ? '<button onclick="switchView(\'suscripcion\')" style="padding:8px 16px;font-size:0.78rem;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Mejorar a Premium</button>' : '<span style="font-size:0.78rem;color:var(--green);font-weight:600">Activo</span>'}
+                    </div>
+                </div>
+
+                <!-- Preferencias -->
+                <div style="margin-bottom:28px">
+                    <div style="font-size:0.88rem;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Preferencias
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg-light);border-radius:8px;cursor:pointer;font-size:0.85rem;color:var(--text-body)">
+                            <input type="checkbox" id="profEmailNotif" ${extra.emailNotif ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--primary)">
+                            Recibir notificaciones por email cuando cambien los precios
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg-light);border-radius:8px;cursor:pointer;font-size:0.85rem;color:var(--text-body)">
+                            <input type="checkbox" id="profNewsletter" ${extra.newsletter ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--primary)">
+                            Recibir ofertas semanales por email
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones de accion -->
+                <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--border-light)">
+                    <button onclick="saveProfile()" style="padding:12px 28px;font-size:0.88rem;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:all var(--transition)">Guardar cambios</button>
+                    <button onclick="if(confirm('Seguro que quieres cerrar sesion?'))doLogout()" style="padding:12px 28px;font-size:0.88rem;font-weight:600;background:var(--bg-light);color:var(--text-secondary);border:none;border-radius:10px;cursor:pointer;font-family:inherit">Cerrar sesion</button>
+                    <button onclick="if(confirm('Seguro que quieres eliminar tu cuenta? Esta accion no se puede deshacer.'))" style="padding:12px 28px;font-size:0.88rem;font-weight:600;background:var(--red-light);color:var(--red);border:none;border-radius:10px;cursor:pointer;font-family:inherit;margin-left:auto">Eliminar cuenta</button>
+                </div>
+            `;
+        }
+
+        function saveProfile() {
+            const extra = getProfileExtra();
+            extra.farmacia = document.getElementById('profFarmacia').value.trim();
+            extra.ubicacion = document.getElementById('profUbicacion').value.trim();
+            extra.telefono = document.getElementById('profTelefono').value.trim();
+            extra.web = document.getElementById('profWeb').value.trim();
+            extra.emailNotif = document.getElementById('profEmailNotif').checked;
+            extra.newsletter = document.getElementById('profNewsletter').checked;
+            saveProfileExtra(extra);
+
+            // Update nombre in currentUser if changed
+            const newNombre = document.getElementById('profNombre').value.trim();
+            if (newNombre && currentUser && newNombre !== currentUser.nombre) {
+                currentUser.nombre = newNombre;
+                localStorage.setItem('fs_user', JSON.stringify(currentUser));
+                applyAuthState();
+            }
+
+            // Password change
+            const passCurrent = document.getElementById('profPassCurrent').value;
+            const passNew = document.getElementById('profPassNew').value;
+            const passConfirm = document.getElementById('profPassConfirm').value;
+            if (passNew) {
+                if (passNew.length < 6) { showToast('La contrasena debe tener al menos 6 caracteres', 'error'); return; }
+                if (passNew !== passConfirm) { showToast('Las contrasenas no coinciden', 'error'); return; }
+                if (!passCurrent) { showToast('Introduce tu contrasena actual', 'error'); return; }
+                showToast('Cambio de contrasena: requiere conexion con el servidor', 'info');
+            }
+
+            showToast('Perfil guardado correctamente', 'success');
+        }
+
+        // ===== ALERTAS / SEGUIMIENTO (localStorage) =====
+        const ALERTS_KEY = 'fs_alertas';
+        const ALERTS_MAX = 30;
+
+        function getAlerts() {
+            try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch(e) { return []; }
+        }
+        function saveAlerts(alerts) {
+            localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts.slice(0, ALERTS_MAX)));
+        }
+        function isAlertActive(nombre) {
+            return getAlerts().some(a => a.nombre === nombre);
+        }
+        function hasAlertChanged(nombre, currentPrice) {
+            const alert = getAlerts().find(a => a.nombre === nombre);
+            if (!alert || !alert.precio_guardado || !currentPrice) return false;
+            return Math.abs(alert.precio_guardado - currentPrice) >= 0.01 && !alert.leido;
+        }
+
+        function toggleAlertByIdx(globalIdx, btn) {
+            const prod = currentData[globalIdx];
+            if (!prod) return;
+            const nombre = prod.nombre;
+            const precio = prod.mejor_precio || null;
+            const farmacia = prod.farmacia || '';
+            const url = prod.url || '';
+            const alerts = getAlerts();
+            const existing = alerts.findIndex(a => a.nombre === nombre);
+            if (existing >= 0) {
+                alerts.splice(existing, 1);
+                btn.classList.remove('active', 'changed');
+                showToast('Alerta eliminada', 'info');
+            } else {
+                alerts.unshift({ nombre, precio_guardado: precio, farmacia, url, fecha: new Date().toISOString(), leido: true });
+                btn.classList.add('active');
+                btn.classList.remove('changed');
+                showToast('Alerta activada', 'success');
+            }
+            saveAlerts(alerts);
+            updateAlertsBadge();
+        }
+
+        function updateAlertsBadge() {
+            const alerts = getAlerts();
+            const unread = alerts.filter(a => !a.leido).length;
+            const dot = document.getElementById('alertasDot');
+            if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
+        }
+
+        function checkAlertChanges(searchResults) {
+            const alerts = getAlerts();
+            if (alerts.length === 0) return;
+            let changed = false;
+            searchResults.forEach(prod => {
+                const alert = alerts.find(a => a.nombre === prod.nombre);
+                if (alert && prod.mejor_precio && alert.precio_guardado) {
+                    if (Math.abs(alert.precio_guardado - prod.mejor_precio) >= 0.01) {
+                        alert.precio_anterior = alert.precio_guardado;
+                        alert.precio_actual = prod.mejor_precio;
+                        alert.leido = false;
+                        alert.fecha_cambio = new Date().toISOString();
+                        changed = true;
+                    }
+                }
+            });
+            if (changed) { saveAlerts(alerts); updateAlertsBadge(); }
+        }
+
+        let alertCardCounter = 10000;
+
+        function loadAlertasView() {
+            const el = document.getElementById('alertasList');
+            const alerts = getAlerts();
+            if (alerts.length === 0) {
+                el.innerHTML = '<div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><p>No tienes alertas activas.<br>Busca un producto y pulsa la campanita para seguirlo.</p></div>';
+                return;
+            }
+
+            let html = '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">' + alerts.length + ' producto' + (alerts.length !== 1 ? 's' : '') + ' en seguimiento</div>';
+
+            alerts.forEach(function(a, i) {
+                const cardIdx = alertCardCounter++;
+                const priceStr = a.precio_guardado ? a.precio_guardado.toFixed(2) + ' \u20ac' : '\u2014';
+                const farmaciaHtml = a.farmacia ?
+                    '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(a.farmacia) + '</span><span class="pharmacy-price best">' + priceStr + '</span>' +
+                    '<a href="' + escapeHtml(a.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Comprar \u2192</a></div>' : '';
+
+                let changeInfo = '';
+                if (!a.leido && a.precio_anterior && a.precio_actual) {
+                    const diff = a.precio_actual - a.precio_anterior;
+                    changeInfo = '<div style="padding:6px 14px;margin-bottom:2px;background:' + (diff < 0 ? 'var(--green-light)' : 'var(--red-light)') + ';border-radius:var(--radius) var(--radius) 0 0;font-size:0.78rem;font-weight:600;color:' + (diff < 0 ? 'var(--green)' : 'var(--red)') + '">' + (diff < 0 ? '\u2193 Precio bajo' : '\u2191 Precio subio') + ': ' + a.precio_anterior.toFixed(2) + ' \u2192 ' + a.precio_actual.toFixed(2) + ' \u20ac</div>';
+                }
+
+                html += changeInfo +
+                    '<div class="product-card" id="card-' + cardIdx + '" onclick="toggleCard(' + cardIdx + ')" style="opacity:1;animation:none">' +
+                        '<div class="product-header">' +
+                            '<div class="product-info">' +
+                                '<div class="product-name">' + escapeHtml(a.nombre) + '</div>' +
+                                '<div class="product-meta"><span>' + escapeHtml(a.farmacia || '') + '</span><span>Guardado: ' + new Date(a.fecha).toLocaleDateString('es-ES') + '</span></div>' +
+                            '</div>' +
+                            '<div class="product-price-area">' +
+                                '<div class="best-price">' + priceStr + '</div>' +
+                                '<div class="price-label">precio guardado</div>' +
+                            '</div>' +
+                            '<button class="alert-bell active" onclick="event.stopPropagation();removeAlert(' + i + ')" title="Eliminar alerta"><svg viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>' +
+                            '<div class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></div>' +
+                        '</div>' +
+                        '<div class="product-detail"><div class="detail-inner">' + farmaciaHtml + '</div></div>' +
+                    '</div>';
+            });
+
+            el.innerHTML = html;
+        }
+
+        function removeAlert(idx) {
+            const alerts = getAlerts();
+            alerts.splice(idx, 1);
+            saveAlerts(alerts);
+            loadAlertasView();
+            updateAlertsBadge();
+            showToast('Alerta eliminada', 'info');
+        }
+
+        function markAllAlertsRead() {
+            const alerts = getAlerts();
+            alerts.forEach(a => { a.leido = true; });
+            saveAlerts(alerts);
+            updateAlertsBadge();
+            loadAlertasView();
+            showToast('Alertas marcadas como leidas', 'info');
+        }
+
+        // Check for price changes on search results
+        updateAlertsBadge();
+
+        // ===== HISTORIAL (localStorage) =====
+        const HIST_KEY = 'fs_historial';
+        const HIST_MAX = 15;
+        const HIST_MAX_PRODUCTS = 8;
+
+        function getHistorial() {
+            try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch(e) { return []; }
+        }
+
+        function saveHistorial(hist) {
+            localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, HIST_MAX)));
+        }
+
+        function addToHistorial(termino, productoNombre, precio) {
+            const hist = getHistorial();
+            const term = termino.trim().toLowerCase();
+            // Find or create entry for this search term
+            let entry = hist.find(h => h.termino.toLowerCase() === term);
+            if (!entry) {
+                entry = { termino: termino.trim(), fecha: new Date().toISOString(), productos: [] };
+                hist.unshift(entry);
+            } else {
+                // Move to top
+                const idx = hist.indexOf(entry);
+                if (idx > 0) { hist.splice(idx, 1); hist.unshift(entry); }
+                entry.fecha = new Date().toISOString();
+            }
+            // Add product if not already there
+            const cleanName = productoNombre.replace(/<[^>]*>/g, '').trim();
+            if (!entry.productos.find(p => p.nombre === cleanName)) {
+                entry.productos.unshift({ nombre: cleanName, precio: precio, fecha: new Date().toISOString() });
+                if (entry.productos.length > HIST_MAX_PRODUCTS) entry.productos.pop();
+            }
+            saveHistorial(hist);
+        }
+
+        function loadHistorialView() {
+            const el = document.getElementById('histList');
+            const hist = getHistorial();
+            if (hist.length === 0) {
+                el.innerHTML = '<div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>No has buscado nada todavia.<br>Busca productos y despliega tarjetas para verlos aqui.</p></div>';
+                return;
+            }
+            el.innerHTML = hist.map((h, i) => {
+                const timeAgo = getTimeAgo(h.fecha);
+                const prodsHtml = h.productos.map(p =>
+                    '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-light);border-radius:8px;margin-top:4px">' +
+                        '<div style="flex:1;min-width:0"><div style="font-size:0.8rem;font-weight:500;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(p.nombre) + '</div></div>' +
+                        (p.precio ? '<div style="font-size:0.82rem;font-weight:700;color:var(--primary-dark);flex-shrink:0">' + escapeHtml(p.precio) + '</div>' : '') +
+                    '</div>'
+                ).join('');
+                return '<div style="background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px;margin-bottom:10px">' +
+                    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+                        '<div style="display:flex;align-items:center;gap:10px">' +
+                            '<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>' +
+                            '<span style="font-size:0.92rem;font-weight:600;color:var(--text-dark)">' + escapeHtml(h.termino) + '</span>' +
+                            '<span style="font-size:0.7rem;color:var(--text-muted)">' + timeAgo + '</span>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:6px">' +
+                            '<button onclick="switchView(\'buscador\');searchCategory(\'' + escapeHtml(h.termino).replace(/'/g,"\\'") + '\')" style="padding:5px 12px;font-size:0.72rem;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Buscar</button>' +
+                            '<button onclick="removeHistEntry(' + i + ')" style="padding:5px 8px;font-size:0.72rem;background:var(--red-light);color:var(--red);border:none;border-radius:6px;cursor:pointer" title="Eliminar">&#10005;</button>' +
+                        '</div>' +
+                    '</div>' +
+                    (h.productos.length > 0 ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">' + h.productos.length + ' producto' + (h.productos.length !== 1 ? 's' : '') + ' consultado' + (h.productos.length !== 1 ? 's' : '') + '</div>' + prodsHtml : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic">Busqueda sin productos desplegados</div>') +
+                '</div>';
+            }).join('');
+        }
+
+        function getTimeAgo(dateStr) {
+            const diff = Date.now() - new Date(dateStr).getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'ahora';
+            if (mins < 60) return 'hace ' + mins + ' min';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return 'hace ' + hours + 'h';
+            const days = Math.floor(hours / 24);
+            if (days < 7) return 'hace ' + days + 'd';
+            return new Date(dateStr).toLocaleDateString('es-ES', {day:'numeric',month:'short'});
+        }
+
+        function removeHistEntry(idx) {
+            const hist = getHistorial();
+            hist.splice(idx, 1);
+            saveHistorial(hist);
+            loadHistorialView();
+        }
+
+        function clearHistorial() {
+            localStorage.removeItem(HIST_KEY);
+            loadHistorialView();
+            showToast('Historial borrado', 'info');
+        }
+
+        // ===== VIEW FILTER =====
+        function filterView(containerId, query) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const q = query.toLowerCase().trim();
+            const items = container.querySelectorAll('.oferta-card, .product-card, .catalogo-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = q === '' || text.includes(q) ? '' : 'none';
+            });
+        }
+
+        // ===== CATALOGO =====
+        const CATALOGO_KEY = 'fs_catalogo';
+
+        function downloadCatalogoTemplate() {
+            if (typeof XLSX === 'undefined') { showToast('Error: libreria Excel no cargada', 'error'); return; }
+            const data = [
+                ['Nombre', 'Precio', 'EAN'],
+                ['Paracetamol 500mg 20 comprimidos', 1.50, ''],
+                ['Crema hidratante Avene 400ml', 14.99, ''],
+                ['Proteccion solar SPF50 200ml', 12.00, '']
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [{wch:40},{wch:10},{wch:16}];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Catalogo');
+            XLSX.writeFile(wb, 'plantilla_catalogo_farmasearch.xlsx');
+            showToast('Plantilla descargada', 'success');
+        }
+
+        function importCatalogoExcel(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (typeof XLSX === 'undefined') { showToast('Error: libreria Excel no cargada', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const wb = XLSX.read(e.target.result, {type:'array'});
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(ws);
+                    if (rows.length === 0) { showToast('El archivo esta vacio', 'error'); return; }
+                    const products = rows.map(r => ({
+                        nombre: r.Nombre || r.nombre || r.NOMBRE || r.Producto || r.producto || '',
+                        precio: parseFloat(r.Precio || r.precio || r.PRECIO || r.PVP || r.pvp || 0) || null,
+                        ean: (r.EAN || r.ean || r.Codigo || r.codigo || '').toString()
+                    })).filter(p => p.nombre.trim().length > 0);
+                    if (products.length === 0) { showToast('No se encontraron productos. Asegurate de que la columna se llama "Nombre"', 'error'); return; }
+                    localStorage.setItem(CATALOGO_KEY, JSON.stringify(products));
+                    showToast(products.length + ' productos importados', 'success');
+                    compareCatalogo(products);
+                } catch(err) { showToast('Error al leer el archivo: ' + err.message, 'error'); }
+            };
+            reader.readAsArrayBuffer(file);
+            input.value = '';
+        }
+
+        function loadCatalogoView() {
+            const saved = localStorage.getItem(CATALOGO_KEY);
+            if (saved) {
+                try {
+                    const products = JSON.parse(saved);
+                    if (products.length > 0) { compareCatalogo(products); return; }
+                } catch(e) {}
+            }
+            document.getElementById('catalogoResults').innerHTML =
+                '<div style="text-align:center;padding:60px 20px">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px;margin-bottom:12px;opacity:0.4"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+                    '<div style="font-size:0.95rem;font-weight:500;color:var(--text-body);margin-bottom:6px">Sube tu catalogo de productos</div>' +
+                    '<div style="font-size:0.82rem;color:var(--text-muted);max-width:400px;margin:0 auto;line-height:1.5">Descarga la plantilla, rellena tus productos con nombre y precio, y subelo para comparar con las 8 farmacias de FarmaSearch.</div>' +
+                '</div>';
+        }
+
+        async function compareCatalogo(products) {
+            const el = document.getElementById('catalogoResults');
+            el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">Comparando ' + products.length + ' productos con FarmaSearch...</div>';
+
+            let found = 0, cheaper = 0, cardIdx = 20000;
+            let html = '';
+
+            for (let i = 0; i < products.length; i++) {
+                const p = products[i];
+                let matchHtml = '';
+                let vsHtml = '<span class="catalogo-vs nomatch">No encontrado</span>';
+
+                try {
+                    const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/search_products', {
+                        method: 'POST', headers: supabaseHeaders(),
+                        body: JSON.stringify({ search_term: p.nombre, page_num: 1, page_size: 3, sort_by: 'relevancia' })
+                    });
+                    const data = await res.json();
+                    const items = data.items || [];
+                    const match = items.length > 0 ? items[0] : null;
+
+                    if (match && match.mejor_precio) {
+                        found++;
+                        const bestPrice = match.mejor_precio;
+                        const priceStr = bestPrice.toFixed(2) + ' \u20ac';
+
+                        if (p.precio) {
+                            const diff = p.precio - bestPrice;
+                            if (diff > 0.01) {
+                                vsHtml = '<span class="catalogo-vs expensive">+' + diff.toFixed(2) + ' \u20ac mas caro</span>';
+                            } else if (diff < -0.01) {
+                                vsHtml = '<span class="catalogo-vs cheaper">' + diff.toFixed(2) + ' \u20ac mas barato</span>';
+                                cheaper++;
+                            } else {
+                                vsHtml = '<span class="catalogo-vs equal">Mismo precio</span>';
+                            }
+                        }
+
+                        const cIdx = cardIdx++;
+                        const farmHtml = match.farmacia ?
+                            '<div class="pharmacy-row"><span class="pharmacy-name">' + escapeHtml(match.farmacia) + '</span><span class="pharmacy-price best">' + priceStr + '</span><span class="stock-badge ' + (match.en_stock ? 'in-stock' : 'out-stock') + '">' + (match.en_stock ? 'Disponible' : 'Sin stock') + '</span><a href="' + escapeHtml(match.url || '#') + '" target="_blank" rel="noopener" class="buy-link" onclick="event.stopPropagation()">Ver \u2192</a></div>' : '';
+
+                        matchHtml = '<div class="catalogo-competitor" onclick="document.getElementById(\'catcard-' + cIdx + '\').classList.toggle(\'open\')" style="cursor:pointer">' +
+                            '<div style="display:flex;align-items:center;justify-content:space-between">' +
+                                '<span style="font-size:0.78rem;color:var(--text-muted)">Mejor precio en FarmaSearch:</span>' +
+                                '<span style="font-size:0.95rem;font-weight:700;color:var(--primary-dark)">' + priceStr + '</span>' +
+                            '</div>' +
+                            '<div id="catcard-' + cIdx + '" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease">' +
+                                '<div style="padding-top:8px">' + farmHtml + '</div>' +
+                            '</div>' +
+                            '<div style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:4px">Pulsa para ver detalle</div>' +
+                        '</div>';
+                    }
+                } catch(e) {}
+
+                html += '<div class="catalogo-item">' +
+                    '<div class="catalogo-item-header">' +
+                        '<div class="catalogo-item-client">' +
+                            '<div class="catalogo-item-name">' + escapeHtml(p.nombre) + '</div>' +
+                            '<div class="catalogo-item-meta">' + (p.ean ? 'EAN: ' + escapeHtml(p.ean) + ' · ' : '') + 'Tu producto #' + (i+1) + '</div>' +
+                        '</div>' +
+                        (p.precio ? '<div class="catalogo-item-price">' + p.precio.toFixed(2) + ' \u20ac</div>' : '') +
+                        vsHtml +
+                    '</div>' +
+                    matchHtml +
+                '</div>';
+
+                // Update progress
+                if (i % 5 === 0 || i === products.length - 1) {
+                    el.innerHTML = '<div style="text-align:center;padding:10px;color:var(--text-muted);font-size:0.82rem">Comparando... ' + (i+1) + '/' + products.length + '</div>' +
+                        '<div class="catalogo-summary">' +
+                            '<div class="catalogo-stat"><div class="catalogo-stat-val">' + products.length + '</div><div class="catalogo-stat-label">Productos</div></div>' +
+                            '<div class="catalogo-stat"><div class="catalogo-stat-val">' + found + '</div><div class="catalogo-stat-label">Encontrados</div></div>' +
+                            '<div class="catalogo-stat"><div class="catalogo-stat-val">' + cheaper + '</div><div class="catalogo-stat-label">Mas baratos</div></div>' +
+                        '</div>' + html;
+                }
+            }
+
+            // Final render
+            el.innerHTML = '<div class="catalogo-summary">' +
+                '<div class="catalogo-stat"><div class="catalogo-stat-val">' + products.length + '</div><div class="catalogo-stat-label">Productos subidos</div></div>' +
+                '<div class="catalogo-stat"><div class="catalogo-stat-val">' + found + '</div><div class="catalogo-stat-label">Encontrados</div></div>' +
+                '<div class="catalogo-stat"><div class="catalogo-stat-val">' + cheaper + '</div><div class="catalogo-stat-label">Tu eres mas barato</div></div>' +
+                '<div class="catalogo-stat"><div class="catalogo-stat-val">' + (found - cheaper) + '</div><div class="catalogo-stat-label">Competencia mas barata</div></div>' +
+            '</div>' + html;
+
+            // Add toggle logic for catcard
+            document.querySelectorAll('[id^="catcard-"]').forEach(el => {
+                el.parentElement.addEventListener('click', () => {
+                    el.style.maxHeight = el.style.maxHeight === '0px' || !el.style.maxHeight ? '200px' : '0px';
+                });
+            });
+        }
+
+        function clearCatalogo() {
+            localStorage.removeItem(CATALOGO_KEY);
+            loadCatalogoView();
+            showToast('Catalogo limpiado', 'info');
+        }
+
+        // ===== OFERTAS VIEW =====
+        async function loadOfertasView() {
+            const el = document.getElementById('ofertasList');
+            el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:0.85rem">Cargando ofertas...</div>';
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/precios?select=precio,precio_original,producto:productos(nombre,farmacia,url)&precio_original=gt.0&en_stock=eq.true&order=fecha_captura.desc&limit=200', {
+                    headers: supabaseHeaders()
+                });
+                const data = await res.json();
+                if (data.error || data.message) {
+                    el.innerHTML = '<div class="view-empty"><p>Error al cargar ofertas</p></div>';
+                    return;
+                }
+                const offers = [];
+                data.forEach(d => {
+                    if (d.precio && d.precio_original && d.precio < d.precio_original && d.producto) {
+                        const pct = Math.round((1 - d.precio / d.precio_original) * 100);
+                        if (pct >= 5) {
+                            offers.push({pct, precio: d.precio, original: d.precio_original, nombre: d.producto.nombre, farmacia: d.producto.farmacia, url: d.producto.url});
+                        }
+                    }
+                });
+                offers.sort((a, b) => b.pct - a.pct);
+                const top = offers.slice(0, 30);
+
+                if (top.length === 0) {
+                    el.innerHTML = '<div class="view-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:48px;height:48px"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01" stroke-width="3"/></svg><p>No hay ofertas con bajada de precio hoy</p></div>';
+                    return;
+                }
+
+                el.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px">' + top.length + ' productos con descuento (ordenados por mayor ahorro)</div>' +
+                    top.map(o =>
+                        '<div class="oferta-card">' +
+                            '<span class="oferta-badge">-' + o.pct + '%</span>' +
+                            '<div class="oferta-info">' +
+                                '<div class="oferta-name" title="' + escapeHtml(o.nombre) + '">' + escapeHtml(o.nombre) + '</div>' +
+                                '<div class="oferta-farm">' + escapeHtml(o.farmacia) + '</div>' +
+                            '</div>' +
+                            '<div class="oferta-prices">' +
+                                '<div class="oferta-old">' + o.original.toFixed(2) + ' \u20ac</div>' +
+                                '<div class="oferta-new">' + o.precio.toFixed(2) + ' \u20ac</div>' +
+                            '</div>' +
+                            '<a href="' + escapeHtml(o.url || '#') + '" target="_blank" rel="noopener" class="buy-link" style="flex-shrink:0">Comprar</a>' +
+                        '</div>'
+                    ).join('');
+            } catch(e) {
+                el.innerHTML = '<div class="view-empty"><p>Error al cargar ofertas</p></div>';
+            }
         }
 
         // ===== FARMABOT - CHATBOT SIMULADO =====
@@ -1456,10 +2714,10 @@
             {id:19,cat:'general',keywords:['tipo','tipos','productos','parafarmacia','categoria'],q:'Que tipo de productos hay',a:'Encontraras productos de <b>parafarmacia</b>: cremas, champus, proteccion solar, vitaminas, dental, bebes, desodorantes, analgesicos (sin receta), optica y mucho mas.'},
             {id:20,cat:'general',keywords:['preciso','precision','exacto','actualizado','fiable','precio'],q:'Los precios son exactos',a:'Los precios se actualizan periodicamente. Puede haber <b>pequenas variaciones</b> entre lo que mostramos y el precio actual en la farmacia, pero nos esforzamos por mantenerlos lo mas actualizados posible.'},
             {id:21,cat:'general',keywords:['sugerir','anadir','nueva','farmacia','agregar'],q:'Puedo sugerir una farmacia nueva',a:'Estamos siempre buscando <b>ampliar nuestro catalogo</b> de farmacias. Agradecemos las sugerencias, estamos trabajando en un formulario para ello.'},
-            {id:22,cat:'general',keywords:['futuro','planes','roadmap','proximamente','nuevo'],q:'Que planes de futuro tiene FarmaSearch',a:'Estamos trabajando en: <b>alertas de precio</b>, listas de la compra, historial de busqueda, ofertas del dia, dashboard personal y app movil nativa. Muchas de estas funciones ya aparecen en el menu.'},
+            {id:22,cat:'general',keywords:['futuro','planes','roadmap','proximamente','nuevo'],q:'Que planes de futuro tiene FarmaSearch',a:'Ya tenemos activas muchas funciones: <b>Alertas, Ofertas, Dashboard, Historial, Catalogo Premium y Suscripciones</b>. Seguimos trabajando en mejoras como app movil nativa, mas farmacias y nuevas herramientas.'},
             {id:23,cat:'general',keywords:['api','desarrollador','integrar','embed','widget'],q:'Tiene API publica',a:'De momento <b>no ofrecemos API publica</b>. Es algo que podriamos considerar en el futuro.'},
-            {id:24,cat:'general',keywords:['afiliado','comision','ganar','dinero','modelo','negocio'],q:'Como gana dinero FarmaSearch',a:'Actualmente FarmaSearch es un <b>proyecto gratuito</b>. En el futuro podria incluir un modelo de suscripcion premium con funciones avanzadas.'},
-            {id:25,cat:'general',keywords:['nuevo','novedades','actualizado','version','cambios'],q:'Que hay de nuevo en FarmaSearch',a:'Estamos constantemente mejorando la aplicacion. Las ultimas novedades incluyen el <b>sistema de busqueda mejorado</b>, categorias por temas, ordenacion avanzada y esta misma funcion de asistente virtual.'},
+            {id:24,cat:'general',keywords:['afiliado','comision','ganar','dinero','modelo','negocio'],q:'Como gana dinero FarmaSearch',a:'FarmaSearch tiene un modelo de <b>suscripcion</b>: plan Estandar (50 EUR/mes) y plan Premium (70 EUR/mes). Los ingresos provienen de las suscripciones de los usuarios.'},
+            {id:25,cat:'general',keywords:['nuevo','novedades','actualizado','version','cambios'],q:'Que hay de nuevo en FarmaSearch',a:'Las ultimas novedades incluyen: <b>Alertas con campanita</b> en cada producto, <b>Ofertas reales</b> con descuentos de hasta 51%, <b>Dashboard</b> con estadisticas, <b>Historial</b> de busquedas, <b>Mi Catalogo</b> (Premium), asistente de registro en 3 pasos y Panel Admin.'},
             {id:26,cat:'general',keywords:['mejor','farmacia','barata','economica','recomendada'],q:'Cual es la farmacia mas barata',a:'No hay una sola farmacia que sea siempre la mas barata. <b>Depende del producto</b>. Por eso existe FarmaSearch: para que compares y encuentres la mejor opcion en cada caso.'},
             {id:27,cat:'general',keywords:['envio','gastos','envio','transporte','entrega'],q:'Los precios incluyen gastos de envio',a:'No, los precios mostrados son <b>solo del producto</b>. Los gastos de envio dependen de cada farmacia y del importe total de tu pedido.'},
             {id:28,cat:'general',keywords:['devolucion','devolver','garantia','reembolso'],q:'Que pasa con las devoluciones',a:'Las devoluciones se gestionan <b>directamente con la farmacia</b> donde hayas comprado. Cada una tiene su propia politica de devolucion.'},
@@ -1527,10 +2785,10 @@
             {id:216,cat:'productos',keywords:['moneda','euro','euros','divisa','currency'],q:'En que moneda son los precios',a:'Todos los precios estan en <b>euros (€)</b>.'},
             {id:217,cat:'productos',keywords:['actualizar','actualizan','frecuencia','cuando','update'],q:'Cada cuanto se actualizan los precios',a:'Los precios se actualizan <b>periodicamente</b> mediante un sistema automatizado. Puede haber pequenas diferencias con el precio actual en la farmacia.'},
             {id:218,cat:'productos',keywords:['diferente','diferencia','precio','web','farmacia'],q:'El precio es diferente al de la farmacia',a:'Es posible que haya <b>pequenas diferencias</b> ya que los precios se actualizan periodicamente. Si ves una gran diferencia, puedes reportarla.'},
-            {id:219,cat:'productos',keywords:['favorito','guardar','corazon','like','save'],q:'Puedo guardar un producto como favorito',a:'La funcion de <b>favoritos esta en desarrollo</b> y estara disponible proximamente. Podras guardar productos para seguirlos facilmente.'},
+            {id:219,cat:'productos',keywords:['favorito','guardar','corazon','like','save','campanita','alerta','seguir'],q:'Puedo guardar un producto como favorito',a:'La seccion Favoritos se ha fusionado con <b>Alertas</b>. Ahora puedes pulsar el <b>icono de campanita</b> en cualquier tarjeta de producto para seguirlo. Cuando su precio cambie, recibiras una alerta. Consulta tus productos seguidos en la seccion Alertas del menu.'},
             {id:220,cat:'productos',keywords:['comparar','dos','solo','especifico','farmacia','filtrar'],q:'Puedo comparar solo 2 farmacias',a:'De momento <b>no hay filtro por farmacia</b>. Se muestran todas las farmacias que tienen el producto. Es una funcion que consideramos para el futuro.'},
             {id:221,cat:'productos',keywords:['historico','historial','precio','evolucion','grafica'],q:'Puedo ver el historico de precios',a:'El <b>historial de precios</b> es una funcion que estamos desarrollando. Proximamente podras ver como ha evolucionado el precio de un producto.'},
-            {id:222,cat:'productos',keywords:['alerta','aviso','notificacion','precio','baja'],q:'Puedo poner alertas de precio',a:'Las <b>alertas de precio</b> estan planificadas como funcion futura. Te avisaremos cuando un producto baje del precio que tu elijas.'},
+            {id:222,cat:'productos',keywords:['alerta','aviso','notificacion','precio','baja','campanita'],q:'Puedo poner alertas de precio',a:'Si! Pulsa el <b>icono de campanita</b> en cualquier tarjeta de producto para activar una alerta. Cuando el precio cambie, veras un <b>punto rojo</b> en la seccion Alertas del menu y un badge en la tarjeta del producto. Puedes tener hasta 30 alertas activas.'},
             {id:223,cat:'productos',keywords:['exportar','descargar','excel','pdf','lista'],q:'Puedo exportar los resultados',a:'De momento <b>no es posible exportar</b> los resultados. Es una funcion que consideramos para el futuro.'},
             {id:224,cat:'productos',keywords:['compartir','enviar','link','enlace','amigo'],q:'Puedo compartir un producto',a:'De momento <b>no hay funcion de compartir</b> directamente. Puedes copiar el enlace de la farmacia desde el boton "Comprar" y compartirlo.'},
             {id:225,cat:'productos',keywords:['cerrar','colapsar','plegar','minimizar','contraer'],q:'Como cierro un producto expandido',a:'Haz clic de nuevo en la <b>tarjeta del producto</b> o en la flecha para colapsarla.'},
@@ -1538,26 +2796,26 @@
             {id:227,cat:'productos',keywords:['scroll','arriba','subir','volver','top'],q:'Como vuelvo arriba rapido',a:'Cuando bajas en la pagina aparece un <b>boton circular verde</b> abajo a la derecha. Pulsalo para volver al inicio de la pagina suavemente.'},
             {id:228,cat:'productos',keywords:['notificacion','toast','mensaje','verde','rojo','aviso'],q:'Que son los mensajes que aparecen arriba',a:'Son <b>notificaciones (toasts)</b>: verde = exito, rojo = error, oscuro = informacion. Desaparecen automaticamente tras unos segundos.'},
             {id:229,cat:'productos',keywords:['total','todos','ver','numero','resultado'],q:'Cuantos resultados tiene mi busqueda',a:'El <b>numero total</b> aparece junto al texto "Resultados para..." en una burbuja gris despues de buscar.'},
-            {id:230,cat:'productos',keywords:['oferta','descuento','rebaja','promocion','chollo'],q:'Donde veo las ofertas',a:'La seccion <b>"Ofertas"</b> esta en el menu lateral izquierdo. Aun esta en desarrollo, pero proximamente mostrara los productos con mayor bajada de precio.'},
+            {id:230,cat:'productos',keywords:['oferta','descuento','rebaja','promocion','chollo'],q:'Donde veo las ofertas',a:'Ve a la seccion <b>"Ofertas"</b> en el menu lateral. Muestra productos reales con descuentos de hasta <b>51%</b>, cargados desde Supabase. Puedes filtrar ofertas por nombre con la barra de filtro superior.'},
 
             // ========== CUENTA Y AUTH (30+) ==========
-            {id:301,cat:'cuenta',keywords:['registrar','registro','crear','cuenta','nueva','registrarse'],q:'Como me registro',a:'En la pantalla de inicio, pulsa <b>"Crear cuenta"</b>. Rellena tu nombre, email y una contrasena de al menos 6 caracteres. Asi de facil.'},
+            {id:301,cat:'cuenta',keywords:['registrar','registro','crear','cuenta','nueva','registrarse'],q:'Como me registro',a:'En la pantalla de inicio, pulsa <b>"Crear cuenta"</b>. El registro tiene 3 pasos: <b>1)</b> Datos personales (nombre, email, contrasena), <b>2)</b> Elegir plan (Estandar o Premium), <b>3)</b> Datos de farmacia (opcional). Asi de facil.'},
             {id:302,cat:'cuenta',keywords:['iniciar','sesion','login','entrar','acceder'],q:'Como inicio sesion',a:'En la pantalla de inicio, introduce tu <b>email y contrasena</b> y pulsa "Iniciar sesion". Si ya iniciaste sesion antes, se recuerda automaticamente.'},
             {id:303,cat:'cuenta',keywords:['cerrar','sesion','logout','salir','desconectar'],q:'Como cierro sesion',a:'En la <b>parte inferior del menu lateral</b>, junto a tu nombre, veras un icono de flecha. Pulsalo para cerrar sesion.'},
-            {id:304,cat:'cuenta',keywords:['auth','wall','muro','pantalla','inicio','obligatorio'],q:'Por que tengo que iniciar sesion para usar la app',a:'El <b>muro de autenticacion</b> garantiza una experiencia personalizada. Necesitas cuenta para acceder a funciones como favoritos, historial y listas (cuando esten disponibles).'},
+            {id:304,cat:'cuenta',keywords:['auth','wall','muro','pantalla','inicio','obligatorio'],q:'Por que tengo que iniciar sesion para usar la app',a:'El <b>muro de autenticacion</b> garantiza una experiencia personalizada. Necesitas cuenta para acceder a funciones como alertas de precio, historial de busquedas, dashboard, ofertas y tu catalogo.'},
             {id:305,cat:'cuenta',keywords:['obligatorio','necesario','forzoso','sin','cuenta'],q:'Puedo usar la app sin registrarme',a:'De momento <b>es necesario registrarse</b> para usar FarmaSearch. El registro es gratuito y rapido (solo nombre, email y contrasena).'},
-            {id:306,cat:'cuenta',keywords:['cambiar','contrasena','password','clave','modificar'],q:'Puedo cambiar mi contrasena',a:'La funcion de <b>cambiar contrasena aun no esta disponible</b>. Estamos trabajando en ella para la seccion "Mi Perfil".'},
+            {id:306,cat:'cuenta',keywords:['cambiar','contrasena','password','clave','modificar'],q:'Puedo cambiar mi contrasena',a:'Si, ve a <b>Mi Perfil</b> en el menu lateral. Alli encontraras la seccion de cambio de contrasena donde puedes introducir tu contrasena actual y establecer una nueva.'},
             {id:307,cat:'cuenta',keywords:['eliminar','borrar','cuenta','baja','darme'],q:'Puedo eliminar mi cuenta',a:'La funcion de <b>eliminacion de cuenta aun no esta disponible</b>. Proximamente podras hacerlo desde "Mi Perfil".'},
             {id:308,cat:'cuenta',keywords:['datos','almacena','guarda','informacion','personal'],q:'Que datos se guardan de mi cuenta',a:'Guardamos tu <b>nombre, email y contrasena cifrada</b>. Tambien tu plan de suscripcion y preferencias. No almacenamos datos de pago.'},
             {id:309,cat:'cuenta',keywords:['segura','cifrada','encriptada','hash','password'],q:'Mi contrasena es segura',a:'Si, tu contrasena se almacena <b>cifrada con bcrypt</b> en la base de datos. Ni siquiera nosotros podemos verla.'},
             {id:310,cat:'cuenta',keywords:['avatar','iniciales','icono','foto','perfil'],q:'Que son las iniciales en el menu',a:'El <b>circulo con tu inicial</b> en la parte inferior del menu es tu avatar. Se genera automaticamente con la primera letra de tu nombre.'},
-            {id:311,cat:'cuenta',keywords:['plan','estandar','standard','tipo','free'],q:'Que es el plan Estandar',a:'El plan <b>"Estandar"</b> es el plan gratuito por defecto. Incluye todas las funciones basicas de busqueda y comparacion de precios.'},
-            {id:312,cat:'cuenta',keywords:['plan','pro','premium','pago','ventajas'],q:'Que es el plan Pro',a:'El plan <b>"Pro"</b> esta en desarrollo. Incluira funciones avanzadas como alertas de precio, historial detallado y exportacion de datos.'},
-            {id:313,cat:'cuenta',keywords:['suscripcion','planes','upgrade','mejorar'],q:'Que planes de suscripcion hay',a:'Actualmente solo existe el <b>plan Estandar (gratuito)</b>. Proximamente habra un plan Pro con funciones adicionales. La seccion "Suscripcion" del menu tendra todos los detalles.'},
-            {id:314,cat:'cuenta',keywords:['gratis','suficiente','plan','free','limitacion'],q:'El plan gratuito es suficiente',a:'Si, el plan gratuito te da <b>acceso completo</b> a la busqueda y comparacion de precios. Las funciones Pro seran extras opcionales.'},
+            {id:311,cat:'cuenta',keywords:['plan','estandar','standard','tipo','precio'],q:'Que es el plan Estandar',a:'El plan <b>"Estandar"</b> cuesta 50 EUR/mes e incluye busqueda y comparacion de precios, alertas de precio, historial, dashboard y acceso a ofertas. No incluye Mi Catalogo ni funciones premium.'},
+            {id:312,cat:'cuenta',keywords:['plan','pro','premium','pago','ventajas'],q:'Que es el plan Premium',a:'El plan <b>"Premium"</b> cuesta 70 EUR/mes e incluye todo lo del plan Estandar mas: <b>Mi Catalogo</b> (importar tu Excel de productos y comparar precios), soporte prioritario y funciones avanzadas.'},
+            {id:313,cat:'cuenta',keywords:['suscripcion','planes','upgrade','mejorar'],q:'Que planes de suscripcion hay',a:'Hay dos planes: <b>Estandar (50 EUR/mes)</b> con busqueda, alertas, historial, dashboard y ofertas; y <b>Premium (70 EUR/mes)</b> que anade Mi Catalogo y funciones avanzadas. Puedes ver la comparativa completa en la seccion Suscripcion del menu.'},
+            {id:314,cat:'cuenta',keywords:['gratis','suficiente','plan','free','limitacion','estandar'],q:'El plan Estandar es suficiente',a:'El plan Estandar te da acceso a <b>busqueda, comparacion, alertas, historial, dashboard y ofertas</b>. Si necesitas importar tu propio catalogo de farmacia para comparar precios, necesitaras el plan Premium.'},
             {id:315,cat:'cuenta',keywords:['olvidado','olvide','recuperar','contrasena','reset'],q:'He olvidado mi contrasena',a:'La funcion de <b>recuperacion de contrasena aun no esta disponible</b>. Estamos trabajando en implementarla proximamente.'},
-            {id:316,cat:'cuenta',keywords:['cambiar','nombre','modificar','usuario','editar'],q:'Puedo cambiar mi nombre',a:'La edicion de perfil estara disponible proximamente en la seccion <b>"Mi Perfil"</b>.'},
-            {id:317,cat:'cuenta',keywords:['cambiar','email','correo','modificar'],q:'Puedo cambiar mi email',a:'La edicion de email estara disponible proximamente en la seccion <b>"Mi Perfil"</b>.'},
+            {id:316,cat:'cuenta',keywords:['cambiar','nombre','modificar','usuario','editar'],q:'Puedo cambiar mi nombre',a:'Si, ve a <b>Mi Perfil</b> en el menu lateral. Alli puedes editar tu nombre, apellidos y otros datos personales. Los cambios se guardan en tu cuenta.'},
+            {id:317,cat:'cuenta',keywords:['cambiar','email','correo','modificar'],q:'Puedo cambiar mi email',a:'Si, ve a <b>Mi Perfil</b> en el menu lateral. Alli puedes modificar tu email y otros datos de contacto.'},
             {id:318,cat:'cuenta',keywords:['sesion','expira','caduca','tiempo','duracion'],q:'Cuanto dura mi sesion',a:'Tu sesion se mantiene activa <b>mientras no cierres sesion</b>. Se guarda en tu navegador (localStorage), asi que no tienes que iniciar sesion cada vez.'},
             {id:319,cat:'cuenta',keywords:['google','social','facebook','apple','login'],q:'Puedo iniciar sesion con Google',a:'De momento <b>no hay login social</b> (Google, Facebook, etc.). Es una funcion que estamos considerando para el futuro.'},
             {id:320,cat:'cuenta',keywords:['dos','factores','2fa','verificacion','doble'],q:'Hay verificacion en dos pasos',a:'De momento <b>no hay 2FA</b>. Lo tenemos en mente para mejorar la seguridad de las cuentas en el futuro.'},
@@ -1568,21 +2826,21 @@
 
             // ========== NAVEGACION (35+) ==========
             {id:401,cat:'navegacion',keywords:['menu','lateral','sidebar','barra','izquierda'],q:'Como funciona el menu lateral',a:'El <b>menu lateral (sidebar)</b> es tu centro de navegacion. Tiene todas las secciones de la app, opciones de accesibilidad y tu informacion de usuario en la parte inferior.'},
-            {id:402,cat:'navegacion',keywords:['secciones','apartados','paginas','opciones','cuantas'],q:'Que secciones tiene la app',a:'Hay <b>8 secciones</b>: Buscador, Ofertas, Mis Listas, Dashboard, Favoritos, Historial, Suscripcion y Mi Perfil. El Buscador es la principal.'},
+            {id:402,cat:'navegacion',keywords:['secciones','apartados','paginas','opciones','cuantas'],q:'Que secciones tiene la app',a:'Las secciones del menu lateral son: <b>Buscador, Ofertas, Dashboard, Alertas, Historial, Mi Catalogo</b> (solo Premium), <b>Panel Admin</b> (solo admin), <b>Suscripcion y Mi Perfil</b>. El Buscador es la principal.'},
             {id:403,cat:'navegacion',keywords:['buscador','principal','inicio','home','buscar'],q:'Que es la seccion Buscador',a:'Es la <b>pagina principal</b> de FarmaSearch. Aqui puedes buscar productos, ver categorias, comparar precios y acceder a las farmacias.'},
-            {id:404,cat:'navegacion',keywords:['ofertas','oferta','dia','deals','descuentos'],q:'Que es la seccion Ofertas',a:'<b>"Ofertas del dia"</b> mostrara los productos con mayor bajada de precio. Esta seccion esta <b>en desarrollo</b> y estara disponible proximamente.'},
-            {id:405,cat:'navegacion',keywords:['listas','lista','compra','cesta','carrito'],q:'Que es Mis Listas',a:'<b>"Mis Listas"</b> te permitira crear cestas de productos para comparar precios como si fuera una lista de la compra. Esta <b>en desarrollo</b>.'},
-            {id:406,cat:'navegacion',keywords:['dashboard','panel','estadisticas','resumen'],q:'Que es el Dashboard',a:'El <b>Dashboard</b> sera un panel con estadisticas y resumen de tu actividad: productos consultados, ahorro acumulado, etc. Esta <b>en desarrollo</b>.'},
-            {id:407,cat:'navegacion',keywords:['favoritos','guardados','corazon','like'],q:'Que es Favoritos',a:'<b>"Favoritos"</b> te permitira guardar productos que te interesen para consultarlos facilmente despues. Esta <b>en desarrollo</b>.'},
-            {id:408,cat:'navegacion',keywords:['historial','historial','reciente','visitado','consultado'],q:'Que es Historial',a:'<b>"Historial"</b> mostrara los productos que has consultado recientemente. Esta <b>en desarrollo</b>.'},
-            {id:409,cat:'navegacion',keywords:['suscripcion','plan','premium','pro','pago'],q:'Que es Suscripcion',a:'La seccion <b>"Suscripcion"</b> mostrara tu plan actual y opciones de mejora. Actualmente todos los usuarios tienen el plan Estandar (gratuito). Esta <b>en desarrollo</b>.'},
-            {id:410,cat:'navegacion',keywords:['perfil','cuenta','configuracion','ajustes'],q:'Que es Mi Perfil',a:'<b>"Mi Perfil"</b> te permitira editar tu nombre, email, contrasena y otras configuraciones de tu cuenta. Esta <b>en desarrollo</b>.'},
-            {id:411,cat:'navegacion',keywords:['proximamente','desarrollo','soon','cuando','disponible'],q:'Cuando estaran disponibles las secciones',a:'Estamos trabajando activamente en las nuevas funciones. <b>No hay fecha exacta</b>, pero las iremos activando progresivamente. La busqueda y comparacion ya estan 100% operativas.'},
+            {id:404,cat:'navegacion',keywords:['ofertas','oferta','dia','deals','descuentos'],q:'Que es la seccion Ofertas',a:'<b>"Ofertas"</b> muestra productos reales con descuentos de hasta <b>51%</b>, cargados desde la base de datos. Incluye una barra de filtro para buscar ofertas por nombre de producto. Los descuentos se calculan automaticamente.'},
+            {id:405,cat:'navegacion',keywords:['listas','lista','compra','cesta','carrito'],q:'Que es Mis Listas',a:'La seccion <b>"Mis Listas" fue eliminada</b> de la aplicacion. Para seguir productos, usa el sistema de <b>Alertas</b> (icono de campanita en cada producto). Para gestionar tu propio catalogo, consulta <b>Mi Catalogo</b> (Premium).'},
+            {id:406,cat:'navegacion',keywords:['dashboard','panel','estadisticas','resumen'],q:'Que es el Dashboard',a:'El <b>Dashboard</b> es tu panel personal con estadisticas reales: busquedas realizadas, productos consultados, alertas activas y ofertas disponibles. Tambien muestra tus <b>busquedas recientes, cambios de precio</b> y acciones rapidas para navegar a otras secciones.'},
+            {id:407,cat:'navegacion',keywords:['favoritos','guardados','corazon','like','alertas','campanita'],q:'Que es Favoritos / Alertas',a:'La seccion Favoritos se ha fusionado con <b>Alertas</b>. Ahora, en vez de guardar favoritos, pulsas la <b>campanita</b> en un producto para seguirlo. Cuando su precio cambie, recibiras una alerta. Todo se gestiona desde la seccion <b>Alertas</b> del menu.'},
+            {id:408,cat:'navegacion',keywords:['historial','historial','reciente','visitado','consultado'],q:'Que es Historial',a:'<b>"Historial"</b> guarda automaticamente tus busquedas y los productos que has expandido. Muestra la <b>hora relativa</b> (hace 5 min, hace 1 hora...) y puedes eliminar entradas individualmente o borrar todo el historial. Los datos se guardan en localStorage.'},
+            {id:409,cat:'navegacion',keywords:['suscripcion','plan','premium','pro','pago'],q:'Que es Suscripcion',a:'La seccion <b>"Suscripcion"</b> muestra tu plan actual y la comparativa entre los dos planes: <b>Estandar (50 EUR/mes)</b> y <b>Premium (70 EUR/mes)</b>. Puedes ver que funciones incluye cada plan y cambiar de plan.'},
+            {id:410,cat:'navegacion',keywords:['perfil','cuenta','configuracion','ajustes'],q:'Que es Mi Perfil',a:'<b>"Mi Perfil"</b> es tu centro de configuracion. Puedes editar tus <b>datos personales</b> (nombre, email), <b>datos de farmacia</b> (nombre, ubicacion, web), <b>cambiar contrasena</b>, gestionar preferencias y ver tu plan actual con su badge (PRO/ESTANDAR).'},
+            {id:411,cat:'navegacion',keywords:['proximamente','desarrollo','soon','cuando','disponible'],q:'Estan todas las secciones funcionando',a:'Si! Todas las secciones principales estan <b>100% operativas</b>: Buscador, Ofertas, Dashboard, Alertas, Historial, Suscripcion y Mi Perfil. Ademas, los usuarios Premium tienen acceso a <b>Mi Catalogo</b> y los administradores al <b>Panel Admin</b>.'},
             {id:412,cat:'navegacion',keywords:['hamburguesa','hamburger','tres','lineas','movil','mobile'],q:'Que es el boton de las tres lineas',a:'Es el <b>boton hamburguesa</b> que aparece en movil o pantallas pequenas. Abrelo para ver el menu lateral completo. Pulsalo de nuevo o toca fuera para cerrarlo.'},
             {id:413,cat:'navegacion',keywords:['overlay','fondo','oscuro','sombra','fondo','gris'],q:'Que es el fondo oscuro detras del menu',a:'Es un <b>overlay</b> que aparece cuando abres el menu en movil. Pulsalo para cerrar el menu rapidamente.'},
             {id:414,cat:'navegacion',keywords:['redimensionar','ancho','sidebar','estrecho','ancho'],q:'Puedo cambiar el ancho del menu',a:'Si, en el <b>panel de accesibilidad</b> (abajo del menu) hay botones para hacer el sidebar mas estrecho (180px), normal (240px) o mas ancho (300px).'},
             {id:415,cat:'navegacion',keywords:['logo','inicio','volver','home','click'],q:'Que pasa si pulso el logo',a:'Al pulsar el <b>logo de FarmaSearch</b> en la parte superior del menu, vuelves a la pagina principal (Buscador).'},
-            {id:416,cat:'navegacion',keywords:['seguimiento','seccion','grupo','etiqueta'],q:'Que es la seccion Seguimiento',a:'<b>"Seguimiento"</b> es una etiqueta que agrupa las opciones de Favoritos e Historial en el menu lateral.'},
+            {id:416,cat:'navegacion',keywords:['seguimiento','seccion','grupo','etiqueta'],q:'Que es la seccion Seguimiento',a:'<b>"Seguimiento"</b> es una etiqueta que agrupa las opciones de Alertas e Historial en el menu lateral.'},
             {id:417,cat:'navegacion',keywords:['cuenta','seccion','grupo','etiqueta'],q:'Que es la seccion Cuenta en el menu',a:'<b>"Cuenta"</b> es una etiqueta que agrupa Suscripcion y Mi Perfil en el menu lateral.'},
             {id:418,cat:'navegacion',keywords:['activo','resaltado','seleccionado','actual','verde'],q:'Como se cual seccion estoy viendo',a:'La seccion activa se muestra con <b>fondo verde claro y texto verde oscuro</b> en el menu lateral.'},
             {id:419,cat:'navegacion',keywords:['volver','atras','anterior','regresar','back'],q:'Como vuelvo a la busqueda',a:'Pulsa <b>"Buscador"</b> en el menu lateral (la primera opcion). Tambien puedes pulsar el logo de FarmaSearch.'},
@@ -1646,13 +2904,13 @@
             {id:716,cat:'tecnico',keywords:['dark','mode','oscuro','tema','noche'],q:'Hay modo oscuro',a:'De momento <b>no hay modo oscuro</b>, pero tenemos el modo alto contraste que oscurece los textos. Un modo oscuro completo esta en consideracion.'},
             {id:717,cat:'tecnico',keywords:['cookie','cookies','almacenamiento','local','datos'],q:'FarmaSearch usa cookies',a:'No usamos cookies tradicionales. Usamos <b>localStorage</b> del navegador para guardar tu sesion, preferencias de accesibilidad y tamano de fuente.'},
             {id:718,cat:'tecnico',keywords:['restablecer','reset','configuracion','defecto','original'],q:'Como restablezco toda la configuracion',a:'Borra los datos de localStorage de tu navegador para este sitio. Esto <b>reseteara todo</b>: sesion, tamano de fuente, ancho de sidebar y modo contraste.'},
-            {id:719,cat:'tecnico',keywords:['datos','guarda','local','almacena','navegador'],q:'Que datos se guardan en mi navegador',a:'En localStorage guardamos: <b>sesion de usuario</b> (nombre, email), preferencia de tamano de fuente, ancho de sidebar y estado de alto contraste.'},
+            {id:719,cat:'tecnico',keywords:['datos','guarda','local','almacena','navegador'],q:'Que datos se guardan en mi navegador',a:'En localStorage guardamos: <b>sesion de usuario</b> (nombre, email), preferencias de accesibilidad, alertas de productos, historial de busquedas, datos de catalogo (Premium) y configuracion del dashboard.'},
             {id:720,cat:'tecnico',keywords:['https','cifrado','ssl','seguro','conexion'],q:'La conexion es segura',a:'Si, FarmaSearch usa <b>HTTPS</b> (conexion cifrada). Tus datos viajan encriptados entre tu navegador y nuestros servidores.'},
             {id:721,cat:'tecnico',keywords:['login','falla','no','puedo','entrar','error'],q:'No puedo iniciar sesion',a:'Verifica que: <b>1)</b> El email es correcto, <b>2)</b> La contrasena es correcta (minimo 6 chars), <b>3)</b> Tienes conexion a internet. Si el problema persiste, prueba a borrar cache.'},
             {id:722,cat:'tecnico',keywords:['registro','falla','no','puedo','registrar','error'],q:'No puedo registrarme',a:'Verifica que: <b>1)</b> El email tiene formato valido, <b>2)</b> La contrasena tiene al menos 6 caracteres, <b>3)</b> Rellenas todos los campos. Si dice error, puede que el email ya este registrado.'},
             {id:723,cat:'tecnico',keywords:['velocidad','rapida','internet','necesaria','minima'],q:'Que velocidad de internet necesito',a:'FarmaSearch es <b>bastante ligero</b>. Cualquier conexion moderna (3G, 4G, WiFi) deberia ser suficiente. Las busquedas son rapidas porque usamos una base de datos optimizada.'},
             {id:724,cat:'tecnico',keywords:['supabase','base','datos','backend','servidor'],q:'Que tecnologia usa FarmaSearch',a:'FarmaSearch usa <b>Supabase</b> (PostgreSQL en la nube) como base de datos y esta desplegado como una web estatica que se conecta directamente a la API.'},
-            {id:725,cat:'tecnico',keywords:['auth','wall','muro','pantalla','aparece','inicio'],q:'Por que aparece la pantalla de login al entrar',a:'Es el <b>muro de autenticacion</b>. Garantiza que solo usuarios registrados accedan a la app. Una vez inicias sesion, no volveras a verlo hasta que cierres sesion.'},
+            {id:725,cat:'tecnico',keywords:['auth','wall','muro','pantalla','aparece','inicio','fondo','farmacia'],q:'Por que aparece la pantalla de login al entrar',a:'Es el <b>muro de autenticacion</b> con una imagen de fondo de farmacia. Puedes alternar entre <b>iniciar sesion</b> y <b>crear cuenta</b>. El registro tiene 3 pasos (datos personales, plan, farmacia). Una vez inicias sesion, no volveras a verlo hasta que cierres sesion.'},
 
             // ========== EASTER EGGS Y SALUDOS (30+) ==========
             {id:901,cat:'easter',keywords:['hola','hello','hey','hi','buenas','saludos'],q:'Saludo',a:'Hola! Soy <b>FarmaBot</b>, tu asistente virtual de FarmaSearch. En que puedo ayudarte? Puedes preguntarme sobre busquedas, precios, farmacias o cualquier funcion de la app.'},
@@ -1674,7 +2932,7 @@
             {id:917,cat:'easter',keywords:['inteligente','listo','sabio','ia','artificial'],q:'Eres inteligente',a:'Gracias! La verdad es que tengo <b>muchas respuestas preparadas</b>, pero no soy una IA. Si me preguntas algo sobre FarmaSearch, seguro que te puedo ayudar.'},
             {id:918,cat:'easter',keywords:['genial','fantastica','increible','buena','app','aplicacion','mola'],q:'Esta app es genial',a:'Muchas gracias! Nos alegra que te guste. Estamos trabajando para hacerla <b>aun mejor</b> con nuevas funciones. Si tienes sugerencias, nos encanta escucharlas!'},
             {id:919,cat:'easter',keywords:['problema','issue','queja','mal','funciona'],q:'Tengo un problema',a:'Lo siento! Cuentame que pasa e intentare ayudarte. Si es un <b>problema tecnico</b>, prueba a recargar la pagina o borrar cache. Si es sobre la app, preguntame y te oriento.'},
-            {id:920,cat:'easter',keywords:['nuevo','novedad','update','novedades','version'],q:'Que hay de nuevo',a:'Las ultimas novedades son: <b>busqueda mejorada, 15 categorias, 7 opciones de ordenacion, panel de accesibilidad</b> y este asistente virtual (yo!). Seguimos trabajando en mas funciones.'},
+            {id:920,cat:'easter',keywords:['nuevo','novedad','update','novedades','version'],q:'Que hay de nuevo',a:'Las ultimas novedades son: <b>Alertas con campanita</b>, Ofertas reales con descuentos, Dashboard con estadisticas, Historial de busquedas, <b>Mi Catalogo</b> (Premium), registro en 3 pasos, Panel Admin, suscripciones Estandar/Premium y mucho mas!'},
             {id:921,cat:'easter',keywords:['curiosidad','dato','interesante','sabias','fun','fact'],q:'Dime un dato curioso',a:'Dato curioso: <b>la diferencia de precio de un mismo producto entre farmacias puede llegar a ser de mas de 10€</b>. Por eso merece la pena comparar. Para eso estamos aqui!'},
             {id:922,cat:'easter',keywords:['buscar','producto','mas','buscado','popular','trending'],q:'Cual es lo mas buscado',a:'Los productos mas buscados suelen ser <b>cremas hidratantes, proteccion solar, champus anticaida y vitaminas</b>. Prueba a buscar alguno!'},
             {id:923,cat:'easter',keywords:['recomendar','sugerir','mejor','producto','recomendacion'],q:'Recomiendame un producto',a:'No puedo recomendar productos especificos, pero si buscas por ejemplo <b>"crema hidratante"</b> y ordenas por precio, encontraras grandes opciones a buen precio!'},
@@ -1700,7 +2958,7 @@
             {id:41,cat:'general',keywords:['similares','parecido','alternativa','equivalente'],q:'Puedo ver productos similares',a:'De momento <b>no hay funcion de "productos similares"</b>, pero si buscas el tipo de producto (ej: "crema hidratante") veras todas las opciones de distintas marcas.'},
             {id:42,cat:'general',keywords:['opinion','opiniones','review','valoracion','resena'],q:'Hay opiniones de productos',a:'De momento <b>no mostramos opiniones</b> ni valoraciones. Es una funcion que consideramos para el futuro.'},
             {id:43,cat:'general',keywords:['imagen','foto','producto','ver','aspecto'],q:'Puedo ver fotos del producto',a:'De momento <b>no mostramos imagenes</b> de los productos. Es algo que estamos valorando anadir en futuras versiones.'},
-            {id:44,cat:'general',keywords:['notificacion','aviso','email','alerta','push'],q:'Puedo recibir notificaciones',a:'Las <b>notificaciones y alertas de precio</b> estan en desarrollo. Proximamente podras recibir avisos cuando un producto baje de precio.'},
+            {id:44,cat:'general',keywords:['notificacion','aviso','email','alerta','push'],q:'Puedo recibir notificaciones',a:'Si! Con el sistema de <b>Alertas</b>, puedes pulsar la campanita en cualquier producto para seguirlo. Cuando el precio cambie, veras un <b>punto rojo en el sidebar</b> y un badge en la tarjeta. Todo se gestiona desde la seccion Alertas.'},
             {id:45,cat:'general',keywords:['colaborar','contribuir','ayudar','voluntario','proyecto'],q:'Puedo colaborar con el proyecto',a:'Agradecemos el interes! De momento <b>no hay programa de voluntariado</b>, pero toda sugerencia es bienvenida.'},
 
             // ========== ADICIONALES BUSQUEDA (141-155) ==========
@@ -1779,7 +3037,58 @@
             {id:942,cat:'easter',keywords:['acne','grano','granos','espinilla','piel','grasa'],q:'Tengo acne',a:'Busca "acne", "piel grasa" o "limpiador facial" en FarmaSearch. Marcas como <b>La Roche Posay (Effaclar), Avene o CeraVe</b> tienen lineas especificas.'},
             {id:943,cat:'easter',keywords:['bebe','embarazada','embarazo','mama','papa'],q:'Voy a tener un bebe',a:'Felicidades! En FarmaSearch puedes buscar todo lo que necesitas: <b>panales, cremas para bebe, biberones, leches infantiles</b>... Compara precios y ahorra para el pequeno!'},
             {id:944,cat:'easter',keywords:['redes','social','instagram','twitter','tiktok','facebook'],q:'Teneis redes sociales',a:'De momento <b>no tenemos redes sociales oficiales</b>. Proximamente podriamos abrir perfiles para compartir novedades y ofertas.'},
-            {id:945,cat:'easter',keywords:['valorar','puntuar','estrellas','review','opinar'],q:'Puedo valorar la app',a:'Agradecemos mucho tu feedback! De momento no hay un sistema de valoracion interno, pero <b>toda sugerencia es bienvenida</b>.'}
+            {id:945,cat:'easter',keywords:['valorar','puntuar','estrellas','review','opinar'],q:'Puedo valorar la app',a:'Agradecemos mucho tu feedback! De momento no hay un sistema de valoracion interno, pero <b>toda sugerencia es bienvenida</b>.'},
+
+            // ========== ALERTAS / CAMPANITA (950-964) ==========
+            {id:950,cat:'navegacion',keywords:['campanita','campana','bell','icono','producto','tarjeta'],q:'Que es el icono de campanita en las tarjetas',a:'La <b>campanita</b> es el sistema de alertas de FarmaSearch. Al pulsarla en una tarjeta de producto, activas una alerta para ese producto. Cuando su precio cambie, seras notificado.'},
+            {id:951,cat:'navegacion',keywords:['activar','alerta','campanita','seguir','producto'],q:'Como activo una alerta en un producto',a:'Pulsa el <b>icono de campanita</b> que aparece en la esquina de cada tarjeta de producto. La campanita se resaltara indicando que la alerta esta activa.'},
+            {id:952,cat:'navegacion',keywords:['desactivar','quitar','eliminar','alerta','dejar','seguir'],q:'Como desactivo una alerta',a:'Pulsa de nuevo la <b>campanita</b> en la tarjeta del producto, o ve a la seccion <b>Alertas</b> del menu y elimina la alerta desde alli.'},
+            {id:953,cat:'navegacion',keywords:['alertas','seccion','ver','mis','todas'],q:'Donde veo mis alertas',a:'En la seccion <b>Alertas</b> del menu lateral (icono de campana). Ahi veras todos los productos que sigues, con su precio actual y si ha habido cambios.'},
+            {id:954,cat:'navegacion',keywords:['precio','cambia','cambio','notificacion','rojo','punto','badge'],q:'Que pasa cuando cambia el precio de un producto con alerta',a:'Cuando un precio cambia, aparece un <b>punto rojo</b> junto a la seccion Alertas en el sidebar y un badge en la tarjeta del producto. Asi sabes que hay novedades sin entrar a la seccion.'},
+            {id:955,cat:'navegacion',keywords:['leida','leido','marcar','leer','alerta'],q:'Como marco una alerta como leida',a:'Entra en la seccion <b>Alertas</b> y pulsa sobre la alerta con cambio de precio. Al consultarla, se marca como leida y desaparece el indicador rojo.'},
+            {id:956,cat:'navegacion',keywords:['maximo','limite','cuantas','alertas','tope','30'],q:'Cuantas alertas puedo tener',a:'Puedes tener hasta <b>30 alertas activas</b> simultaneamente. Si llegas al limite, tendras que eliminar alguna para anadir nuevas.'},
+            {id:957,cat:'navegacion',keywords:['alertas','guardan','almacenan','localstorage','datos'],q:'Donde se guardan las alertas',a:'Las alertas se almacenan en el <b>localStorage</b> de tu navegador. Esto significa que persisten mientras no borres los datos del navegador.'},
+            {id:958,cat:'navegacion',keywords:['filtrar','buscar','alerta','alertas','barra'],q:'Puedo filtrar mis alertas',a:'Si, en la seccion Alertas hay una <b>barra de filtro</b> en la parte superior. Escribe el nombre del producto para filtrar tus alertas rapidamente.'},
+            {id:959,cat:'navegacion',keywords:['eliminar','borrar','alerta','quitar','campanita'],q:'Como elimino una alerta',a:'Puedes eliminar una alerta de dos formas: pulsando la <b>campanita</b> de nuevo en la tarjeta del producto, o desde la seccion <b>Alertas</b> pulsando el boton de eliminar junto a cada alerta.'},
+            {id:960,cat:'navegacion',keywords:['favoritos','alertas','diferencia','cambio','fusionado'],q:'Que paso con Favoritos',a:'La seccion Favoritos fue <b>fusionada con Alertas</b>. Ahora en vez de "guardar como favorito" puedes "activar alerta" con la campanita. Es mas util porque te avisa de cambios de precio.'},
+
+            // ========== CATALOGO PREMIUM (965-977) ==========
+            {id:965,cat:'navegacion',keywords:['catalogo','mi','premium','seccion','que'],q:'Que es Mi Catalogo',a:'<b>Mi Catalogo</b> es una funcion exclusiva para usuarios Premium. Te permite importar tu propio listado de productos (desde un Excel) y comparar tus precios con los mejores precios de FarmaSearch.'},
+            {id:966,cat:'navegacion',keywords:['excel','plantilla','descargar','template','catalogo'],q:'Como descargo la plantilla de Excel para Mi Catalogo',a:'En la seccion <b>Mi Catalogo</b>, pulsa el boton <b>"Descargar plantilla"</b>. Se descargara un archivo Excel con las columnas necesarias: Nombre, Precio y EAN.'},
+            {id:967,cat:'navegacion',keywords:['subir','importar','cargar','excel','catalogo','upload'],q:'Como subo mi Excel al catalogo',a:'En Mi Catalogo, pulsa <b>"Importar Excel"</b> y selecciona tu archivo. El sistema leera las columnas Nombre, Precio y EAN, y comparara automaticamente con los precios de FarmaSearch.'},
+            {id:968,cat:'navegacion',keywords:['columnas','campos','plantilla','nombre','precio','ean'],q:'Que columnas tiene la plantilla del catalogo',a:'La plantilla tiene 3 columnas: <b>Nombre</b> (nombre del producto), <b>Precio</b> (tu precio de venta) y <b>EAN</b> (codigo de barras, opcional). El sistema usa el nombre para buscar coincidencias.'},
+            {id:969,cat:'navegacion',keywords:['comparacion','comparar','catalogo','precio','mejor','badge'],q:'Como funciona la comparacion en Mi Catalogo',a:'Al importar tu catalogo, el sistema compara cada producto con el <b>mejor precio en FarmaSearch</b>. Muestra badges de colores: <b>verde (mas barato)</b> si tu precio es mejor, <b>rojo (mas caro)</b> si es peor, o <b>gris (no encontrado)</b> si no hay coincidencia.'},
+            {id:970,cat:'navegacion',keywords:['badge','barato','caro','encontrado','catalogo','color'],q:'Que significan los badges en Mi Catalogo',a:'<b>Verde "mas barato"</b>: tu precio es inferior al de FarmaSearch. <b>Rojo "mas caro"</b>: tu precio es superior. <b>Gris "no encontrado"</b>: no se encontro el producto en la base de datos de FarmaSearch.'},
+            {id:971,cat:'navegacion',keywords:['premium','solo','catalogo','necesario','plan'],q:'Mi Catalogo es solo para Premium',a:'Si, <b>Mi Catalogo es exclusivo del plan Premium</b> (70 EUR/mes). Los usuarios del plan Estandar no tienen acceso a esta funcion.'},
+            {id:972,cat:'navegacion',keywords:['catalogo','datos','guardan','persisten','localstorage'],q:'Los datos del catalogo se guardan',a:'Si, los datos importados del catalogo se guardan en <b>localStorage</b> de tu navegador. Persisten entre sesiones mientras no borres los datos del navegador.'},
+            {id:973,cat:'navegacion',keywords:['limpiar','borrar','catalogo','vaciar','eliminar','datos'],q:'Como borro mi catalogo',a:'En la seccion Mi Catalogo hay un boton para <b>limpiar todos los datos</b>. Esto eliminara todos los productos importados del localStorage.'},
+
+            // ========== DASHBOARD (978-983) ==========
+            {id:978,cat:'navegacion',keywords:['dashboard','muestra','estadisticas','datos','info'],q:'Que muestra el Dashboard',a:'El Dashboard muestra: <b>tarjetas de estadisticas</b> (busquedas realizadas, productos consultados, alertas activas, ofertas), tus <b>busquedas recientes</b>, <b>cambios de precio</b> en tus alertas y <b>acciones rapidas</b> para navegar.'},
+            {id:979,cat:'navegacion',keywords:['tarjetas','estadisticas','numeros','stat','cards'],q:'Que son las tarjetas de estadisticas del Dashboard',a:'Son 4 tarjetas en la parte superior: <b>Busquedas</b> (cuantas has hecho), <b>Productos</b> (cuantos has consultado), <b>Alertas</b> (cuantas tienes activas) y <b>Ofertas</b> (disponibles). Los datos vienen de localStorage y Supabase.'},
+            {id:980,cat:'navegacion',keywords:['acciones','rapidas','quick','actions','dashboard','boton'],q:'Que son las acciones rapidas del Dashboard',a:'Son botones en el Dashboard que te llevan directamente a las secciones principales: <b>Buscar productos, Ver ofertas, Mis alertas</b>, etc. Sirven como atajos de navegacion.'},
+            {id:981,cat:'navegacion',keywords:['dashboard','datos','origen','donde','vienen','fuente'],q:'De donde salen los datos del Dashboard',a:'Los datos del Dashboard provienen de dos fuentes: <b>localStorage</b> (busquedas, historial, alertas) y <b>Supabase</b> (ofertas, datos de la cuenta). Se actualizan cada vez que entras en el Dashboard.'},
+
+            // ========== REGISTRO WIZARD (984-988) ==========
+            {id:984,cat:'cuenta',keywords:['registro','pasos','wizard','asistente','crear','cuenta','3'],q:'Como es el proceso de registro',a:'El registro tiene <b>3 pasos</b>: <b>Paso 1)</b> Datos personales (nombre, email, contrasena), <b>Paso 2)</b> Elegir plan (Estandar 50 EUR/mes o Premium 70 EUR/mes), <b>Paso 3)</b> Datos de farmacia (nombre, ubicacion, web) - este paso es opcional.'},
+            {id:985,cat:'cuenta',keywords:['paso','3','farmacia','datos','opcional','registro'],q:'El paso 3 del registro es obligatorio',a:'No, el paso 3 (datos de farmacia) es <b>totalmente opcional</b>. Puedes saltarlo y completar esa informacion mas tarde desde Mi Perfil.'},
+            {id:986,cat:'cuenta',keywords:['plan','elegir','registro','paso','2','estandar','premium'],q:'Que plan elijo al registrarme',a:'En el paso 2 del registro puedes elegir entre <b>Estandar (50 EUR/mes)</b> o <b>Premium (70 EUR/mes)</b>. La diferencia principal es que Premium incluye Mi Catalogo para importar tu Excel de productos.'},
+            {id:987,cat:'cuenta',keywords:['farmacia','nombre','ubicacion','web','registro','perfil'],q:'Para que sirven los datos de farmacia en el registro',a:'Si eres propietario de una farmacia, puedes introducir el <b>nombre, ubicacion y web</b> de tu farmacia. Esto es util para el sistema de Catalogo y para personalizar tu experiencia. Es <b>opcional</b>.'},
+
+            // ========== PANEL ADMIN (989-993) ==========
+            {id:989,cat:'navegacion',keywords:['admin','panel','administrador','administracion'],q:'Que es el Panel Admin',a:'El <b>Panel Admin</b> es una seccion exclusiva para administradores. Permite ver todos los usuarios registrados, estadisticas globales de la plataforma y gestionar la aplicacion. Solo visible para cuentas con rol admin.'},
+            {id:990,cat:'navegacion',keywords:['admin','convertirse','ser','como','administrador'],q:'Como me convierto en administrador',a:'El rol de administrador se asigna <b>manualmente</b> en la base de datos. No es posible autoasignarse el rol de admin desde la aplicacion.'},
+            {id:991,cat:'navegacion',keywords:['admin','badge','morado','purple','insignia'],q:'Que es el badge morado ADMIN',a:'Los usuarios administradores tienen un <b>badge morado "ADMIN"</b> visible en su perfil y en el Panel Admin. Indica que tienen permisos especiales de gestion.'},
+            {id:992,cat:'navegacion',keywords:['admin','ver','usuarios','estadisticas','global'],q:'Que puede ver un administrador',a:'Un admin puede ver: <b>lista de todos los usuarios</b> registrados, sus planes, fechas de registro, estadisticas globales de uso y herramientas de gestion de la plataforma.'},
+
+            // ========== FILTROS (994-996) ==========
+            {id:994,cat:'navegacion',keywords:['filtro','filtrar','barra','buscar','ofertas','alertas','catalogo'],q:'Como filtro en Ofertas, Alertas o Catalogo',a:'En las secciones Ofertas, Alertas y Mi Catalogo hay una <b>barra de filtro</b> en la parte superior. Escribe el nombre del producto y los resultados se filtran <b>al instante</b> mientras escribes.'},
+            {id:995,cat:'navegacion',keywords:['filtro','instantaneo','tiempo','real','rapido','busca'],q:'El filtro busca en tiempo real',a:'Si, la barra de filtro en Ofertas, Alertas y Catalogo funciona en <b>tiempo real</b>. Los resultados se actualizan instantaneamente con cada letra que escribes, filtrando por nombre de producto.'},
+
+            // ========== AUTH WALL (997-999) ==========
+            {id:997,cat:'cuenta',keywords:['login','pantalla','fondo','imagen','farmacia','bonita'],q:'Que es la imagen de fondo en el login',a:'La pantalla de login tiene una <b>imagen de fondo de una farmacia</b> que le da un aspecto profesional y tematico. El formulario aparece sobre esta imagen con un fondo semitransparente.'},
+            {id:998,cat:'cuenta',keywords:['alternar','cambiar','login','registro','switch','crear'],q:'Como cambio entre login y registro',a:'En la pantalla de autenticacion hay un enlace debajo del formulario: <b>"Crear cuenta"</b> si estas en login, o <b>"Ya tengo cuenta"</b> si estas en registro. Pulsa para alternar entre ambos.'},
+            {id:999,cat:'cuenta',keywords:['perfil','farmacia','datos','nombre','ubicacion','web','editar'],q:'Puedo editar los datos de mi farmacia',a:'Si, en <b>Mi Perfil</b> encontraras una seccion de datos de farmacia donde puedes editar el nombre de tu farmacia, su ubicacion y su pagina web. Estos datos son opcionales.'}
         ];
 
         // --- Algoritmo de matching ---
