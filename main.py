@@ -23,6 +23,7 @@ FARMACIAS_DISPONIBLES = {
     "farmaciabarata": "scrapers.farmaciabarata",
     "okfarma": "scrapers.okfarma",
     "farmacoslada": "scrapers.farmacoslada",
+    "primor": "scrapers.primor",
 }
 
 
